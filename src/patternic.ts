@@ -6,10 +6,32 @@ interface FieldOption {
     grant?: any[];
 }
 
+const function_chain = (
+        target: any,
+        memberName: string,
+        propertyDescriptor: PropertyDescriptor): any => {
+    return {
+        get() {
+            const func = (...args: any[]) => {
+                // Make sure default value does not conflict with this func.
+                // To add later.
+
+                // Add decorated function to function chain.
+                this._function_chain.push(
+                    (...args) => {
+                        propertyDescriptor.value.apply(this, args)
+                    }
+                )
+            }
+            return func;
+        }
+    }
+}
+
 export class Field {
     option: FieldOption;
     _value: any;
-    _functions: Array<Function>;
+    _function_chain: Array<Function> = [];
 
     constructor(option: FieldOption = {
         required: true,
@@ -26,6 +48,11 @@ export class Field {
         } else {
             return this.option.default;
         }
+    }
+
+    @function_chain
+    instance(value, type) {
+        console.log(value, type);
     }
 };
 

@@ -22,7 +22,7 @@
     },
     "test": {
       "distDir": "test-html/",
-      "outputFormat": "global"
+      "outputFormat": "esmodule"
     }
   }
 }
