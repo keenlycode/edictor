@@ -1,0 +1,28 @@
+{
+  "name": "@nitipit/patternic",
+  "version": "0.0.1",
+  "description": "Javascript data schema and validation",
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "schema",
+    "json",
+    "validation"
+  ],
+  "author": "Nitipit Nontasuwan",
+  "license": "ISC",
+  "targets": {
+    "module": {
+      "distDir": "dist",
+      "isLibrary": true
+    },
+    "test": {
+      "distDir": "test-html/",
+      "outputFormat": "global"
+    }
+  }
+}
