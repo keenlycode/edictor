@@ -1,5 +1,6 @@
 import { strict as assert } from 'assert';
 
+/** Undefined Value */
 class _UNDEF {};
 
 const UNDEF = new _UNDEF();
@@ -46,6 +47,17 @@ const function_chain = (
     }
 }
 
+/** Error class to show when values doesn't pass validation. */
+class VerifyError extends Error {
+    name: string;
+    message: string;
+    constructor(message) {
+        super(message);
+        this.name = 'VerifyError';
+    }
+}
+
+/** Error class to show when required value is UNDEF */
 class RequiredError extends Error {
     name: string;
     message: string;
@@ -53,6 +65,17 @@ class RequiredError extends Error {
     constructor(message) {
         super(message);
         this.name = 'RequiredError';
+    }
+}
+
+/** Error to be raised when field constrains are conflicts */
+class DefineError extends Error {
+    name: string;
+    message: string;
+
+    constructor(message) {
+        super(message);
+        this.name = 'DefineError';
     }
 }
 
