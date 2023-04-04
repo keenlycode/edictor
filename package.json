@@ -1,9 +1,12 @@
 {
-  "name": "@nitipit/patternic",
+  "name": "patternic",
   "version": "0.0.1",
   "description": "Javascript data schema and validation",
   "devDependencies": {
-    "parcel": "^2.8.3"
+    "patternic": "file:./",
+    "assert": "^2.0.0",
+    "parcel": "^2.8.3",
+    "process": "^0.11.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

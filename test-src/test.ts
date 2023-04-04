@@ -1,7 +1,5 @@
-import { Field } from '@nitipit/patternic/src/patternic';
+import { Field } from 'patternic/src/patternic';
 
-let name = new Field();
-
-name.instance('a', 'string');
-
-console.log(name._function_chain[0]());
+let name = new Field().instance('string');
+name._value = 'user';
+name._validate();

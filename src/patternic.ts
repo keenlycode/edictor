@@ -1,4 +1,21 @@
+import { strict as assert } from 'assert';
+
 class UNDEF {};
+
+
+class Func {
+    func: Function;
+    args: any[];
+    constructor(func, ...args) {
+        this.func = func;
+        this.args = args;
+    }
+
+    call(value): any {
+        this.func(value, ...this.args);
+    }
+}
+
 
 interface FieldOption {
     required?: boolean;
@@ -14,12 +31,15 @@ const function_chain = (
         get() {
             const func = (...args: any[]) => {
                 // Make sure default value does not conflict with this func.
-                // To add later.
+                // To be added later.
+                // ...
 
-                // Add decorated function to function chain.
+
+                // Add Func() to function chain.
                 this._function_chain.push(
-                    () => { propertyDescriptor.value.apply(this, args)}
-                )
+                    new Func(propertyDescriptor.value, ...args)
+                );
+                return this;
             }
             return func;
         }
@@ -29,6 +49,12 @@ const function_chain = (
 export class Field {
     option: FieldOption;
     _value: any;
+    set value(value) {
+        
+    }
+    get value() {
+        return this._value;
+    }
     _function_chain: Array<Function> = [];
 
     constructor(option: FieldOption = {
@@ -40,6 +66,12 @@ export class Field {
         this._value = option.default;
     }
 
+    _validate() {
+        for (let func of this._function_chain) {
+            func.call(this.value);
+        }
+    }
+
     default() {
         if (this.option.default instanceof Function) {
             return this.option.default();
@@ -49,14 +81,14 @@ export class Field {
     }
 
     @function_chain
-    instance(value, type) {
+    instance(value, type): Field {
         // When type is Class.
         if (typeof(type) === 'function') {
-            console.assert(value instanceof type);
+            assert(value instanceof type);
         }
         // When type is primative.
         if (typeof(type) === 'string') {
-            console.assert(typeof(value) === type);
+            assert(typeof(value) === type);
         }
     }
 };
