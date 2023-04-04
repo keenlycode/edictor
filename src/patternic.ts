@@ -18,9 +18,7 @@ const function_chain = (
 
                 // Add decorated function to function chain.
                 this._function_chain.push(
-                    (...args) => {
-                        propertyDescriptor.value.apply(this, args)
-                    }
+                    () => { propertyDescriptor.value.apply(this, args)}
                 )
             }
             return func;
@@ -52,7 +50,14 @@ export class Field {
 
     @function_chain
     instance(value, type) {
-        console.log(value, type);
+        // When type is Class.
+        if (typeof(type) === 'function') {
+            console.assert(value instanceof type);
+        }
+        // When type is primative.
+        if (typeof(type) === 'string') {
+            console.assert(typeof(value) === type);
+        }
     }
 };
 
