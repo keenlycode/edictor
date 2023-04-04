@@ -1,7 +1,8 @@
 import { strict as assert } from 'assert';
 
-class UNDEF {};
+class _UNDEF {};
 
+const UNDEF = new _UNDEF();
 
 class Func {
     func: Function;
@@ -30,19 +31,28 @@ const function_chain = (
     return {
         get() {
             const func = (...args: any[]) => {
+                // To do:
                 // Make sure default value does not conflict with this func.
-                // To be added later.
                 // ...
 
-
-                // Add Func() to function chain.
+                // Add to function chain.
                 this._function_chain.push(
-                    new Func(propertyDescriptor.value, ...args)
+                    new Func(propertyDescriptor.value(), ...args)
                 );
                 return this;
             }
             return func;
         }
+    }
+}
+
+class RequiredError extends Error {
+    name: string;
+    message: string;
+
+    constructor(message) {
+        super(message);
+        this.name = 'RequiredError';
     }
 }
 
@@ -53,22 +63,25 @@ export class Field {
         
     }
     get value() {
+        if ( (this.option.required) && (this._value === UNDEF) ) {
+            throw new RequiredError('sadfasdf');
+        }
         return this._value;
     }
     _function_chain: Array<Function> = [];
 
     constructor(option: FieldOption = {
         required: true,
-        default: new UNDEF(),
+        default: UNDEF,
         grant: []
     }) {
         this.option = option;
         this._value = option.default;
     }
 
-    _validate() {
+    _validate(value) {
         for (let func of this._function_chain) {
-            func.call(this.value);
+            func.call(value);
         }
     }
 
@@ -81,15 +94,18 @@ export class Field {
     }
 
     @function_chain
-    instance(value, type): Field {
-        // When type is Class.
-        if (typeof(type) === 'function') {
-            assert(value instanceof type);
-        }
-        // When type is primative.
-        if (typeof(type) === 'string') {
-            assert(typeof(value) === type);
-        }
+    instance(type): any {
+        return (value, type): any => {
+            // When type is Class.
+            const msg = `${value} is not instanceof ${type}`
+            if (typeof(type) === 'function') {
+                assert(value instanceof type, msg);
+            }
+            // When type is primative.
+            if (typeof(type) === 'string') {
+                assert(typeof(value) === type, msg);
+            }
+        };
     }
 };
 
