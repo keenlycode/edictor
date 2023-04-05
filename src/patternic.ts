@@ -5,6 +5,21 @@ class _UNDEF {};
 
 const UNDEF = new _UNDEF();
 
+
+export class ListOf extends Array {
+    constructor(...args) {
+        super(...args);
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+                return Reflect.get(target, prop, receiver);
+            },
+            set(obj, prop, value) {
+                return Reflect.set(obj, prop, value);
+            }
+        });
+    }
+}
+
 class Func {
     func: Function;
     args: any[];

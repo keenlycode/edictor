@@ -1,4 +1,5 @@
-import { Field } from 'patternic/src/patternic';
+import { Field, ListOf } from 'patternic/src/patternic';
 
-let name = new Field().instance('string');
-name.value = 'um';
+let list = new ListOf(1, 2);
+console.log(list);
+window.list = list;
