@@ -81,17 +81,53 @@ class DefineError extends Error {
 
 export class Field {
     option: FieldOption;
+    _function_chain: Array<Func> = [];
     _value: any;
+
     set value(value) {
-        
+        const errors = [];
+
+        // Check required constrain.
+        if ( (this.option.required) && (value === UNDEF) ) {
+            throw new RequiredError(`Field is required`);
+        }
+        // Check with grant values
+        if (value in this.option.grant) {
+            this._value = value;
+        }
+
+        // Verify value by function chain
+        for (const func of this._function_chain) {
+            try {
+                // Set field's value if function return value
+                let value_ = func.call(value);
+                if (value_ != null) {
+                    value = value_;
+                }
+            } catch (e) {
+                errors.push((func.func, e));
+            }
+        }
+        if (errors.length > 0) {
+            throw new VerifyError(errors.toString());
+        }
+        this._value = value;
+
     }
     get value() {
         if ( (this.option.required) && (this._value === UNDEF) ) {
-            throw new RequiredError('sadfasdf');
+            throw new RequiredError(`Field is required`);
         }
         return this._value;
     }
-    _function_chain: Array<Function> = [];
+
+    get default() {
+        if (this.option.default instanceof Function) {
+            return this.option.default();
+        } else {
+            return this.option.default;
+        }
+    }
 
     constructor(option: FieldOption = {
         required: true,
@@ -100,20 +136,6 @@ export class Field {
     }) {
         this.option = option;
         this._value = option.default;
-    }
-
-    _validate(value) {
-        for (let func of this._function_chain) {
-            func.call(value);
-        }
-    }
-
-    default() {
-        if (this.option.default instanceof Function) {
-            return this.option.default();
-        } else {
-            return this.option.default;
-        }
     }
 
     @function_chain
