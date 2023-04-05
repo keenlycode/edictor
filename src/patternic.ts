@@ -112,8 +112,8 @@ export class Field {
             throw new VerifyError(errors.toString());
         }
         this._value = value;
-
     }
+
     get value() {
         if ( (this.option.required) && (this._value === UNDEF) ) {
             throw new RequiredError(`Field is required`);
@@ -136,6 +136,11 @@ export class Field {
     }) {
         this.option = option;
         this._value = option.default;
+    }
+
+    /** Reset value to default or UNDEF */
+    reset() {
+        this._value = this.option.default;
     }
 
     @function_chain
