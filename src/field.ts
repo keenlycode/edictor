@@ -57,29 +57,6 @@ interface FieldOption {
     grant?: any[];
 }
 
-const function_chain = (
-        target: any,
-        memberName: string,
-        propertyDescriptor: PropertyDescriptor): any => {
-    return {
-        get() {
-            const func = (...args: any[]) => {
-                // To do:
-                // Make sure default value does not conflict with this func.
-                // ...
-                console.log(this);
-
-                // Add to function chain.
-                this._function_chain.push(
-                    new Func(propertyDescriptor.value(), ...args)
-                );
-                return this;
-            }
-            return func;
-        }
-    }
-}
-
 /** Error class to show when values doesn't pass validation. */
 class VerifyError extends Error {
     name: string;
@@ -109,6 +86,39 @@ class DefineError extends Error {
     constructor(message) {
         super(message);
         this.name = 'DefineError';
+    }
+}
+
+const function_chain = (
+        target: any,
+        memberName: string,
+        propertyDescriptor: PropertyDescriptor): any => {
+    return {
+        get() {
+            const decorator = (...args: any[]) => {
+                // To do:
+                // Make sure default value does not conflict with this func.
+                // ...
+                const func = propertyDescriptor.value();
+                if (this.option.default != undefined) {
+                    try {
+                        func(this.option.default, ...args);
+                    } catch (e) {
+                        throw new DefineError(
+                            `Field(default=${this.option.default}) conflicts with `
+                            + `${func.name}(${args})`
+                        )
+                    }
+                }
+
+                // Add to function chain.
+                this._function_chain.push(
+                    new Func(func, ...args)
+                );
+                return this;
+            }
+            return decorator;
+        }
     }
 }
 
@@ -178,7 +188,8 @@ export class Field {
 
     @function_chain
     instance(type): any {
-        return (value, type): any => {
+        let instance: any;
+        return instance = (value, type): any => {
             const msg = `${value} is not an instanceof ${type}`;
 
             // When type is Class.
