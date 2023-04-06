@@ -67,6 +67,7 @@ const function_chain = (
                 // To do:
                 // Make sure default value does not conflict with this func.
                 // ...
+                console.log(this);
 
                 // Add to function chain.
                 this._function_chain.push(
@@ -178,9 +179,10 @@ export class Field {
     @function_chain
     instance(type): any {
         return (value, type): any => {
+            const msg = `${value} is not an instanceof ${type}`;
+
             // When type is Class.
-            const msg = `${value} is not instanceof ${type}`
-            if (typeof(type) === 'function') {
+            if (isClass(type)) {
                 assert(value instanceof type, msg);
             }
             // When type is primative.
