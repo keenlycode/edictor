@@ -1,5 +1,6 @@
-import { Field, ListOf } from 'patternic/src/patternic';
+import { Field, ListOf, assertClass, assertFunction } from 'patternic/src/field';
 
-let list = new ListOf(1, 2);
-console.log(list);
-window.list = list;
+class A {};
+assertClass(A);
+const a = 'hi';
+assertFunction(a);

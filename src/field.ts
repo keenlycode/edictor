@@ -1,6 +1,26 @@
 import { strict as assert } from 'assert';
 
 
+export function assertFunction(instance) {
+    try {
+        assert(instance instanceof Function)
+        assert(instance.toString().match(/^function/));
+    } catch (e) {
+        throw new Error('instance is not a function');
+    }
+}
+
+
+export function assertClass(instance) {
+    try {
+        assert(instance instanceof Function);
+        assert(instance.toString().match(/^class/));
+    } catch (e) {
+        throw new Error('instance is not a Class')
+    };
+}
+
+
 export class ListOf extends Array {
     constructor(...args) {
         super(...args);
@@ -67,7 +87,7 @@ class VerifyError extends Error {
     }
 }
 
-/** Error class to show when required value is UNDEF */
+/** Error class to show when required value is undefined */
 class RequiredError extends Error {
     name: string;
     message: string;
@@ -125,7 +145,7 @@ export class Field {
     }
 
     get value() {
-        if ( (this.option.required) && (this._value === UNDEF) ) {
+        if ( (this.option.required) && (this._value === undefined) ) {
             throw new RequiredError(`Field is required`);
         }
         return this._value;
@@ -167,42 +187,6 @@ export class Field {
             }
         };
     }
+
+    /** listof */
 };
-
-export class Model extends Map {
-    constructor(data: Object) {
-        super();
-        if (data instanceof Array) {
-            throw new Error("data can't be an instance of Array");
-        }
-        if (!(data instanceof Object)) {
-            throw new Error("data must be an instance of Object");
-        }
-        for (let key in data) {
-            this.set(key, data[key]);
-        }
-    }
-
-    get(key: any) {
-        return super.get(key);
-    }
-
-    set(key: any, value: any): this {
-        super.set(key, value);
-        return this;
-    }
-    
-
-    to_json() {
-        let json = {};
-        for (let [key, value] of this) {
-            if (value instanceof Map) {
-            }
-            json[key] = value
-        }
-        return json;
-    }
-    to_string() {
-        return JSON.stringify(this.to_json());
-    }
-}
