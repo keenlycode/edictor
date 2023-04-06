@@ -1,23 +1,25 @@
 import { strict as assert } from 'assert';
 
 
-export function assertFunction(instance) {
-    try {
-        assert(instance instanceof Function)
-        assert(instance.toString().match(/^function/));
-    } catch (e) {
-        throw new Error('instance is not a function');
+export function isFunction(instance) {
+    if (
+        instance instanceof Function
+        && instance.toString().match(/^function/)
+    ) {
+        return true
     }
+    return false
 }
 
 
-export function assertClass(instance) {
-    try {
-        assert(instance instanceof Function);
-        assert(instance.toString().match(/^class/));
-    } catch (e) {
-        throw new Error('instance is not a Class')
-    };
+export function isClass(instance) {
+    if (
+        instance instanceof Function
+        && instance.toString().match(/^class/)
+    ) {
+        return true
+    }
+    return false
 }
 
 
