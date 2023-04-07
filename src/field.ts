@@ -193,7 +193,7 @@ export class Field {
 
     /** Check instance type
      * @param {(String|Class)} type - type for instance test
-     *     Use String for primative type, for example:
+     *     Use String for primative type test, for example:
      *     'string', 'number', 'boolean'
      */
     @function_chain
