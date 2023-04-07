@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 
-
-export function isFunction(instance) {
+/** Utility function to check if instance is a Function */
+export function is_function(instance) {
     if (
         instance instanceof Function
         && instance.toString().match(/^function/)
@@ -11,8 +11,8 @@ export function isFunction(instance) {
     return false
 }
 
-
-export function isClass(instance) {
+/** Utility function to check if instance is a Class */
+export function is_class(instance) {
     if (
         instance instanceof Function
         && instance.toString().match(/^class/)
@@ -23,19 +23,19 @@ export function isClass(instance) {
 }
 
 
-export class ListOf extends Array {
-    constructor(...args) {
-        super(...args);
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-                return Reflect.get(target, prop, receiver);
-            },
-            set(obj, prop, value) {
-                return Reflect.set(obj, prop, value);
-            }
-        });
-    }
-}
+// export class ListOf extends Array {
+//     constructor(...args) {
+//         super(...args);
+//         return new Proxy(this, {
+//             get(target, prop, receiver) {
+//                 return Reflect.get(target, prop, receiver);
+//             },
+//             set(obj, prop, value) {
+//                 return Reflect.set(obj, prop, value);
+//             }
+//         });
+//     }
+// }
 
 class Func {
     func: Function;
@@ -89,35 +89,34 @@ class DefineError extends Error {
     }
 }
 
+/** Decorator function to add constrain function to function chain */
 const function_chain = (
         target: any,
         memberName: string,
         propertyDescriptor: PropertyDescriptor): any => {
     return {
         get() {
-            const decorator = (...args: any[]) => {
-                // To do:
-                // Make sure default value does not conflict with this func.
-                // ...
+            const wrapper = (...args: any[]) => {
+                /** Make sure constrain function doesn't conflict with default value */
                 const func = propertyDescriptor.value();
                 if (this.option.default != undefined) {
                     try {
                         func(this.option.default, ...args);
                     } catch (e) {
                         throw new DefineError(
-                            `Field(default=${this.option.default}) conflicts with `
+                            `Field({default: ${this.option.default}) conflicts with `
                             + `${func.name}(${args})`
+                            + `\n${e}`
                         )
                     }
                 }
 
-                // Add to function chain.
-                this._function_chain.push(
-                    new Func(func, ...args)
-                );
+                /** Add constrain function to function chain
+                 * to be called on validation */ 
+                this._function_chain.push(new Func(func, ...args));
                 return this;
             }
-            return decorator;
+            return wrapper;
         }
     }
 }
@@ -193,7 +192,7 @@ export class Field {
             const msg = `${value} is not an instanceof ${type}`;
 
             // When type is Class.
-            if (isClass(type)) {
+            if (is_class(type)) {
                 assert(value instanceof type, msg);
             }
             // When type is primative.
