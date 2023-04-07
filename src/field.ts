@@ -37,6 +37,7 @@ export function is_class(instance) {
 //     }
 // }
 
+/** Class to keep function and it's argument to be called later */
 class Func {
     func: Function;
     args: any[];
@@ -121,7 +122,12 @@ const function_chain = (
     }
 }
 
+
+/** `Field()` is a Class with abilities to set and validates value
+ * according to constaint kept inside `_function_chain`
+ */
 export class Field {
+
     option: FieldOption;
     _function_chain: Array<Func> = [];
     _value: any;
@@ -182,12 +188,17 @@ export class Field {
 
     /** Reset value to default */
     reset() {
-        this._value = this.option.default;
+        this.value = this.option.default;
     }
 
+    /** Check instance type
+     * @param {(String|Class)} type - type for instance test
+     *     Use String for primative type, for example:
+     *     'string', 'number', 'boolean'
+     */
     @function_chain
     instance(type): any {
-        let instance: any;
+        let instance: Function;
         return instance = (value, type): any => {
             const msg = `${value} is not an instanceof ${type}`;
 
