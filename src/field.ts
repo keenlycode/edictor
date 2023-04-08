@@ -142,6 +142,15 @@ const function_chain = (
  */
 export class Field {
 
+    constructor(option: FieldOption = {
+        required: true,
+        default: undefined,
+        grant: []
+    }) {
+        this.option = option;
+        this._value = option.default;
+    }
+
     option: FieldOption;
     _function_chain: Array<Func> = [];
     _value: any;
@@ -194,15 +203,6 @@ export class Field {
             throw new RequiredError(`Field is required`);
         }
         return this._value;
-    }
-
-    constructor(option: FieldOption = {
-        required: true,
-        default: undefined,
-        grant: []
-    }) {
-        this.option = option;
-        this._value = option.default;
     }
 
     /** Reset value to default */
