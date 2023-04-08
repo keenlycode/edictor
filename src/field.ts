@@ -23,19 +23,19 @@ export function is_class(instance) {
 }
 
 
-// export class ListOf extends Array {
-//     constructor(...args) {
-//         super(...args);
-//         return new Proxy(this, {
-//             get(target, prop, receiver) {
-//                 return Reflect.get(target, prop, receiver);
-//             },
-//             set(obj, prop, value) {
-//                 return Reflect.set(obj, prop, value);
-//             }
-//         });
-//     }
-// }
+export class ArrayProxy extends Array {
+    constructor(...args) {
+        super(...args);
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+                return Reflect.get(target, prop, receiver);
+            },
+            set(obj, prop, value) {
+                return Reflect.set(obj, prop, value);
+            }
+        });
+    }
+}
 
 /** Class to keep function and it's argument to be called later */
 class Func {
@@ -153,7 +153,6 @@ export class Field {
 
     option: FieldOption;
     _function_chain: Array<Func> = [];
-    _value: any;
 
     /** Return field's default value */
     get default() {
@@ -164,6 +163,7 @@ export class Field {
         }
     }
 
+    _value: any;
     /** Set field's value
      * - verify value by feild's function chain
      * - Set field's value if function return value
@@ -232,5 +232,9 @@ export class Field {
         };
     }
 
-    /** listof */
+    /** array() */
+    @function_chain
+    array(validator: String|Array<String>|Function) {
+        // Return ArrayProxy which can validate it's array.
+    }
 };
