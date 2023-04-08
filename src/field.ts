@@ -125,6 +125,20 @@ const function_chain = (
 
 /** `Field()` is a Class with abilities to set and validates value
  * according to constaint kept inside `_function_chain`
+ * 
+ * # Examples
+ * 
+ * ```javascript
+ * // Use with validators.
+ * field = Field({required=true}).oneof(['AM', 'PM']);
+ * field.value = 'AM'; // Ok
+ * field.value = 'A'; // This line will throw VerifyError
+ * 
+ * // Chained validators.
+ * field = Field({default='user@example.com'}).instance(str).search('.*@.*');
+ * field.value = 'user@somewhere.com';
+ * field.value = 1; This line will throw VerifyError
+ * ```
  */
 export class Field {
 
@@ -132,6 +146,19 @@ export class Field {
     _function_chain: Array<Func> = [];
     _value: any;
 
+    /** Return field's default value */
+    get default() {
+        if (this.option.default instanceof Function) {
+            return this.option.default();
+        } else {
+            return this.option.default;
+        }
+    }
+
+    /** Set field's value
+     * - verify value by feild's function chain
+     * - Set field's value if function return value
+     */
     set value(value) {
         const errors = [];
 
@@ -167,14 +194,6 @@ export class Field {
             throw new RequiredError(`Field is required`);
         }
         return this._value;
-    }
-
-    get default() {
-        if (this.option.default instanceof Function) {
-            return this.option.default();
-        } else {
-            return this.option.default;
-        }
     }
 
     constructor(option: FieldOption = {
