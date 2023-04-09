@@ -108,12 +108,12 @@ const function_chain = (
     }
 }
 
-interface ArrayProxyParam {
+interface ListParam {
     validator?: string|Function|Array<string|Function>
 }
 
-export class ArrayProxy extends Array {
-    constructor(values: Array<any>, param: ArrayProxyParam) {
+export class List extends Array {
+    constructor(values: Array<any>, param: ListParam) {
         super(...values);
         let validators: Array<string|Function>;
 
@@ -127,12 +127,14 @@ export class ArrayProxy extends Array {
         this.validate(values, this._validators);
 
         return new Proxy(this, {
-            get(target, index: PropertyKey, receiver) {
-                return Reflect.get(target, index, receiver);
+            get(target, key: PropertyKey, receiver) {
+                console.log(`get ${key}`);
+                return Reflect.get(target, key, receiver);
             },
-            set(target, index: string|symbol, value) {
-                this._validate(value);
-                return Reflect.set(target, index, value);
+            set(target, key: string|symbol, value) {
+                console.log(`set ${key}: ${value}`);
+                target.validate([value], target._validators)
+                return Reflect.set(target, key, value);
             }
         });
     }
@@ -287,9 +289,9 @@ export class Field {
     /** array() */
     // @function_chain
     // array(validator: string|Array<string>|Function) {
-    //     // Return ArrayProxy which can validate it's array.
+    //     // Return List which can validate it's array.
     //     const array = (values, validator) => {
-    //         return new ArrayProxy(values, validator);
+    //         return new List(values, validator);
     //     }
     //     return array;
     // }
