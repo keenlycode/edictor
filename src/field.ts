@@ -45,12 +45,12 @@ interface FieldOption {
 }
 
 /** Error class to show when values doesn't pass validation. */
-class VerifyError extends Error {
+class ValidationError extends Error {
     name: string;
     message: string;
     constructor(message) {
         super(message);
-        this.name = 'VerifyError';
+        this.name = 'ValidationError';
     }
 }
 
@@ -108,32 +108,69 @@ const function_chain = (
     }
 }
 
-interface Validator {
-    validator?: string|Array<string|Function>|Function
+interface ArrayProxyParam {
+    validator?: string|Function|Array<string|Function>
 }
 
 export class ArrayProxy extends Array {
-    constructor(values: Array<any> = [], param: Validator) {
-            // validator: string|Array<string|Function>|Function = null}) {
+    constructor(values: Array<any>, param: ArrayProxyParam) {
         super(...values);
-        const validator = param.validator;
+        let validators: Array<string|Function>;
+
+        // Normalize validators to Array
+        if (param.validator instanceof Array<string|Function>) {
+            validators = param.validator;
+        } else {
+            validators = [param.validator];
+        }
+        this._validators = validators; // keep validators for setting a new value.
+        this.validate(values, this._validators);
+
         return new Proxy(this, {
             get(target, index: PropertyKey, receiver) {
                 return Reflect.get(target, index, receiver);
             },
             set(target, index: string|symbol, value) {
-                // If validator is a primative type.
-                if (typeof(validator) === "string") {
-                    assert(typeof(value) === validator);
-                // If validator is Array of primative types.
-                } else if (validator instanceof Array<string>) {
-                    for (const value of values) {
-                        assert(validator.includes(typeof(value)))
-                    }
-                }
+                this._validate(value);
                 return Reflect.set(target, index, value);
             }
         });
+    }
+
+    _validators: Array<string|Function>;
+
+    _validate_with_validator(value, validator) {
+        // If validator is a primative type.
+        if (typeof(validator) === "string") {
+            assert(typeof(value) === validator);
+        }
+        // If validator is a Function or Class
+        else if (is_function(validator as Function)){
+            validator = validator as Function;
+            if (is_class(validator)) {
+                assert(value instanceof validator)
+            } else {
+                assert(validator(value))
+            }
+            assert(validator(value))
+        }
+    }
+
+    validate(values: Array<any>, validators: Array<string|Function>) {
+        for (const i in values) {
+            let value_pass = false;
+            for (let validator of validators) {
+                try {
+                    this._validate_with_validator(values[i], validator);
+                    value_pass = true;
+                    break;
+                } catch {};
+            }
+            if (!value_pass) {
+                const msg = `{${i}: ${values[i]}}`
+                throw new ValidationError(msg);
+            }
+        }
     }
 }
 
@@ -147,12 +184,12 @@ export class ArrayProxy extends Array {
  * // Use with validators.
  * field = Field({required=true}).oneof(['AM', 'PM']);
  * field.value = 'AM'; // Ok
- * field.value = 'A'; // This line will throw VerifyError
+ * field.value = 'A'; // This line will throw ValidationError
  * 
  * // Chained validators.
  * field = Field({default='user@example.com'}).instance(str).search('.*@.*');
  * field.value = 'user@somewhere.com';
- * field.value = 1; This line will throw VerifyError
+ * field.value = 1; This line will throw ValidationError
  * ```
  */
 export class Field {
@@ -208,7 +245,7 @@ export class Field {
             }
         }
         if (errors.length > 0) {
-            throw new VerifyError(errors.toString());
+            throw new ValidationError(errors.toString());
         }
         this._value = value;
     }
