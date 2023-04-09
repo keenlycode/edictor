@@ -23,20 +23,6 @@ export function is_class(instance) {
 }
 
 
-export class ArrayProxy extends Array {
-    constructor(...args) {
-        super(...args);
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-                return Reflect.get(target, prop, receiver);
-            },
-            set(obj, prop, value) {
-                return Reflect.set(obj, prop, value);
-            }
-        });
-    }
-}
-
 /** Class to keep function and it's argument to be called later */
 class Func {
     func: Function;
@@ -119,6 +105,35 @@ const function_chain = (
             }
             return wrapper;
         }
+    }
+}
+
+interface Validator {
+    validator?: string|Array<string|Function>|Function
+}
+
+export class ArrayProxy extends Array {
+    constructor(values: Array<any> = [], param: Validator) {
+            // validator: string|Array<string|Function>|Function = null}) {
+        super(...values);
+        const validator = param.validator;
+        return new Proxy(this, {
+            get(target, index: PropertyKey, receiver) {
+                return Reflect.get(target, index, receiver);
+            },
+            set(target, index: string|symbol, value) {
+                // If validator is a primative type.
+                if (typeof(validator) === "string") {
+                    assert(typeof(value) === validator);
+                // If validator is Array of primative types.
+                } else if (validator instanceof Array<string>) {
+                    for (const value of values) {
+                        assert(validator.includes(typeof(value)))
+                    }
+                }
+                return Reflect.set(target, index, value);
+            }
+        });
     }
 }
 
@@ -211,14 +226,13 @@ export class Field {
     }
 
     /** Check instance type
-     * @param {(String|Class)} type - type for instance test
-     *     Use String for primative type test, for example:
+     * @param {(string|Class)} type - type for instance test
+     *     Use string for primative type test, for example:
      *     'string', 'number', 'boolean'
      */
     @function_chain
     instance(type): any {
-        let instance: Function;
-        return instance = (value, type): any => {
+        const instance = (value, type): any => {
             const msg = `${value} is not an instanceof ${type}`;
 
             // When type is Class.
@@ -230,11 +244,16 @@ export class Field {
                 assert(typeof(value) === type, msg);
             }
         };
+        return instance;
     }
 
     /** array() */
-    @function_chain
-    array(validator: String|Array<String>|Function) {
-        // Return ArrayProxy which can validate it's array.
-    }
+    // @function_chain
+    // array(validator: string|Array<string>|Function) {
+    //     // Return ArrayProxy which can validate it's array.
+    //     const array = (values, validator) => {
+    //         return new ArrayProxy(values, validator);
+    //     }
+    //     return array;
+    // }
 };
