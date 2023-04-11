@@ -125,7 +125,7 @@ export class List extends Array {
      * @param {ListParam}  
      * @returns {List}
      */
-    constructor(values: Array<any>, {
+    constructor(values: Array<any> = [], {
             validator=undefined
     }: ListParam) {
         super(...values);
