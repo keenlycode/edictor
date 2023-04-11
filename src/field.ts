@@ -2,13 +2,16 @@ import { strict as assert } from 'assert';
 
 /** Utility function to check if instance is a Function */
 export function is_function(instance) {
-    if (
-        instance instanceof Function
-        && instance.toString().match(/^function/)
-    ) {
-        return true
+    if (!(instance instanceof Function)) {
+        return false;
     }
-    return false
+    if (instance.toString().match(/^function/)) {
+        return true;
+    }
+    if (instance.toString().match(/^\(\w*\)/)) {
+        return true;
+    }
+    return false;
 }
 
 /** Utility function to check if instance is a Class */
@@ -118,7 +121,6 @@ interface ListParam {
 export class List extends Array {
 
     /**
-     * 
      * @param {Array<any>} values - values in an array.
      * @param {ListParam}  
      * @returns {List}
@@ -161,13 +163,11 @@ export class List extends Array {
             assert(typeof(value) === validator);
         }
         // If validator is a Function or Class
-        else if (is_function(validator as Function)){
-            validator = validator as Function;
-            if (is_class(validator)) {
-                assert(value instanceof validator)
-            } else {
-                assert(validator(value))
-            }
+        else if (is_function(validator as Function)) {
+            assert(validator(value));
+        }
+        else if (is_class(validator)) {
+            assert(value instanceof validator);
         }
     }
 
