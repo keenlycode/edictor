@@ -109,19 +109,31 @@ const function_chain = (
 }
 
 interface ListParam {
+    /** validator as types or functions */
     validator?: string|Function|Array<string|Function>
 }
 
+
+/** Modified array which check it's members instance. */
 export class List extends Array {
-    constructor(values: Array<any>, param: ListParam) {
+
+    /**
+     * 
+     * @param {Array<any>} values - values in an array.
+     * @param {ListParam}  
+     * @returns {List}
+     */
+    constructor(values: Array<any>, {
+            validator=undefined
+    }: ListParam) {
         super(...values);
         let validators: Array<string|Function>;
 
         // Normalize validators to Array
-        if (param.validator instanceof Array<string|Function>) {
-            validators = param.validator;
+        if (validator instanceof Array<string|Function>) {
+            validators = validator;
         } else {
-            validators = [param.validator];
+            validators = [validator];
         }
         this._validators = validators; // keep validators for setting a new value.
         this.validate(values, this._validators);
@@ -139,8 +151,10 @@ export class List extends Array {
         });
     }
 
+    /** propery to keep validators */
     _validators: Array<string|Function>;
 
+    /** validate a value with a validator */
     _validate_with_validator(value, validator) {
         // If validator is a primative type.
         if (typeof(validator) === "string") {
@@ -154,7 +168,6 @@ export class List extends Array {
             } else {
                 assert(validator(value))
             }
-            assert(validator(value))
         }
     }
 

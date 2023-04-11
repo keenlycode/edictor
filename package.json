@@ -1,9 +1,8 @@
 {
-  "name": "patternic",
+  "name": "edictor",
   "version": "0.0.1",
   "description": "Javascript data schema and validation",
   "devDependencies": {
-    "patternic": "file:./",
     "assert": "^2.0.0",
     "parcel": "^2.8.3",
     "process": "^0.11.10"
