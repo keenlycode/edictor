@@ -125,10 +125,11 @@ export class List extends Array {
      * @param {ListParam}  
      * @returns {List}
      */
-    constructor(values: Array<any> = [], {
-            validator=undefined
-    }: ListParam) {
+    constructor(values: Array<any> = [], param: ListParam = {
+        validator: undefined
+    }) {
         super(...values);
+        const validator = param.validator;
         let validators: Array<string|Function>;
 
         // Normalize validators to Array
@@ -141,13 +142,13 @@ export class List extends Array {
         this.validate(values, this._validators);
 
         return new Proxy(this, {
-            get(target, key: PropertyKey, receiver) {
-                console.log(`get ${key}`);
+            get(target, key: PropertyKey, receiver): any {
                 return Reflect.get(target, key, receiver);
             },
-            set(target, key: string|symbol, value) {
-                console.log(`set ${key}: ${value}`);
-                target.validate([value], target._validators)
+            set(target, key: string|symbol, value): boolean {
+                if (Number(key)) {
+                    target.validate([value], target._validators);
+                }
                 return Reflect.set(target, key, value);
             }
         });
@@ -155,6 +156,10 @@ export class List extends Array {
 
     /** propery to keep validators */
     _validators: Array<string|Function>;
+
+    get object() {
+        return [...this];
+    }
 
     /** validate a value with a validator */
     _validate_with_validator(value, validator) {
