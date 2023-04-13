@@ -16,13 +16,14 @@ export function is_function(instance) {
 
 /** Utility function to check if instance is a Class */
 export function is_class(instance) {
-    if (
-        instance instanceof Function
-        && instance.toString().match(/^class/)
-    ) {
-        return true
+    if (!(instance instanceof Function)) {
+        return false;
     }
-    return false
+    if (instance.toString().match(/^class/)
+    ) {
+        return true;
+    }
+    return false;
 }
 
 
@@ -125,11 +126,10 @@ export class List extends Array {
      * @param {ListParam}  
      * @returns {List}
      */
-    constructor(values: Array<any> = [], param: ListParam = {
-        validator: undefined
-    }) {
+    constructor(values: Array<any> = [], {
+        validator=null
+    }: ListParam = {}) {
         super(...values);
-        const validator = param.validator;
         let validators: Array<string|Function>;
 
         // Normalize validators to Array
@@ -162,7 +162,7 @@ export class List extends Array {
     }
 
     /** validate a value with a validator */
-    _validate_with_validator(value, validator) {
+    _validate(value, validator) {
         // If validator is a primative type.
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator);
@@ -181,7 +181,7 @@ export class List extends Array {
             let value_pass = false;
             for (let validator of validators) {
                 try {
-                    this._validate_with_validator(values[i], validator);
+                    this._validate(values[i], validator);
                     value_pass = true;
                     break;
                 } catch {};
@@ -254,12 +254,9 @@ export class Field {
 
         // Verify value by function chain
         for (const func of this._function_chain) {
+            console.log(func.func);
             try {
-                // Set field's value if function return value
-                let value_ = func.call(value);
-                if (value_ != null) {
-                    value = value_;
-                }
+                func.call(value);
             } catch (e) {
                 errors.push((func.func, e));
             }
@@ -305,12 +302,18 @@ export class Field {
     }
 
     /** array() */
-    // @function_chain
-    // array(validator: string|Array<string>|Function) {
-    //     // Return List which can validate it's array.
-    //     const array = (values, validator) => {
-    //         return new List(values, validator);
-    //     }
-    //     return array;
-    // }
+    @function_chain
+    arrayOf(validator: string|Function|Array<string|Function> = undefined) {
+        // Return List which can validate it's array.
+        const arrayOf = (
+                values: Array<any> = [],
+                validator: string|Function|Array<string|Function> = undefined) => {
+            console.log(values);
+            console.log(validator);
+            return new List(values, {
+                validator: validator
+            });
+        }
+        return arrayOf;
+    }
 };
