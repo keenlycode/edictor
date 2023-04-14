@@ -37,7 +37,7 @@ class Func {
     }
 
     call(value): any {
-        this.func(value, ...this.args);
+        return this.func(value, ...this.args);
     }
 }
 
@@ -146,6 +146,7 @@ export class List extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string|symbol, value): boolean {
+                console.log(key, value);
                 if (Number(key)) {
                     target.validate([value], target._validators);
                 }
@@ -254,9 +255,14 @@ export class Field {
 
         // Verify value by function chain
         for (const func of this._function_chain) {
-            console.log(func.func);
             try {
-                func.call(value);
+                let value_ = func.call(value);
+                // To do: Check if `value_` is instance of `List` or `Model`
+                // to make sure the field's value won't be changed to something else
+                // which is not related to validation.
+                if (value_) {
+                    value = value_;
+                }
             } catch (e) {
                 errors.push((func.func, e));
             }
@@ -268,9 +274,6 @@ export class Field {
     }
 
     get value() {
-        if ( (this.option.required) && (this._value === undefined) ) {
-            throw new RequiredError(`Field is required`);
-        }
         return this._value;
     }
 
@@ -308,8 +311,6 @@ export class Field {
         const arrayOf = (
                 values: Array<any> = [],
                 validator: string|Function|Array<string|Function> = undefined) => {
-            console.log(values);
-            console.log(validator);
             return new List(values, {
                 validator: validator
             });
