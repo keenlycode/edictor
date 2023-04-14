@@ -304,7 +304,7 @@ export class Field {
         return instance;
     }
 
-    /** array() */
+    /** Check if value is array of something. */
     @function_chain
     arrayOf(validator: string|Function|Array<string|Function> = undefined) {
         // Return List which can validate it's array.
@@ -317,4 +317,13 @@ export class Field {
         }
         return arrayOf;
     }
+
+    @function_chain
+    search(regexp: RegExp) {
+        const search = (value: 'string', regexp: RegExp) => {
+            assert(regexp.test(value));
+        }
+        return search;
+    }
+
 };
