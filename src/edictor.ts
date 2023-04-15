@@ -319,11 +319,66 @@ export class Field {
     }
 
     @function_chain
-    search(regexp: RegExp) {
-        const search = (value: 'string', regexp: RegExp) => {
-            assert(regexp.test(value));
+    model(model_class: Model) {
+
+    }
+
+    @function_chain
+    regexp(regexp_: RegExp) {
+        const regexp = (value: 'string', regexp_: RegExp) => {
+            assert(
+                regexp_.test(value),
+                `Value doesn't pass Regular Expression => `
+                + `${regexp_}`
+            );
         }
-        return search;
+        return regexp;
+    }
+
+    @function_chain
+    validate(func, msg=null) {
+        const validate = (value, func) => {
+            assert(func(value), msg);
+        }
+        return validate;
     }
 
 };
+
+export class Model extends Map {
+    constructor(data: Object) {
+        super();
+        if (data instanceof Array) {
+            throw new Error("data can't be an instance of Array");
+        }
+        if (!(data instanceof Object)) {
+            throw new Error("data must be an instance of Object");
+        }
+        for (let key in data) {
+            this.set(key, data[key]);
+        }
+    }
+
+    get(key: any) {
+        return super.get(key);
+    }
+
+    set(key: any, value: any): this {
+        super.set(key, value);
+        return this;
+    }
+    
+
+    to_json() {
+        let json = {};
+        for (let [key, value] of this) {
+            if (value instanceof Map) {
+            }
+            json[key] = value
+        }
+        return json;
+    }
+    to_string() {
+        return JSON.stringify(this.to_json());
+    }
+}
