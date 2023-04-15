@@ -112,23 +112,23 @@ const function_chain = (
     }
 }
 
-interface ListParam {
+interface ArrayOfParam {
     /** validator as types or functions */
     validator?: string|Function|Array<string|Function>
 }
 
 
 /** Modified array which check it's members instance. */
-export class List extends Array {
+export class ArrayOf extends Array {
 
     /**
      * @param {Array<any>} values - values in an array.
-     * @param {ListParam}  
-     * @returns {List}
+     * @param {ArrayParam}  
+     * @returns {ArrayOf}
      */
     constructor(values: Array<any> = [], {
         validator=null
-    }: ListParam = {}) {
+    }: ArrayOfParam = {}) {
         super(...values);
         let validators: Array<string|Function>;
 
@@ -251,17 +251,24 @@ export class Field {
         // Check with grant values
         if (value in this.option.grant) {
             this._value = value;
+            return;
         }
 
         // Verify value by function chain
         for (const func of this._function_chain) {
             try {
                 let value_ = func.call(value);
-                // To do: Check if `value_` is instance of `List` or `Model`
-                // to make sure the field's value won't be changed to something else
-                // which is not related to validation.
                 if (value_) {
-                    value = value_;
+                    if ((value instanceof ArrayOf)
+                        ||  (value instanceof Model)
+                    ) {
+                        value = value_
+                    } else {
+                        throw new DefineError(
+                            `Validation function ` +
+                            `doesn't return ArrayOf or Model class`
+                        )
+                    }
                 }
             } catch (e) {
                 errors.push((func.func, e));
@@ -288,8 +295,8 @@ export class Field {
      *     'string', 'number', 'boolean'
      */
     @function_chain
-    instance(type): any {
-        const instance = (value, type): any => {
+    instance(type): Function {
+        const instance = (value, type): void => {
             const msg = `${value} is not an instanceof ${type}`;
 
             // When type is Class.
@@ -306,26 +313,33 @@ export class Field {
 
     /** Check if value is array of something. */
     @function_chain
-    arrayOf(validator: string|Function|Array<string|Function> = undefined) {
-        // Return List which can validate it's array.
+    arrayOf(validator: string|Function|Array<string|Function> = undefined)
+            : Function {
+        // Return ArrayOf instance which can validate it's array.
         const arrayOf = (
                 values: Array<any> = [],
-                validator: string|Function|Array<string|Function> = undefined) => {
-            return new List(values, {
+                validator: string|Function|Array<string|Function> = undefined)
+                : ArrayOf => {
+            return new ArrayOf(values, {
                 validator: validator
             });
         }
         return arrayOf;
     }
 
+    /** Validate that value pass `model_class` validation */
     @function_chain
-    model(model_class: Model) {
-
+    model(model_class: 'Model'): Function {
+        const model = (value, model_class): Model => {
+            return new model_class(value);
+        }
+        return model;
     }
 
+    //** Validate with Regular Expression */
     @function_chain
-    regexp(regexp_: RegExp) {
-        const regexp = (value: 'string', regexp_: RegExp) => {
+    regexp(regexp_: RegExp): Function {
+        const regexp = (value: 'string', regexp_: RegExp): void => {
             assert(
                 regexp_.test(value),
                 `Value doesn't pass Regular Expression => `
@@ -336,8 +350,8 @@ export class Field {
     }
 
     @function_chain
-    validate(func, msg=null) {
-        const validate = (value, func) => {
+    validate(func, msg=null): Function {
+        const validate = (value, func): void => {
             assert(func(value), msg);
         }
         return validate;
