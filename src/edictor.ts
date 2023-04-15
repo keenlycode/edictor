@@ -280,7 +280,15 @@ export class Field {
         this._value = value;
     }
 
+    /** get Field's value
+     * - Required field will throw RequiredError if ask for value
+     *   before assigned.
+     */
     get value() {
+
+        if ( (this.option.required) && (this._value === undefined) ) {
+            throw new RequiredError(`Field is required`);
+        }
         return this._value;
     }
 
@@ -336,7 +344,7 @@ export class Field {
         return model;
     }
 
-    //** Validate with Regular Expression */
+    /** Validate with Regular Expression */
     @function_chain
     regexp(regexp_: RegExp): Function {
         const regexp = (value: 'string', regexp_: RegExp): void => {
@@ -349,14 +357,16 @@ export class Field {
         return regexp;
     }
 
+    /** Validate value with provided function
+     * - The provided function must return `true` or `false`
+     */
     @function_chain
-    validate(func, msg=null): Function {
+    validate(func: Function, msg=null): Function {
         const validate = (value, func): void => {
             assert(func(value), msg);
         }
         return validate;
     }
-
 };
 
 export class Model extends Map {
