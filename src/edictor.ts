@@ -243,17 +243,15 @@ export class Field {
     set value(value) {
         const errors = [];
 
-        // Check required constrain.
-        if ( (this.option.required) && (value === undefined) ) {
-            throw new RequiredError(`Field is required`);
-        }
-
         if (value === undefined) {
+            // Check required constrain.
             if (this.option.required) {
                 throw new RequiredError(`Field is required`);
-            } else {
+            } else { // If field is not required.
                 // Dont' just let value == undefined but delete it.
                 delete this._value;
+                // Then return like the value haven't been set
+                // since it doesn't have to be validated.
                 return;
             }
         }
