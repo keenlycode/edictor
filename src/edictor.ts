@@ -42,12 +42,6 @@ class Func {
 }
 
 
-interface FieldOption {
-    required?: boolean;
-    default?: any;
-    grant?: any[];
-}
-
 /** Error class to show when values doesn't pass validation. */
 class ValidationError extends Error {
     name: string;
@@ -90,12 +84,12 @@ const function_chain = (
             const wrapper = (...args: any[]) => {
                 /** Make sure constrain function doesn't conflict with default value */
                 const func = propertyDescriptor.value();
-                if (this.option.default != undefined) {
+                if (this.option.initial != undefined) {
                     try {
-                        func(this.option.default, ...args);
+                        func(this.option.initial, ...args);
                     } catch (e) {
                         throw new DefineError(
-                            `Field({default: ${this.option.default}) conflicts with `
+                            `Field({default: ${this.option.initial}) conflicts with `
                             + `${func.name}(${args})`
                             + `\n${e}`
                         )
@@ -195,6 +189,13 @@ export class ArrayOf extends Array {
 }
 
 
+interface FieldOption {
+    required?: boolean;
+    initial?: any;
+    grant?: any[];
+}
+
+
 /** `Field()` is a Class with abilities to set and validates value
  * according to constaint kept inside `_function_chain`
  * 
@@ -214,12 +215,12 @@ export class ArrayOf extends Array {
  */
 export class Field {
 
-    constructor(option: FieldOption = {
-            required: false,
-            default: undefined,
-            grant: []}) {
-        this.option = option;
-        this._value = option.default;
+    constructor({
+            required=false,
+            initial=undefined,
+            grant=[]}: FieldOption = {}) {
+        this.option = { required: required, initial: initial, grant: grant };
+        this._value = initial;
     }
 
     option: FieldOption;
@@ -227,10 +228,10 @@ export class Field {
 
     /** Return field's default value */
     get default() {
-        if (this.option.default instanceof Function) {
-            return this.option.default();
+        if (this.option.initial instanceof Function) {
+            return this.option.initial();
         } else {
-            return this.option.default;
+            return this.option.initial;
         }
     }
 
@@ -302,7 +303,7 @@ export class Field {
 
     /** Reset value to default */
     reset() {
-        this.value = this.option.default;
+        this.value = this.option.initial;
     }
 
     /** Check instance type
@@ -389,11 +390,19 @@ class ModelError extends Error {
 };
 
 
+interface ModelOption {
+    strict?: boolean
+}
+
+
 export class Model {
     _data = {};
     _field = {};
+    option: ModelOption;
 
-    constructor(data: Object = {}) {
+    constructor(data: Object = {}, {strict=true}: ModelOption = {}) {
+        console.log(data);
+        console.log(strict);
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
         }
@@ -409,6 +418,7 @@ export class Model {
             },
             set(target, key: string|symbol, value): boolean {
                 const field = target._field[key];
+                if ((field === undefined) && target)
                 field.value = value;
                 return Reflect.set(target, key, value);
             }
@@ -422,8 +432,6 @@ export class Model {
         for (const [key, value] of Object.entries(this)) {
             // `continue` loop if the value isn't instance of Field().
             if (!(value instanceof Field)) { continue };
-
-            console.log(key, value);
 
             // Set default value if defined.
             let field = value as Field;
