@@ -401,8 +401,6 @@ export class Model {
     option: ModelOption;
 
     constructor(data: Object = {}, {strict=true}: ModelOption = {}) {
-        console.log(data);
-        console.log(strict);
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
         }
@@ -410,15 +408,19 @@ export class Model {
             throw new Error("data must be an instance of Object");
         }
         this._data = data;
+        this.option = {strict: strict}
         const proxy = new Proxy(this, {
             get(target, key: PropertyKey, receiver): any {
-                const value = target[key];
-                if (value) { return value };
+                const field = target._field[key];
+                if (field) { return field.value };
                 return Reflect.get(target, key, receiver);
             },
-            set(target, key: string|symbol, value): boolean {
+            set(target, key: string|symbol, value: any): boolean {
                 const field = target._field[key];
-                if ((field === undefined) && target)
+                if ((field === undefined)
+                        && (!target.option.strict)) {
+                    target._field[key] = value;
+                }
                 field.value = value;
                 return Reflect.set(target, key, value);
             }
