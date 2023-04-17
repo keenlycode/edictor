@@ -403,11 +403,13 @@ export class Model {
         this._data = data;
         const proxy = new Proxy(this, {
             get(target, key: PropertyKey, receiver): any {
-                const value = this[key];
+                const value = target[key];
                 if (value) { return value };
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string|symbol, value): boolean {
+                const field = target._field[key];
+                field.value = value;
                 return Reflect.set(target, key, value);
             }
         });
@@ -418,10 +420,10 @@ export class Model {
         let data = this._data;
 
         for (const [key, value] of Object.entries(this)) {
-            console.log(key, value);
-
             // `continue` loop if the value isn't instance of Field().
             if (!(value instanceof Field)) { continue };
+
+            console.log(key, value);
 
             // Set default value if defined.
             let field = value as Field;
