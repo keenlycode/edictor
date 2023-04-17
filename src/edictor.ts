@@ -146,7 +146,6 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string|symbol, value): boolean {
-                console.log(key, value);
                 if (Number(key)) {
                     target.validate([value], target._validators);
                 }
@@ -369,29 +368,32 @@ export class Field {
     }
 };
 
-export class Model extends Map {
-    constructor(data: Object) {
-        super();
+export class Model {
+    constructor(data: Object = {}) {
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
         }
         if (!(data instanceof Object)) {
             throw new Error("data must be an instance of Object");
         }
-        for (let key in data) {
-            this.set(key, data[key]);
+        const proxy = new Proxy(this, {
+            get(target, key: PropertyKey, receiver): any {
+                return Reflect.get(target, key, receiver);
+            },
+            set(target, key: string|symbol, value): boolean {
+                return Reflect.set(target, key, value);
+            }
+        });
+        return proxy;
+    }
+
+    init() {
+        for (const [key, value] of Object.entries(this)) {
+            if (value instanceof Field) {
+                console.log(key);
+            }
         }
     }
-
-    get(key: any) {
-        return super.get(key);
-    }
-
-    set(key: any, value: any): this {
-        super.set(key, value);
-        return this;
-    }
-    
 
     to_json() {
         let json = {};
