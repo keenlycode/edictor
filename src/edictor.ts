@@ -215,10 +215,9 @@ export class ArrayOf extends Array {
 export class Field {
 
     constructor(option: FieldOption = {
-        required: true,
-        default: undefined,
-        grant: []
-    }) {
+            required: false,
+            default: undefined,
+            grant: []}) {
         this.option = option;
         this._value = option.default;
     }
@@ -236,6 +235,7 @@ export class Field {
     }
 
     _value: any;
+
     /** Set field's value
      * - verify value by feild's function chain
      * - Set field's value if function return value
@@ -247,6 +247,17 @@ export class Field {
         if ( (this.option.required) && (value === undefined) ) {
             throw new RequiredError(`Field is required`);
         }
+
+        if (value === undefined) {
+            if (this.option.required) {
+                throw new RequiredError(`Field is required`);
+            } else {
+                // Dont' just let value == undefined but delete it.
+                delete this._value;
+                return;
+            }
+        }
+
         // Check with grant values
         if (value in this.option.grant) {
             this._value = value;
@@ -368,7 +379,22 @@ export class Field {
     }
 };
 
+
+class ModelError extends Error {
+    name: string;
+    message: string;
+
+    constructor(message) {
+        super(message);
+        this.name = 'ModelError';
+    }
+};
+
+
 export class Model {
+    _data = {};
+    _field = {};
+
     constructor(data: Object = {}) {
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
@@ -376,8 +402,11 @@ export class Model {
         if (!(data instanceof Object)) {
             throw new Error("data must be an instance of Object");
         }
+        this._data = data;
         const proxy = new Proxy(this, {
             get(target, key: PropertyKey, receiver): any {
+                const value = this[key];
+                if (value) { return value };
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string|symbol, value): boolean {
@@ -388,23 +417,35 @@ export class Model {
     }
 
     init() {
+        let data = this._data;
+
         for (const [key, value] of Object.entries(this)) {
-            if (value instanceof Field) {
-                console.log(key);
-            }
+            console.log(key, value);
+
+            // `continue` loop if the value isn't instance of Field().
+            if (!(value instanceof Field)) { continue };
+
+            // Set default value if defined.
+            let field = value as Field;
+            field.value = data[key];
+            // Keep Field() in this._field for data validation.
+            this._field[key] = field;
         }
+        this.post_validate();
     }
 
-    to_json() {
-        let json = {};
-        for (let [key, value] of this) {
-            if (value instanceof Map) {
-            }
-            json[key] = value
-        }
-        return json;
-    }
-    to_string() {
-        return JSON.stringify(this.to_json());
-    }
+    post_validate() {};
+
+    // to_json() {
+    //     let json = {};
+    //     for (let [key, value] of this) {
+    //         if (value instanceof Map) {
+    //         }
+    //         json[key] = value
+    //     }
+    //     return json;
+    // }
+    // to_string() {
+    //     return JSON.stringify(this.to_json());
+    // }
 }
