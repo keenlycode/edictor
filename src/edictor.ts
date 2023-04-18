@@ -315,14 +315,25 @@ export class Field {
     instance(type): Function {
         const instance = (value, type): void => {
             const msg = `${value} is not an instanceof ${type}`;
+            let valid = false;
 
-            // When type is Class.
-            if (is_class(type)) {
-                assert(value instanceof type, msg);
+            // Normalize type to Array
+            if (!(type instanceof Array)) {
+                type = [type];
             }
-            // When type is primative.
-            if (typeof(type) === 'string') {
-                assert(typeof(value) === type, msg);
+
+            for (const t of type) {
+                // When type is Class.
+                if (is_class(t)) {
+                    if (value instanceof t) { valid = true };
+                }
+                // When type is primative.
+                if (typeof(t) === 'string') {
+                    if (typeof(value) === t) { valid = true };
+                }
+            }
+            if (!valid) {
+                throw new ValidationError(msg);
             }
         };
         return instance;
@@ -398,6 +409,7 @@ interface ModelOption {
 export class Model {
     _data = {};
     _field = {};
+    _proxy;
     option: ModelOption;
 
     constructor(data: Object = {}, {strict=true}: ModelOption = {}) {
@@ -410,12 +422,19 @@ export class Model {
         this._data = data;
         this.option = {strict: strict}
         const proxy = new Proxy(this, {
-            get(target, key: PropertyKey, receiver): any {
+            deleteProperty: (target, key): boolean => {
+                if (target._field[key]) {
+                    target._field[key].value = undefined;
+                    return true;
+                }
+                return Reflect.deleteProperty(target, key);
+            },
+            get: (target, key: PropertyKey, receiver): any => {
                 const field = target._field[key];
                 if (field) { return field.value };
                 return Reflect.get(target, key, receiver);
             },
-            set(target, key: string|symbol, value: any): boolean {
+            set: (target, key: string|symbol, value: any): boolean => {
                 const field = target._field[key];
                 if ((field === undefined)
                         && (!target.option.strict)) {
@@ -425,6 +444,7 @@ export class Model {
                 return Reflect.set(target, key, value);
             }
         });
+        this._proxy = proxy;
         return proxy;
     }
 
@@ -442,9 +462,18 @@ export class Model {
             this._field[key] = field;
         }
         this.post_validate();
+        return this._proxy;
     }
 
     post_validate() {};
+
+    get data(): any {
+        // const data = {};
+        // for (const [key, value] of Object.entries(this._field)) {
+        //     console.log(key, value);
+        // };
+        return true;
+    }
 
     // to_json() {
     //     let json = {};
