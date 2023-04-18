@@ -242,8 +242,29 @@ export class Field {
      * - Set field's value if function return value
      */
     set value(value) {
-        const errors = [];
+        value = this.test(value);
+        this._value = value;
+    }
 
+    /** get Field's value
+     * - Required field will throw RequiredError if ask for value
+     *   before assigned.
+     */
+    get value() {
+
+        if ( (this.option.required) && (this._value === undefined) ) {
+            throw new RequiredError(`Field is required`);
+        }
+        return this._value;
+    }
+
+    /** Reset value to default */
+    reset() {
+        this.value = this.option.initial;
+    }
+
+    test(value) {
+        const errors = [];
         if (value === undefined) {
             // Check required constrain.
             if (this.option.required) {
@@ -286,24 +307,7 @@ export class Field {
         if (errors.length > 0) {
             throw new ValidationError(errors.toString());
         }
-        this._value = value;
-    }
-
-    /** get Field's value
-     * - Required field will throw RequiredError if ask for value
-     *   before assigned.
-     */
-    get value() {
-
-        if ( (this.option.required) && (this._value === undefined) ) {
-            throw new RequiredError(`Field is required`);
-        }
-        return this._value;
-    }
-
-    /** Reset value to default */
-    reset() {
-        this.value = this.option.initial;
+        return value;
     }
 
     /** Check instance type
@@ -405,48 +409,87 @@ interface ModelOption {
     strict?: boolean
 }
 
-
 export class Model {
-    _data = {};
-    _field = {};
-    _proxy;
-    option: ModelOption;
+    static _field = {};
+    static option: ModelOption;
 
-    constructor(data: Object = {}, {strict=true}: ModelOption = {}) {
+    static model(model: Object = {}, option: ModelOption = {}) {
+        this.option = {...{strict: true}, ...option};
+        for (const [key, value] of Object.entries(model)) {
+            // `continue` loop if the value isn't instance of Field().
+            if (!(value instanceof Field)) {
+                throw new ModelError(`${key}: not instance of Field`)
+            };
+            // Keep Field() in this._field for data validation.
+            this._field[key] = value;
+        }
+    }
+
+    constructor(data: Object = {}) {
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
         }
         if (!(data instanceof Object)) {
             throw new Error("data must be an instance of Object");
         }
-        this._data = data;
-        this.option = {strict: strict}
         const proxy = new Proxy(this, {
-            deleteProperty: (target, key): boolean => {
-                if (target._field[key]) {
-                    target._field[key].value = undefined;
-                    return true;
-                }
-                return Reflect.deleteProperty(target, key);
-            },
             get: (target, key: PropertyKey, receiver): any => {
-                const field = target._field[key];
-                if (field) { return field.value };
                 return Reflect.get(target, key, receiver);
             },
             set: (target, key: string|symbol, value: any): boolean => {
-                const field = target._field[key];
-                if ((field === undefined)
-                        && (!target.option.strict)) {
-                    target._field[key] = value;
+                const field = target.constructor._field[key];
+                if (field === undefined) {
+                    if (target.constructor.option.strict) {
+                        throw new ModelError(`this.${key} is not defined`)
+                    } else {
+                        target[key] = value;
+                        return true;
+                    }
                 }
-                field.value = value;
+                field.test(value);
                 return Reflect.set(target, key, value);
             }
         });
-        this._proxy = proxy;
+
+        this.post_validate();
         return proxy;
     }
+
+    // constructor(model: Object = {}, {strict=true}: ModelOption = {}) {
+    //     if (data instanceof Array) {
+    //         throw new Error("data can't be an instance of Array");
+    //     }
+    //     if (!(data instanceof Object)) {
+    //         throw new Error("data must be an instance of Object");
+    //     }
+    //     this._data = data;
+    //     this.option = {strict: strict}
+    //     const proxy = new Proxy(this, {
+    //         deleteProperty: (target, key): boolean => {
+    //             if (target._field[key]) {
+    //                 target._field[key].value = undefined;
+    //                 return true;
+    //             }
+    //             return Reflect.deleteProperty(target, key);
+    //         },
+    //         get: (target, key: PropertyKey, receiver): any => {
+    //             const field = target._field[key];
+    //             if (field) { return field.value };
+    //             return Reflect.get(target, key, receiver);
+    //         },
+    //         set: (target, key: string|symbol, value: any): boolean => {
+    //             const field = target._field[key];
+    //             if ((field === undefined)
+    //                     && (!target.option.strict)) {
+    //                 target._field[key] = value;
+    //             }
+    //             field.value = value;
+    //             return Reflect.set(target, key, value);
+    //         }
+    //     });
+    //     this._proxy = proxy;
+    //     return proxy;
+    // }
 
     init() {
         let data = this._data;
