@@ -43,12 +43,31 @@ class Func {
 
 
 /** Error class to show when values doesn't pass validation. */
+class FieldError extends Error {
+    name: string;
+    message: string;
+    constructor(message) {
+        super(message);
+        this.name = 'FieldError';
+    }
+}
+
 class ValidationError extends Error {
     name: string;
     message: string;
     constructor(message) {
         super(message);
         this.name = 'ValidationError';
+    }
+}
+
+class ArrayOfError extends Error {
+    name: string;
+    message: string;
+
+    constructor(message) {
+        super(message);
+        this.name = 'ArrayOfError';
     }
 }
 
@@ -171,6 +190,7 @@ export class ArrayOf extends Array {
     }
 
     validate(values: Array<any>, validators: Array<string|Function>) {
+        const error_indexes = [];
         for (const i in values) {
             let value_pass = false;
             for (let validator of validators) {
@@ -181,9 +201,12 @@ export class ArrayOf extends Array {
                 } catch {};
             }
             if (!value_pass) {
-                const msg = `{${i}: ${values[i]}}`
-                throw new ValidationError(msg);
+                error_indexes.push(i);
             }
+        }
+        if (error_indexes.length > 0) {
+            const message = `index: [${error_indexes}] not pass ArrayOf validation`;
+            throw new ArrayOfError(message);
         }
     }
 }
@@ -205,22 +228,24 @@ interface FieldOption {
  * // Use with validators.
  * field = Field({required=true}).oneof(['AM', 'PM']);
  * field.value = 'AM'; // Ok
- * field.value = 'A'; // This line will throw ValidationError
+ * field.value = 'A'; // This line will throw FieldError
  * 
  * // Chained validators.
  * field = Field({default='user@example.com'}).instance(str).search('.*@.*');
  * field.value = 'user@somewhere.com';
- * field.value = 1; This line will throw ValidationError
+ * field.value = 1; This line will throw FieldError
  * ```
  */
 export class Field {
+    static default_option = {
+        required: false,
+        initial: undefined,
+        grant: []
+    }
 
-    constructor({
-            required=false,
-            initial=undefined,
-            grant=[]}: FieldOption = {}) {
-        this.option = { required: required, initial: initial, grant: grant };
-        this._value = initial;
+    constructor(option: FieldOption = {}) {
+        this.option = {...Field.default_option, ...option};
+        this._value = this.option.initial;
     }
 
     option: FieldOption;
@@ -242,8 +267,28 @@ export class Field {
      * - Set field's value if function return value
      */
     set value(value) {
-        const errors = [];
+        value = this.test(value);
+        this._value = value;
+    }
 
+    /** get Field's value
+     * - Required field will throw RequiredError if ask for value
+     *   before assigned.
+     */
+    get value() {
+        if ( (this.option.required) && (this._value === undefined) ) {
+            throw new RequiredError(`Field is required`);
+        }
+        return this._value;
+    }
+
+    /** Reset value to default */
+    reset() {
+        this.value = this.option.initial;
+    }
+
+    test(value) {
+        const errors = [];
         if (value === undefined) {
             // Check required constrain.
             if (this.option.required) {
@@ -267,43 +312,23 @@ export class Field {
         for (const func of this._function_chain) {
             try {
                 let value_ = func.call(value);
-                if (value_) {
-                    if ((value instanceof ArrayOf)
-                        ||  (value instanceof Model)
-                    ) {
-                        value = value_
-                    } else {
-                        throw new DefineError(
-                            `Validation function ` +
-                            `doesn't return ArrayOf or Model class`
-                        )
-                    }
+                if(!value_) { continue };
+                if (['model', 'arrayOf'].includes(func.func.name)) {
+                    value = value_;
+                } else {
+                    throw new DefineError(
+                        `Validation function ` +
+                        `doesn't return ArrayOf or Model class`
+                    )
                 }
             } catch (e) {
-                errors.push((func.func, e));
+                errors.push(e);
             }
         }
         if (errors.length > 0) {
-            throw new ValidationError(errors.toString());
+            throw new FieldError(errors);
         }
-        this._value = value;
-    }
-
-    /** get Field's value
-     * - Required field will throw RequiredError if ask for value
-     *   before assigned.
-     */
-    get value() {
-
-        if ( (this.option.required) && (this._value === undefined) ) {
-            throw new RequiredError(`Field is required`);
-        }
-        return this._value;
-    }
-
-    /** Reset value to default */
-    reset() {
-        this.value = this.option.initial;
+        return value;
     }
 
     /** Check instance type
@@ -314,7 +339,6 @@ export class Field {
     @function_chain
     instance(type): Function {
         const instance = (value, type): void => {
-            const msg = `${value} is not an instanceof ${type}`;
             let valid = false;
 
             // Normalize type to Array
@@ -333,6 +357,7 @@ export class Field {
                 }
             }
             if (!valid) {
+                const msg = `${value} is not an instanceof ${type}`;
                 throw new ValidationError(msg);
             }
         };
@@ -357,7 +382,7 @@ export class Field {
 
     /** Validate that value pass `model_class` validation */
     @function_chain
-    model(model_class: 'Model'): Function {
+    model(model_class): Function {
         const model = (value, model_class): Model => {
             return new model_class(value);
         }
@@ -368,11 +393,11 @@ export class Field {
     @function_chain
     regexp(regexp_: RegExp): Function {
         const regexp = (value: 'string', regexp_: RegExp): void => {
-            assert(
-                regexp_.test(value),
-                `Value doesn't pass Regular Expression => `
-                + `${regexp_}`
-            );
+            if (!(regexp_.test(value))) {
+                throw new ValidationError(
+                    `"${value}" doesn't pass Regular Expression => ${regexp_}`
+                )
+            }
         }
         return regexp;
     }
@@ -405,86 +430,74 @@ interface ModelOption {
     strict?: boolean
 }
 
-
 export class Model {
-    _data = {};
-    _field = {};
-    _proxy;
-    option: ModelOption;
+    static _model = {};
+    static option: ModelOption;
 
-    constructor(data: Object = {}, {strict=true}: ModelOption = {}) {
+    static model(model: Object = {}, option: ModelOption = {}) {
+        this.option = {...{strict: true}, ...option};
+        for (const [key, value] of Object.entries(model)) {
+            // `continue` loop if the value isn't instance of Field().
+            if (!(value instanceof Field)) {
+                throw new ModelError(`${key}: not instance of Field`)
+            };
+            // Keep Field() in this._model for data validation.
+            this._model[key] = value;
+        }
+    }
+
+    constructor(data: Object = {}) {
         if (data instanceof Array) {
             throw new Error("data can't be an instance of Array");
         }
         if (!(data instanceof Object)) {
             throw new Error("data must be an instance of Object");
         }
-        this._data = data;
-        this.option = {strict: strict}
+
         const proxy = new Proxy(this, {
-            deleteProperty: (target, key): boolean => {
-                if (target._field[key]) {
-                    target._field[key].value = undefined;
-                    return true;
-                }
-                return Reflect.deleteProperty(target, key);
-            },
             get: (target, key: PropertyKey, receiver): any => {
-                const field = target._field[key];
-                if (field) { return field.value };
                 return Reflect.get(target, key, receiver);
             },
             set: (target, key: string|symbol, value: any): boolean => {
-                const field = target._field[key];
-                if ((field === undefined)
-                        && (!target.option.strict)) {
-                    target._field[key] = value;
+                const field = target.constructor._model[key];
+                if (field === undefined) {
+                    if (target.constructor.option.strict) {
+                        throw new ModelError(`property ['${key}'] is not defined`)
+                    } else {
+                        target[key] = value;
+                        return true;
+                    }
                 }
-                field.value = value;
+                try { field.test(value) } catch (e) {
+                    throw new ModelError(`property ['${key}']: ${e}`)
+                };
+                // target.post_validate();
                 return Reflect.set(target, key, value);
-            }
+            },
+            deleteProperty: (target, key): boolean => {
+                const field = target.constructor._model[key];
+                if (field) { field.test(undefined) };
+                return Reflect.deleteProperty(target, key);
+            },
         });
-        this._proxy = proxy;
+
+        for (const key in this.constructor._model) {
+            proxy[key] = data[key];
+            delete data[key];
+        }
+
+        if (this.constructor.option.strict) {
+            const keys = Object.keys(data);
+            if (keys.length > 0) {
+                throw new ModelError(`Data keys [${keys}] exeeds defined fields`)
+            }
+        } else {
+            Object.assign(proxy, data);
+        }
+
+        this.post_validate();
         return proxy;
     }
 
-    init() {
-        let data = this._data;
-
-        for (const [key, value] of Object.entries(this)) {
-            // `continue` loop if the value isn't instance of Field().
-            if (!(value instanceof Field)) { continue };
-
-            // Set default value if defined.
-            let field = value as Field;
-            field.value = data[key];
-            // Keep Field() in this._field for data validation.
-            this._field[key] = field;
-        }
-        this.post_validate();
-        return this._proxy;
-    }
-
     post_validate() {};
-
-    get data(): any {
-        // const data = {};
-        // for (const [key, value] of Object.entries(this._field)) {
-        //     console.log(key, value);
-        // };
-        return true;
-    }
-
-    // to_json() {
-    //     let json = {};
-    //     for (let [key, value] of this) {
-    //         if (value instanceof Map) {
-    //         }
-    //         json[key] = value
-    //     }
-    //     return json;
-    // }
-    // to_string() {
-    //     return JSON.stringify(this.to_json());
-    // }
 }
