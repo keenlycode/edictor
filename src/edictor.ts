@@ -43,12 +43,31 @@ class Func {
 
 
 /** Error class to show when values doesn't pass validation. */
+class FieldError extends Error {
+    name: string;
+    message: string;
+    constructor(message) {
+        super(message);
+        this.name = 'FieldError';
+    }
+}
+
 class ValidationError extends Error {
     name: string;
     message: string;
     constructor(message) {
         super(message);
         this.name = 'ValidationError';
+    }
+}
+
+class ArrayOfError extends Error {
+    name: string;
+    message: string;
+
+    constructor(message) {
+        super(message);
+        this.name = 'ArrayOfError';
     }
 }
 
@@ -171,6 +190,7 @@ export class ArrayOf extends Array {
     }
 
     validate(values: Array<any>, validators: Array<string|Function>) {
+        const error_indexes = [];
         for (const i in values) {
             let value_pass = false;
             for (let validator of validators) {
@@ -181,9 +201,12 @@ export class ArrayOf extends Array {
                 } catch {};
             }
             if (!value_pass) {
-                const msg = `{${i}: ${values[i]}}`
-                throw new ValidationError(msg);
+                error_indexes.push(i);
             }
+        }
+        if (error_indexes.length > 0) {
+            const message = `index: [${error_indexes}] not pass ArrayOf validation`;
+            throw new ArrayOfError(message);
         }
     }
 }
@@ -205,22 +228,24 @@ interface FieldOption {
  * // Use with validators.
  * field = Field({required=true}).oneof(['AM', 'PM']);
  * field.value = 'AM'; // Ok
- * field.value = 'A'; // This line will throw ValidationError
+ * field.value = 'A'; // This line will throw FieldError
  * 
  * // Chained validators.
  * field = Field({default='user@example.com'}).instance(str).search('.*@.*');
  * field.value = 'user@somewhere.com';
- * field.value = 1; This line will throw ValidationError
+ * field.value = 1; This line will throw FieldError
  * ```
  */
 export class Field {
+    static default_option = {
+        required: false,
+        initial: undefined,
+        grant: []
+    }
 
-    constructor({
-            required=false,
-            initial=undefined,
-            grant=[]}: FieldOption = {}) {
-        this.option = { required: required, initial: initial, grant: grant };
-        this._value = initial;
+    constructor(option: FieldOption = {}) {
+        this.option = {...Field.default_option, ...option};
+        this._value = this.option.initial;
     }
 
     option: FieldOption;
@@ -251,7 +276,6 @@ export class Field {
      *   before assigned.
      */
     get value() {
-
         if ( (this.option.required) && (this._value === undefined) ) {
             throw new RequiredError(`Field is required`);
         }
@@ -288,6 +312,7 @@ export class Field {
         for (const func of this._function_chain) {
             try {
                 let value_ = func.call(value);
+                if(!value_) { continue };
                 if (['model', 'arrayOf'].includes(func.func.name)) {
                     value = value_;
                 } else {
@@ -297,11 +322,11 @@ export class Field {
                     )
                 }
             } catch (e) {
-                errors.push((func.func, e));
+                errors.push(e);
             }
         }
         if (errors.length > 0) {
-            throw new ValidationError(errors.toString());
+            throw new FieldError(errors);
         }
         return value;
     }
@@ -314,7 +339,6 @@ export class Field {
     @function_chain
     instance(type): Function {
         const instance = (value, type): void => {
-            const msg = `${value} is not an instanceof ${type}`;
             let valid = false;
 
             // Normalize type to Array
@@ -333,6 +357,7 @@ export class Field {
                 }
             }
             if (!valid) {
+                const msg = `${value} is not an instanceof ${type}`;
                 throw new ValidationError(msg);
             }
         };
@@ -368,11 +393,11 @@ export class Field {
     @function_chain
     regexp(regexp_: RegExp): Function {
         const regexp = (value: 'string', regexp_: RegExp): void => {
-            assert(
-                regexp_.test(value),
-                `Value doesn't pass Regular Expression => `
-                + `${regexp_}`
-            );
+            if (!(regexp_.test(value))) {
+                throw new ValidationError(
+                    `"${value}" doesn't pass Regular Expression => ${regexp_}`
+                )
+            }
         }
         return regexp;
     }
@@ -428,6 +453,7 @@ export class Model {
         if (!(data instanceof Object)) {
             throw new Error("data must be an instance of Object");
         }
+
         const proxy = new Proxy(this, {
             get: (target, key: PropertyKey, receiver): any => {
                 return Reflect.get(target, key, receiver);
@@ -436,14 +462,16 @@ export class Model {
                 const field = target.constructor._model[key];
                 if (field === undefined) {
                     if (target.constructor.option.strict) {
-                        throw new ModelError(`this.${key} is not defined`)
+                        throw new ModelError(`property ['${key}'] is not defined`)
                     } else {
                         target[key] = value;
                         return true;
                     }
                 }
-                field.test(value);
-                target.post_validate();
+                try { field.test(value) } catch (e) {
+                    throw new ModelError(`property ['${key}']: ${e}`)
+                };
+                // target.post_validate();
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
@@ -452,6 +480,21 @@ export class Model {
                 return Reflect.deleteProperty(target, key);
             },
         });
+
+        for (const key in this.constructor._model) {
+            proxy[key] = data[key];
+            delete data[key];
+        }
+
+        if (this.constructor.option.strict) {
+            const keys = Object.keys(data);
+            if (keys.length > 0) {
+                throw new ModelError(`Data keys [${keys}] exeeds defined fields`)
+            }
+        } else {
+
+        }
+
         this.post_validate();
         return proxy;
     }
