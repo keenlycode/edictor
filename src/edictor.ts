@@ -492,7 +492,7 @@ export class Model {
                 throw new ModelError(`Data keys [${keys}] exeeds defined fields`)
             }
         } else {
-            // To Do: Update data
+            Object.assign(proxy, data);
         }
 
         this.post_validate();
