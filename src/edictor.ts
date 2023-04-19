@@ -458,10 +458,11 @@ export class Model {
             get: (target, key: PropertyKey, receiver): any => {
                 return Reflect.get(target, key, receiver);
             },
-            set: (target, key: string|symbol, value: any): boolean => {
-                const field = target.constructor._model[key];
+            set: (target, key: string, value: any): boolean => {
+                const _class = target.constructor as typeof Model;
+                const field = _class._model[key];
                 if (field === undefined) {
-                    if (target.constructor.option.strict) {
+                    if (_class.option.strict) {
                         throw new ModelError(`property ['${key}'] is not defined`)
                     } else {
                         target[key] = value;
@@ -475,18 +476,21 @@ export class Model {
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
-                const field = target.constructor._model[key];
+                const _class = target.constructor as typeof Model;
+                const field = _class._model[key];
                 if (field) { field.test(undefined) };
                 return Reflect.deleteProperty(target, key);
             },
         });
 
-        for (const key in this.constructor._model) {
+        const _class = this.constructor as typeof Model;
+
+        for (const key in _class._model) {
             proxy[key] = data[key];
             delete data[key];
         }
 
-        if (this.constructor.option.strict) {
+        if (_class.option.strict) {
             const keys = Object.keys(data);
             if (keys.length > 0) {
                 throw new ModelError(`Data keys [${keys}] exeeds defined fields`)
