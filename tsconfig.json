@@ -1,0 +1,6 @@
+// tsconfig.json for parcel
+{
+    "compilerOptions": {
+        "experimentalDecorators": true
+    }
+}

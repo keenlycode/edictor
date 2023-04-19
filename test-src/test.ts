@@ -1,4 +1,4 @@
-import { Field, Model } from 'edictor/src/edictor';
+import { Field, Model } from '../src/edictor';
 
 
 class User extends Model {};
