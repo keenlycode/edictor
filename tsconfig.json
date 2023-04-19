@@ -1,8 +1,0 @@
-{
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "lib": ["es6", "DOM"],
-        "target": "ES6",
-        "moduleResolution": "node"
-    }
-}

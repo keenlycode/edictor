@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "lib": ["es6", "DOM"],
+        "target": "es6",
+        "module": "es6",
+        "moduleResolution": "node",
+        "outDir": "../dist/module/"
+    }
+}

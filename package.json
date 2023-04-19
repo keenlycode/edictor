@@ -2,14 +2,14 @@
   "name": "edictor",
   "version": "0.0.1",
   "description": "Javascript data schema and validation",
-  "devDependencies": {
-    "assert": "^2.0.0",
-    "parcel": "^2.8.3",
-    "process": "^0.11.10"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nitipit/edictor.git"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bugs": {
+    "url": "https://github.com/nitipit/edictor/issues"
   },
+  "homepage": "https://github.com/nitipit/edictor#readme",
   "keywords": [
     "schema",
     "json",
@@ -17,9 +17,27 @@
   ],
   "author": "Nitipit Nontasuwan",
   "license": "ISC",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "module": "dist/module/edictor.js",
+  "dependencies": {
+    "@swc/helpers": "^0.4.12",
+    "edictor": "^0.0.1"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "parcel": "^2.8.3",
+    "process": "^0.11.10",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "targets": {
-    "module": {
-      "distDir": "dist",
+    "bundle": {
+      "distDir": "dist/module/",
       "isLibrary": true
     },
     "test": {
