@@ -1,8 +1,14 @@
 import asyncio
 
 
-async def typescript():
+async def test_typescript():
     cmd = "npx parcel watch --target test 'test-src/**/*.ts'"
+    print(f'{cmd} ...')
+    proc = await asyncio.create_subprocess_shell(cmd)
+    await proc.communicate()
+
+async def test_javascript():
+    cmd = "npx parcel watch --target test 'test-src/**/*.js'"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
@@ -16,7 +22,8 @@ async def html():
 
 async def main():
     await asyncio.gather(
-        typescript(),
+        test_typescript(),
+        # test_javascript(),
         html(),
     )
 
