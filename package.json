@@ -23,8 +23,7 @@
   ],
   "module": "dist/module/edictor.js",
   "dependencies": {
-    "@swc/helpers": "^0.4.12",
-    "edictor": "^0.0.1"
+    "@swc/helpers": "^0.4.12"
   },
   "devDependencies": {
     "assert": "^2.0.0",

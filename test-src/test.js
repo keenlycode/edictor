@@ -1,4 +1,4 @@
-import { Field, Model } from '../dist/module/edictor';
+import { Field, Model } from 'edictor';
 
 
 class User extends Model {};
