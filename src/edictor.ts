@@ -288,17 +288,13 @@ export class Field {
         for (const func of this._function_chain) {
             try {
                 let value_ = func.call(value);
-                if (value_) {
-                    if ((value instanceof ArrayOf)
-                        ||  (value instanceof Model)
-                    ) {
-                        value = value_
-                    } else {
-                        throw new DefineError(
-                            `Validation function ` +
-                            `doesn't return ArrayOf or Model class`
-                        )
-                    }
+                if (['model', 'arrayOf'].includes(func.func.name)) {
+                    value = value_;
+                } else {
+                    throw new DefineError(
+                        `Validation function ` +
+                        `doesn't return ArrayOf or Model class`
+                    )
                 }
             } catch (e) {
                 errors.push((func.func, e));
@@ -361,7 +357,7 @@ export class Field {
 
     /** Validate that value pass `model_class` validation */
     @function_chain
-    model(model_class: 'Model'): Function {
+    model(model_class): Function {
         const model = (value, model_class): Model => {
             return new model_class(value);
         }
@@ -410,7 +406,7 @@ interface ModelOption {
 }
 
 export class Model {
-    static _field = {};
+    static _model = {};
     static option: ModelOption;
 
     static model(model: Object = {}, option: ModelOption = {}) {
@@ -420,8 +416,8 @@ export class Model {
             if (!(value instanceof Field)) {
                 throw new ModelError(`${key}: not instance of Field`)
             };
-            // Keep Field() in this._field for data validation.
-            this._field[key] = value;
+            // Keep Field() in this._model for data validation.
+            this._model[key] = value;
         }
     }
 
@@ -437,7 +433,7 @@ export class Model {
                 return Reflect.get(target, key, receiver);
             },
             set: (target, key: string|symbol, value: any): boolean => {
-                const field = target.constructor._field[key];
+                const field = target.constructor._model[key];
                 if (field === undefined) {
                     if (target.constructor.option.strict) {
                         throw new ModelError(`this.${key} is not defined`)
@@ -447,87 +443,18 @@ export class Model {
                     }
                 }
                 field.test(value);
+                target.post_validate();
                 return Reflect.set(target, key, value);
-            }
+            },
+            deleteProperty: (target, key): boolean => {
+                const field = target.constructor._model[key];
+                if (field) { field.test(undefined) };
+                return Reflect.deleteProperty(target, key);
+            },
         });
-
         this.post_validate();
         return proxy;
     }
 
-    // constructor(model: Object = {}, {strict=true}: ModelOption = {}) {
-    //     if (data instanceof Array) {
-    //         throw new Error("data can't be an instance of Array");
-    //     }
-    //     if (!(data instanceof Object)) {
-    //         throw new Error("data must be an instance of Object");
-    //     }
-    //     this._data = data;
-    //     this.option = {strict: strict}
-    //     const proxy = new Proxy(this, {
-    //         deleteProperty: (target, key): boolean => {
-    //             if (target._field[key]) {
-    //                 target._field[key].value = undefined;
-    //                 return true;
-    //             }
-    //             return Reflect.deleteProperty(target, key);
-    //         },
-    //         get: (target, key: PropertyKey, receiver): any => {
-    //             const field = target._field[key];
-    //             if (field) { return field.value };
-    //             return Reflect.get(target, key, receiver);
-    //         },
-    //         set: (target, key: string|symbol, value: any): boolean => {
-    //             const field = target._field[key];
-    //             if ((field === undefined)
-    //                     && (!target.option.strict)) {
-    //                 target._field[key] = value;
-    //             }
-    //             field.value = value;
-    //             return Reflect.set(target, key, value);
-    //         }
-    //     });
-    //     this._proxy = proxy;
-    //     return proxy;
-    // }
-
-    init() {
-        let data = this._data;
-
-        for (const [key, value] of Object.entries(this)) {
-            // `continue` loop if the value isn't instance of Field().
-            if (!(value instanceof Field)) { continue };
-
-            // Set default value if defined.
-            let field = value as Field;
-            field.value = data[key];
-            // Keep Field() in this._field for data validation.
-            this._field[key] = field;
-        }
-        this.post_validate();
-        return this._proxy;
-    }
-
     post_validate() {};
-
-    get data(): any {
-        // const data = {};
-        // for (const [key, value] of Object.entries(this._field)) {
-        //     console.log(key, value);
-        // };
-        return true;
-    }
-
-    // to_json() {
-    //     let json = {};
-    //     for (let [key, value] of this) {
-    //         if (value instanceof Map) {
-    //         }
-    //         json[key] = value
-    //     }
-    //     return json;
-    // }
-    // to_string() {
-    //     return JSON.stringify(this.to_json());
-    // }
 }
