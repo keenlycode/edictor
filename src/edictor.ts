@@ -250,16 +250,6 @@ export class Field {
 
     option: FieldOption;
     _function_chain: Array<Func> = [];
-
-    /** Return field's default value */
-    get default() {
-        if (this.option.initial instanceof Function) {
-            return this.option.initial();
-        } else {
-            return this.option.initial;
-        }
-    }
-
     _value: any;
 
     /** Set field's value
