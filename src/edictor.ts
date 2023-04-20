@@ -434,6 +434,7 @@ export class Model {
             // Keep Field() in this._model for data validation.
             this._model[key] = value;
         }
+        return this;
     }
 
     constructor(data: Object = {}) {
@@ -462,7 +463,6 @@ export class Model {
                 try { field.test(value) } catch (e) {
                     throw new ModelError(`property ['${key}']: ${e}`)
                 };
-                // target.post_validate();
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
@@ -488,10 +488,6 @@ export class Model {
         } else {
             Object.assign(proxy, data);
         }
-
-        this.post_validate();
         return proxy;
     }
-
-    post_validate() {}
 }
