@@ -379,6 +379,19 @@ export class Field {
         return model;
     }
 
+    /** Validate with Regular Expression */
+    @function_chain
+    regexp(regexp_: RegExp): Function {
+        const regexp = (value: 'string', regexp_: RegExp): void => {
+            if (!(regexp_.test(value))) {
+                throw new ValidationError(
+                    `"${value}" doesn't pass Regular Expression => ${regexp_}`
+                )
+            }
+        }
+        return regexp;
+    }
+
     /** Validate value with provided function
      * - The provided function must return `true` or `false`
      */
