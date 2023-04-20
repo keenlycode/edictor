@@ -503,9 +503,5 @@ export class Model {
         return proxy;
     }
 
-    assign(data: Object) {
-        Object.assign(this, data);
-    }
-
-    post_validate() {};
+    post_validate() {}
 }
