@@ -406,11 +406,11 @@ export class Field {
      * - The provided function must return `true` or `false`
      */
     @function_chain
-    assert(func: Function, msg=''): Function {
-        const assert = (value, func): void => {
+    validate(func: Function, msg=''): Function {
+        const validate = (value, func): void => {
             assert(func(value), msg);
         }
-        return assert;
+        return validate;
     }
 };
 

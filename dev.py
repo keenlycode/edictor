@@ -2,7 +2,7 @@ import asyncio
 
 
 async def test_typescript():
-    cmd = "npx parcel watch --target test 'test-src/**/*.ts'"
+    cmd = "npx parcel watch --no-cache --target test 'test-src/**/*.ts'"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
