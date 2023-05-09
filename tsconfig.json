@@ -1,6 +1,7 @@
 // tsconfig.json for parcel
 {
     "compilerOptions": {
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "esModuleInterop": true
     }
 }

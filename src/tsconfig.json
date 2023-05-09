@@ -1,11 +1,11 @@
 // tsconfig.json for tsc compile.
 {
     "compilerOptions": {
-        "experimentalDecorators": true,
         "lib": ["es2017", "DOM"],
         "target": "es6",
         "module": "es6",
         "moduleResolution": "node",
-        "outDir": "../dist/module/"
-    }
+        "outDir": "../dist/module/",
+    },
+    "exclude": ["**/*.test.ts"]
 }

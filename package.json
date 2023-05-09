@@ -43,13 +43,8 @@
     "test": "jest"
   },
   "targets": {
-    "bundle": {
-      "distDir": "dist/module/",
-      "isLibrary": true
-    },
-    "test": {
-      "distDir": "test-html/",
-      "outputFormat": "esmodule"
+    "browser": {
+      "context": "browser"
     }
   }
 }
