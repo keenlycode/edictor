@@ -1,16 +1,13 @@
 import asyncio
-
-
-async def dist():
-    cmd = 'npx tsc -p src/'
-    print(f'{cmd} ...')
-    proc = await asyncio.create_subprocess_shell(cmd)
-    await proc.communicate()
+from dev import dist_browser, dist_module
 
 
 async def main():
     await asyncio.gather(
-        dist(),
+        dist_module(watch=False),
+        dist_browser(mode='build'),
     )
 
-asyncio.run(main())
+
+if __name__ == "__main__":
+    asyncio.run(main())

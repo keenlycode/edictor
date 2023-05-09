@@ -15,17 +15,20 @@ async def dist_module(watch=True):
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def dist_browser():
-    cmd = f"npx parcel watch --target=browser --dist-dir=dist/browser 'src/edictor.ts'"
+async def dist_browser(mode='watch'):
+    cmd = f"npx parcel {mode} --target=bundle 'src/edictor.ts'"
     print(f"{cmd} ...")
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def docs():
+async def docs_html():
     cmd = 'engrave dev docs-src docs --asset --server'
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
+
+async def docs_javascript():
+    cmd = f"npx parcel watch --target=docs 'docs-src/**/*.ts'"
 
 
 async def main():
@@ -33,7 +36,7 @@ async def main():
         unittest(),
         dist_module(),
         dist_browser(),
-        # html(),
     )
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

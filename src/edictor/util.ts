@@ -27,3 +27,12 @@ export function is_class(instance) {
     }
     return false;
 }
+
+export class AssertionError extends Error {
+    name: string;
+    message: string;
+    constructor(message) {
+        super(message);
+        this.name = 'AssertionError';
+    }
+}
