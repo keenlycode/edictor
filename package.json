@@ -49,6 +49,8 @@
     "bundle": {
         "distDir": "dist/browser"
     },
-    "docs": {}
+    "docs": {
+        "distDir": "docs"
+    }
   }
 }
