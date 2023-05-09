@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% set _v = 1 %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+<title>Edictor</title>
+<script defer src="base.js?v={{_v}}"></script>
+{% endblock title %}
+{% block head %}{% endblock head %}
+</head>
+<body>
+{% block body %}
+{% endblock %}
+</body>
+</html>
