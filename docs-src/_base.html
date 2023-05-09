@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% set _v = 1 %}
+{% set _v = 2 %}
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,12 +7,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {% block title %}
 <title>Edictor</title>
-<script defer src="base.js?v={{_v}}"></script>
 {% endblock title %}
-{% block head %}{% endblock head %}
+
+<link rel="stylesheet" href="base.css?v={{_v}}">
+<script defer src="base.js?v={{_v}}"></script>
+{% block head %}{% endblock %}
 </head>
 <body>
-{% block body %}
+{% block body %}{% endblock %}
+{% block footer %}
+<div style="min-height: 20vh"></div>
 {% endblock %}
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "edictor",
   "version": "0.0.1",
-  "description": "Javascript data schema and validation",
+  "description": "Smart & Simple Javascript data schema and validation",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nitipit/edictor.git"
@@ -21,6 +21,7 @@
     "dist/**/*",
     "src/**/*"
   ],
+  "main": "dist/browser/edictor.js",
   "module": "dist/module/edictor.js",
   "dependencies": {
     "@swc/helpers": "^0.4.12"
@@ -33,6 +34,7 @@
     "assert": "^2.0.0",
     "babel-jest": "^29.5.0",
     "gadjet": "^1.0.4",
+    "highlight.js": "^11.8.0",
     "jest": "^29.5.0",
     "parcel": "^2.8.3",
     "process": "^0.11.10",
@@ -44,11 +46,9 @@
     "test": "jest"
   },
   "targets": {
-    "browser": {
-      "context": "browser"
+    "bundle": {
+        "distDir": "dist/browser"
     },
-    "docs": {
-      "context": "browser"
-    }
+    "docs": {}
   }
 }

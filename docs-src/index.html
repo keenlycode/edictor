@@ -1,8 +1,40 @@
 {% extends '_base.html' %}
 
+{% block head %}
+<script defer src="index.js?v={{_v}}"></script>
+{% endblock %}
+
 {% block body %}
-<div id="header">
-    <h1>{Edictor}</h1>
-    {{markdown('index.html.header.code.md')}}
+<div id="header" class="view">
+    <div class="container">
+        <h1 class="width-100">{Edictor}</h1>
+        <h2 class="width-100">
+            Smart & simple Javascript object definition and validation
+        </h2>
+    </div>
+</div>
+<div id="define" class="view">
+    <div class="container">
+        <h2>Define</h2>
+        {{markdown('index.html.define.md')}}
+    </div>
+</div>
+<div id="assign" class="view">
+    <div class="container">
+        <h2>Assign</h2>
+        {{markdown('index.html.assign.md')}}
+    </div>
+</div>
+<div id="try" class="view">
+    <div class="container flex">
+        <h2>Try</h2>
+        <strong class="width-100">Shift+Ctrl+I</strong>
+        <p style="text-align: center;">
+            The code above has been loaded into your browser.<br>
+            You can play with <code>edictor</code> variable<br>
+            or define your own models.
+            
+        </p>
+    </div>
 </div>
 {% endblock %}

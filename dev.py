@@ -15,8 +15,8 @@ async def dist_module(watch=True):
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def dist_browser():
-    cmd = f"npx parcel watch --target=browser --dist-dir=dist/browser 'src/edictor.ts'"
+async def dist_browser(mode='watch'):
+    cmd = f"npx parcel {mode} --target=bundle 'src/edictor.ts'"
     print(f"{cmd} ...")
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
