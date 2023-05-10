@@ -8,7 +8,7 @@ export class FieldError extends Error {
     name: string;
     constructor(message='') {
         super(message);
-        this.name = 'FieldError';
+        this.name = this.constructor.name;
     }
 }
 
@@ -18,7 +18,7 @@ export class RequiredError extends Error {
     name: string;
     constructor(message='') {
         super(message);
-        this.name = 'RequiredError';
+        this.name = this.constructor.name;
     }
 }
 

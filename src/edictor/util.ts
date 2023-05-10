@@ -28,11 +28,21 @@ export function is_class(instance) {
     return false;
 }
 
-export class AssertionError extends Error {
+export class AssertError extends Error {
     name: string;
     message: string;
+
     constructor(message) {
         super(message);
-        this.name = 'AssertionError';
+        this.name = this.constructor.name;
+    }
+}
+
+export const assert = (exp: boolean, message: string = null) => {
+    if (message === null) {
+        message = `Expected assert(expression) to be true.`
+    }
+    if (exp === false) {
+        throw new AssertError(message);
     }
 }

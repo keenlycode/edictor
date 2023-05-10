@@ -23,15 +23,11 @@
   ],
   "main": "dist/browser/edictor.js",
   "module": "dist/module/edictor.js",
-  "dependencies": {
-    "@swc/helpers": "^0.4.12"
-  },
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-typescript": "^7.21.4",
     "@jest/globals": "^29.5.0",
-    "assert": "^2.0.0",
     "babel-jest": "^29.5.0",
     "gadjet": "^1.0.4",
     "highlight.js": "^11.8.0",
@@ -47,10 +43,10 @@
   },
   "targets": {
     "bundle": {
-        "distDir": "dist/browser"
+      "distDir": "dist/browser"
     },
     "docs": {
-        "distDir": "docs"
+      "distDir": "docs"
     }
   }
 }

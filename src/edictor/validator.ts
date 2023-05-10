@@ -4,6 +4,16 @@ import { DefineField, Model } from './model';
 import { ArrayOf as _ArrayOf } from './arrayof';
 
 
+export class ValidationError extends Error {
+    name: string;
+    message: string;
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+    }
+}
+
+
 export class ArrayOf extends _ArrayOf {
     constructor(...validators: Array<string|Function|DefineField|Field|any>) {
         super(...validators);
@@ -34,15 +44,6 @@ export class ArrayOf extends _ArrayOf {
     }
 }
 
-
-export class ValidationError extends Error {
-    name: string;
-    message: string;
-    constructor(message) {
-        super(message);
-        this.name = 'ValidationError';
-    }
-}
 
 /** Check instance type
  * @param {...(string|Class)} types - type for instance test

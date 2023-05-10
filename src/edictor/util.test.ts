@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import { is_function, is_class } from './util';
+import { is_function, is_class, assert, AssertError } from './util';
 
 const func_1 = (a, b) => { return };
 const func_2 = a => { return };
@@ -7,7 +7,7 @@ function func_3(a,b,c) { return };
 
 class A {};
 
-test('is_function', () => {
+test('is_function()', () => {
     expect(is_function(func_1)).toBeTruthy();
     expect(is_function(func_2)).toBeTruthy();
     expect(is_function(func_3)).toBeTruthy();
@@ -15,8 +15,14 @@ test('is_function', () => {
     expect(is_function('(a,b) => { return }')).toBeFalsy();
 })
 
-test('is_class', () => {
+test('is_class()', () => {
     expect(is_class(A)).toBeTruthy();
     expect(is_class(func_1)).toBeFalsy();
     expect(is_class('class A {};')).toBeFalsy();
+})
+
+test('assert()', () => {
+    assert(true, "true");
+    expect(() => { assert(false, "expression must be true") })
+        .toThrow(AssertError);
 })

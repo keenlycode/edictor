@@ -1,17 +1,9 @@
 import {
     is_function,
     is_class,
-    AssertionError
+    assert
 } from './util';
 
-const assert = (result: boolean|(() => boolean), message="") => {
-    if (is_function(result)) {
-        result = (result as Function)();
-    }
-    if (result === false) {
-        throw new AssertionError(message);
-    }
-}
 
 export class ArrayOfError extends Error {
     name: string;
@@ -19,7 +11,7 @@ export class ArrayOfError extends Error {
 
     constructor(message) {
         super(message);
-        this.name = 'ArrayOfError';
+        this.name = this.constructor.name;
     }
 }
 

@@ -7,7 +7,7 @@ export class ModelError extends Error {
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'ModelError';
+        this.name = this.constructor.name;
     }
 };
 
@@ -16,7 +16,7 @@ export class DefineError extends Error {
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'DefineError';
+        this.name = this.constructor.name;
     }
 };
 
