@@ -7,11 +7,11 @@ test('Usage Test', () => {
 
     class Account extends Model {};
 
-    const phone = defineField()
+    const phone = defineField({name: "phone"})
         .instance('string')
         .regexp(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/)
 
-    const email = defineField({name: 'email', required: true})
+    const email = defineField({name: "email", required: true})
         .instance('string')
         .regexp(/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/)
 

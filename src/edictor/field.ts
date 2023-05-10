@@ -120,13 +120,18 @@ export class Field {
         */
         for (const validator of this.validators) {
             try {
-                const value_ = validator(value);
                 if (['arrayOf', 'model'].includes(validator.name)) {
-                    value = value_;
+                    value = validator(value);
+                    continue;
                 }
-                if (value_ !== undefined) {
-                    value = value_;
+                if (validator.name === 'apply') {
+                    const value_ = validator(value);
+                    if (value_ !== undefined) {
+                        value = value_;
+                    }
+                    continue;
                 }
+                validator(value);
             } catch (e) {
                 errors.push(e.message);
             }
