@@ -5,12 +5,29 @@
 {% endblock %}
 
 {% block body %}
-<div id="header" class="view">
-    <div class="container">
-        <h1 class="width-100">{Edictor}</h1>
-        <h2 class="width-100">
-            Smart & simple Javascript object definition and validation
-        </h2>
+<div id="header" class="view flex">
+    <div class="container flex flex-center" style="max-width: 1200px;">
+        <div class="flex" el="left">
+            <img src="earth.webp?v={{_v}}">
+        </div>
+        <div class="flex" el="right">
+            <h1 class="width-100">{Edictor}</h1>
+            <h2 class="width-100">
+                Modular & Self-Contained<br>
+                Javascript object<br>
+                definition and validation<br>
+                Now available on Earth...
+            </h2>
+        </div>
+    </div>
+    <div class="flex flex-center width-100">
+        <a href="guide/index.html"><button>Guide</button></a>
+        <a href="https://github.com/nitipit/edictor">
+            <button class="gray">
+                <el-icon name="github" style="margin-right: 0.2rem;"></el-icon>
+                Github
+            </button>
+        </a>
     </div>
 </div>
 <div id="define" class="view">
@@ -30,10 +47,11 @@
         <h2>Try</h2>
         <strong class="width-100">Shift+Ctrl+I</strong>
         <p style="text-align: center;">
-            The code above has been loaded into your browser.<br>
-            You can play with <code>edictor</code> variable<br>
-            or define your own models.
-            
+            The code above has been loaded into your browser.
+        </p>
+        <p style="text-align: center;">
+            You can play with <code>edictor</code> variable
+            or define your own models in browser console.
         </p>
     </div>
 </div>

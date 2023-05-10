@@ -2,9 +2,9 @@
 import { Model, defineField } from 'edictor/src/edictor';
 
 class Package extends Model {};
-class Author extends Model {};
+class People extends Model {};
 
-Author.define({
+People.define({
     name: defineField({required: true})
         .instance('string'),
     email: defineField()
@@ -30,6 +30,8 @@ Package.define({
         .apply((value) => { new URL(value) }),
     author: /** Nested data */
         defineField()
-        .model(Author)
+        .model(People),
+    contributors: defineField()
+        .arrayOf(People)
 })
 ```

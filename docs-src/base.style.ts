@@ -33,12 +33,17 @@ body {
     padding: 0;
 }
 
+img {
+    width: 100%;
+}
+
 pre > code.hljs {
     box-sizing: border-box;
     width: 100%;
     max-width: 50rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin: auto;
+    padding: 1.5rem 1rem;
 }
 
 code {
@@ -63,6 +68,11 @@ p {
 .flex {
     display: flex;
     flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.flex-center {
+    justify-content: center;
 }
 
 .width-100 {

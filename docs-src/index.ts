@@ -3,9 +3,9 @@ import './index.style';
 
 
 class Package extends Model {};
-class Author extends Model {};
+class People extends Model {};
 
-Author.define({
+People.define({
     name: defineField({required: true})
         .instance('string'),
     email: defineField()
@@ -31,14 +31,17 @@ Package.define({
         .apply((value) => { new URL(value) }),
     author: /** Nested data */
         defineField()
-        .model(Author)
+        .model(People),
+    contributors: defineField()
+        .arrayOf(People)
 })
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;
 window.defineField = defineField;
 window.Package = Package;
-window.Author = Author;
+window.People = People;
+
 window.edictor = new Package({
     "name": "Edictor",
     "version": "0.0.1",
