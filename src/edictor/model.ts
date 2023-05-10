@@ -85,7 +85,7 @@ export class Model {
             },
             set: (target, key: string, value: any): boolean => {
                 const field = _class._define[key] as Field;
-                /** Check undefined value with Model._option.strict */
+                /** Check undefined field with Model._option.strict */
                 if (field === undefined) {
                     if (this._option.strict) {
                         throw new ModelError(`["${key}"] is not defined`)
@@ -98,6 +98,9 @@ export class Model {
                 try { value = field.validate(value) } catch (e) {
                     throw new ModelError(`["${key}"] => ${e}`)
                 };
+                if (value === undefined) {
+                    return Reflect.deleteProperty(target, key);
+                }
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
