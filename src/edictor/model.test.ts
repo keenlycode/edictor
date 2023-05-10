@@ -104,4 +104,11 @@ describe('class Model', () => {
             })
         }).toThrow(ModelError);
     });
+
+    test('Model.object()', () => {
+        user = new User({
+            "name": "Firstname Lastname"
+        });
+        expect(user.object()).toEqual({...user});
+    })
 })

@@ -55,7 +55,8 @@ export class ArrayOf extends Array {
     /** propery to keep validators */
     _validators: Array<string|Function>;
 
-    get object() {
+    /** Return a new native object with same data */
+    object(): Array<any> {
         return [...this];
     }
 

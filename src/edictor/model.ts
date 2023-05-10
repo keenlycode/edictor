@@ -152,4 +152,9 @@ export class Model {
         Object.assign(proxy, data);
         return proxy;
     }
+
+    /** Return a new native object with same data */
+    object(): Object {
+        return {...this};
+    }
 }

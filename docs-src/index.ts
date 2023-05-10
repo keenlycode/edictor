@@ -1,4 +1,4 @@
-import { Model, defineField } from 'edictor/src/edictor';
+import { Model, defineField, ArrayOf } from 'edictor/src/edictor';
 import './index.style';
 
 
@@ -35,6 +35,7 @@ Package.define({
 })
 
 window.Model = Model;
+window.ArrayOf = ArrayOf;
 window.defineField = defineField;
 window.Package = Package;
 window.Author = Author;

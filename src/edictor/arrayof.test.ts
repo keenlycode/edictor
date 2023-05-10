@@ -45,10 +45,10 @@ describe('class ArrayOf', () => {
     })
     
     test('ArrayOf().object', () => {
-        expect(array.object).toEqual(values);
+        expect(array.object()).toEqual(values);
     
         /** Return plain Array */
-        expect(array.object).not.toBeInstanceOf(ArrayOf);
-        expect(array.object).toBeInstanceOf(Array);
+        expect(array.object()).not.toBeInstanceOf(ArrayOf);
+        expect(array.object()).toBeInstanceOf(Array);
     });
 })
