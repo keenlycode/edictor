@@ -46,7 +46,7 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test.only('arrayOf()', () => {
+test('arrayOf()', () => {
     const values = ['a', 'b', 0, 1];
     const number = defineField({'name': 'number'}).instance('number');
     const arrayof: any = arrayOf('string', number);

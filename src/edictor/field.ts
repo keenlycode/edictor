@@ -111,27 +111,13 @@ export class Field {
             return value;
         }
 
-        /** Validate value by validators
-         * - if validator.name is one of ['arrayOf', 'model']
-         *   set value to the return value
-         *   which will be instanceof (ArrayOf|Model)
-         * - if validator.name is 'apply' set value to
-         *   the return value only if it's not undefined.
-        */
+        /** Validate and assign return value if undefined */
         for (const validator of this.validators) {
             try {
-                if (['arrayOf', 'model'].includes(validator.name)) {
-                    value = validator(value);
-                    continue;
+                const value_ = validator(value);
+                if (value_ !== undefined) {
+                    value = value_;
                 }
-                if (validator.name === 'apply') {
-                    const value_ = validator(value);
-                    if (value_ !== undefined) {
-                        value = value_;
-                    }
-                    continue;
-                }
-                validator(value);
             } catch (e) {
                 errors.push(e.message);
             }
