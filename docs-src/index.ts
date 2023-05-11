@@ -36,14 +36,22 @@ Package.define({
         .arrayOf(People)
 })
 
+const edictor = new Package({
+    "name": "Edictor",
+    "version": "0.0.1",
+    "homepage": "https://github.com/nitipit/edictor"
+});
+
+const contributor = new People({
+    name: "Someone Contributor",
+    email: "contributor@somewhere.com"
+})
+
+edictor.contributors.push(contributor);
+
 window.Model = Model;
 window.ArrayOf = ArrayOf;
 window.defineField = defineField;
 window.Package = Package;
 window.People = People;
-
-window.edictor = new Package({
-    "name": "Edictor",
-    "version": "0.0.1",
-    "homepage": "https://github.com/nitipit/edictor"
-})
+window.edictor = edictor;

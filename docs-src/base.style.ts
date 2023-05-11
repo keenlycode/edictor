@@ -37,10 +37,16 @@ img {
     width: 100%;
 }
 
+pre {
+    width: 100%;
+    max-width: 45rem;
+    margin: auto;
+}
+
 pre > code.hljs {
     box-sizing: border-box;
     width: 100%;
-    max-width: 50rem;
+    max-width: 45rem;
     font-size: 0.75rem;
     margin: auto;
     padding: 1.5rem 1rem;
@@ -67,6 +73,7 @@ el-icon {
     width: 90%;
     max-width: 1000px;
     min-width: 300px;
+    margin: auto;
 }
 
 .flex {

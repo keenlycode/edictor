@@ -31,7 +31,7 @@ Package.define({
     author: /** Nested data */
         defineField()
         .model(People),
-    contributors: defineField()
+    contributors: defineField({initial: []})
         .arrayOf(People)
 })
 ```
