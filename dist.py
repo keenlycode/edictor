@@ -1,10 +1,10 @@
 import asyncio
-from dev import dist_module
+from dev import dist
 
 
 async def main():
     await asyncio.gather(
-        dist_module(mode='build'),
+        dist(mode='build'),
     )
 
 

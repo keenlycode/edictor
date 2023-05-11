@@ -7,8 +7,8 @@ async def unittest():
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def dist_module(mode='watch'):
-    cmd = f"npx parcel {mode} --target=module 'src/edictor.ts'"
+async def dist(mode='watch'):
+    cmd = f"npm run {mode}"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
@@ -16,7 +16,7 @@ async def dist_module(mode='watch'):
 async def main():
     await asyncio.gather(
         unittest(),
-        dist_module(),
+        dist(),
     )
 
 if __name__ == "__main__":
