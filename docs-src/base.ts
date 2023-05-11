@@ -4,12 +4,11 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import { Button } from 'gadjet/src/gadjet';
 import { ButtonSquare } from 'gadjet/src/gadjet';
 import { Icon } from '@nitipit/icon/src/icon';
-
 import './base.style';
 
 
 let _base_url: URL = document.currentScript.src;
-_base_url = new URL('./', _base_url);
+_base_url = new URL('./', _base_url).toString();
 
 hljs.registerLanguage('javascript', javascript);
 hljs.highlightAll();

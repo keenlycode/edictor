@@ -4,17 +4,17 @@ import {
     fontFluid
 } from "gadjet/src/gadjet";
 
-let _src = document.currentScript.src;
-_src = new URL(_src);
+let _base_url = document.currentScript.src;
+_base_url = new URL('./', _base_url).toString();
 
 css`
 @font-face {
     font-family: sans;
-    src: url(${_src}/asset/font/NotoSansThaiLooped-Regular.ttf);
+    src: url(${_base_url}asset/font/NotoSansThaiLooped-Regular.ttf);
 }
 @font-face {
     font-family: monospace;
-    src: url(${_src}/asset/font/FiraCode-VariableFont_wght.ttf);
+    src: url(${_base_url}asset/font/FiraCode-VariableFont_wght.ttf);
 }
 
 html {
@@ -47,7 +47,7 @@ pre > code.hljs {
     box-sizing: border-box;
     width: 100%;
     max-width: 45rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     margin: auto;
     padding: 1.5rem 1rem;
 }
