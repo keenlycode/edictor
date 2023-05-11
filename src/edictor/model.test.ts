@@ -68,6 +68,11 @@ describe('class Model', () => {
         expect(() => { Test.define({'property': 1}) }).toThrow(DefineError);
     })
 
+    test('Model.field()', () => {
+        const field = User.field();
+        expect(field).toEqual(User._define);
+    })
+
     test('Model.constructor()', () => {
         expect(() => { new User([1,2,3]) }).toThrow(ModelError);
         expect(() => { new User(1)}).toThrow(ModelError);
@@ -104,14 +109,14 @@ describe('class Model', () => {
         }).toThrow(ModelError);
     });
 
-    test('Model.object()', () => {
+    test('Model().object()', () => {
         let user = new User({
             "name": "Firstname Lastname"
         });
         expect(user.object()).toEqual({...user});
     })
 
-    test('Model.update()', () => {
+    test('Model().update()', () => {
         let user = new User({
             "name": "First Last"
         });

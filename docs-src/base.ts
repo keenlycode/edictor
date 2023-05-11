@@ -7,7 +7,7 @@ import { Icon } from '@nitipit/icon/src/icon';
 import './base.style';
 
 
-let _base_url: URL = document.currentScript.src;
+let _base_url:any  = document.currentScript.src;
 _base_url = new URL('./', _base_url).toString();
 
 hljs.registerLanguage('javascript', javascript);

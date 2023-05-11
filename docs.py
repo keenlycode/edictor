@@ -8,7 +8,7 @@ async def docs_html():
     await proc.communicate()
 
 async def docs_javascript():
-    cmd = f"npx parcel watch --target=docs 'docs-src/**/*.ts' --dist-dir=docs"
+    cmd = f"npx parcel watch --target=docs 'docs-src/**/*.ts'"
     print(f"{cmd} ...")
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()

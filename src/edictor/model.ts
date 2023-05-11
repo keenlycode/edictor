@@ -72,6 +72,10 @@ export class Model {
         this._define = model;
     }
 
+    static field() {
+        return {...this._define};
+    }
+
     protected _option: ModelOption;
 
     constructor(data: Object = {}, option: ModelOption = {}) {

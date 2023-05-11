@@ -7,35 +7,16 @@ async def unittest():
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def dist_module(watch=True):
-    cmd = f"npx tsc --project src/"
-    if (watch == True):
-        cmd = cmd + f" --watch"
+async def dist_module(mode='watch'):
+    cmd = f"npx parcel {mode} --target=module 'src/edictor.ts'"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
-
-async def dist_browser(mode='watch'):
-    cmd = f"npx parcel {mode} --target=bundle 'src/edictor.ts'"
-    print(f"{cmd} ...")
-    proc = await asyncio.create_subprocess_shell(cmd)
-    await proc.communicate()
-
-async def docs_html():
-    cmd = 'engrave dev docs-src docs --asset --server'
-    print(f'{cmd} ...')
-    proc = await asyncio.create_subprocess_shell(cmd)
-    await proc.communicate()
-
-async def docs_javascript():
-    cmd = f"npx parcel watch --target=docs 'docs-src/**/*.ts'"
-
 
 async def main():
     await asyncio.gather(
         unittest(),
         dist_module(),
-        dist_browser(),
     )
 
 if __name__ == "__main__":

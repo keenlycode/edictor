@@ -1,4 +1,4 @@
-import { Model, defineField, ArrayOf } from 'edictor/src/edictor';
+import { Model, defineField, ArrayOf } from './edictor.js';
 import './index.style';
 
 
