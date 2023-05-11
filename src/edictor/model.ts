@@ -20,8 +20,21 @@ export class DefineError extends Error {
     }
 };
 
+export class UpdateError extends Error {
+    name: string;
+    message: string;
+    constructor(message='') {
+        super(message);
+        this.name = this.constructor.name;
+    }
+};
+
 interface ModelOption {
     strict?: boolean
+}
+
+interface UpdateOption {
+    atomic?: boolean;
 }
 
 export class Model {
@@ -163,5 +176,17 @@ export class Model {
     /** Return a new native object with same data */
     object(): Object {
         return {...this};
+    }
+
+    update(data: Object): void {
+        const class_ = this.constructor as typeof Model;
+        try {
+            new class_({ ...this.object(), ...data });
+        } catch (e) {
+            throw new UpdateError(e.message);
+        }
+        for (const key in data) {
+            this[key] = data[key];
+        }
     }
 }

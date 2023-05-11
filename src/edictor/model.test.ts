@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { DefineError, Model, ModelError } from './model';
+import { DefineError, Model, ModelError, UpdateError } from './model';
 import { defineField, Field } from './field';
 
 
@@ -57,7 +57,6 @@ describe('class Model', () => {
             .instance('string')
             .regexp(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/)
     });
-    let user: User;
 
     test('Model.define()', () => {
         expect(Object.keys(User._define)).toEqual(['name', 'phone']);
@@ -73,7 +72,7 @@ describe('class Model', () => {
         expect(() => { new User([1,2,3]) }).toThrow(ModelError);
         expect(() => { new User(1)}).toThrow(ModelError);
 
-        user = new User({
+        let user = new User({
             "name": "Firstname Lastname"
         });
         user['phone'] = '+11 111 1111';
@@ -106,9 +105,21 @@ describe('class Model', () => {
     });
 
     test('Model.object()', () => {
-        user = new User({
+        let user = new User({
             "name": "Firstname Lastname"
         });
         expect(user.object()).toEqual({...user});
+    })
+
+    test('Model.update()', () => {
+        let user = new User({
+            "name": "First Last"
+        });
+        expect(() => { user.update({name: "test", phone: 1}) })
+            .toThrow(UpdateError);
+        expect(user).toEqual({name: "First Last"});
+
+        user.update({name: "test", phone: "+66 111 1111"});
+        expect(user).toEqual({name: "test", phone: "+66 111 1111"});
     })
 })
