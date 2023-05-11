@@ -2,6 +2,7 @@ import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import { Button } from 'gadjet/src/gadjet';
+import { ButtonSquare } from 'gadjet/src/gadjet';
 import { Icon } from '@nitipit/icon/src/icon';
 
 import './base.style';
@@ -23,3 +24,5 @@ Button.tagStyle({
 Button.classStyle('gray', {
     color: '#deddda'
 })
+
+ButtonSquare.define('el-button-square');

@@ -59,6 +59,10 @@ p {
     width: 100%;
 }
 
+el-icon {
+    fill: currentColor;
+}
+
 .container {
     width: 90%;
     max-width: 1000px;

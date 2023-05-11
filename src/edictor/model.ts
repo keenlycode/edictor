@@ -122,6 +122,10 @@ export class Model {
          * - Also delete data[key] after assigned.
         */
         for (const key in _class._define) {
+            if (data[key] === undefined) {
+                proxy[key] = _class._define[key].option.initial;
+                continue;
+            }
             try {
                 proxy[key] = data[key];
             } catch (e) {

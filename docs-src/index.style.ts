@@ -2,7 +2,7 @@ import { addStyle as css } from "gadjet/src/gadjet";
 
 css`
 body {
-    color: white;
+    color: #f6f5f4;
     background: #241f31;
 }
 #header {

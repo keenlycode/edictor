@@ -61,7 +61,10 @@ export class Field {
         option = {...DefineField.option, ...option};
         if (option.initial !== undefined) {
             this.validate(option.initial);
-        };
+        }
+        if (this.value === undefined) {
+            this._value = option.initial;
+        }
         this._option = option;
     }
 
