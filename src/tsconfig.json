@@ -1,7 +1,7 @@
 // tsconfig.json for tsc compile.
 {
     "compilerOptions": {
-        "lib": ["es2017", "DOM"],
+        // "lib": ["es2017", "DOM"],
         "target": "es6",
         "module": "es6",
         "moduleResolution": "node",
