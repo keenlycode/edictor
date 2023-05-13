@@ -60,13 +60,21 @@ export class Model {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
             } else {
-                errors.push(`\n- [${key}]: value is not an instance of DefineField`)
+                errors.push(`\n- [${key}]: value is not an instance of DefineField`);
+                continue;
+            }
+            if (field.option.initial !== undefined) {
+                try {
+                    field.validate(field.option.initial);
+                } catch (e) {
+                    errors.push(`\n- [${key}]: ${e}`);
+                }
             }
 
             model[key] = field;
         }
         if (errors.length > 0) {
-            throw new DefineError(`${errors}`);
+            throw new DefineError(`${this}.define ${errors}`);
         }
         this._define = model;
     }
@@ -79,13 +87,13 @@ export class Model {
 
     constructor(data: Object = {}, option: ModelOption = {}) {
         if (data instanceof Array) {
-            throw new ModelError(`new ${this.constructor.name}() initial data`
-            + ` must be instance of object. Received Array`);
+            throw new ModelError(`new ${this.constructor.name}(data) => `
+            + `data must be instance of object. Received Array`);
         }
 
         if (!(data instanceof Object)) {
-            throw new ModelError(`new ${this.constructor.name}() initial data`
-            + ` must be an instance of object, Received ${typeof(data)}`);
+            throw new ModelError(`new ${this.constructor.name}(data) => `
+            + `data must be an instance of object, Received ${typeof(data)}`);
         }
 
         /** Isolate recevied data */
@@ -104,7 +112,7 @@ export class Model {
                 /** Check undefined field with Model._option.strict */
                 if (field === undefined) {
                     if (this._option.strict) {
-                        throw new ModelError(`["${key}"] is not defined`)
+                        throw new ModelError(`${this.constructor.name}()["${key}"] is not defined`)
                     } else {
                         target[key] = value;
                         return true;
@@ -112,7 +120,7 @@ export class Model {
                 }
                 /** Validate value */
                 try { value = field.validate(value) } catch (e) {
-                    throw new ModelError(`["${key}"] => ${e}`)
+                    throw new ModelError(`${this.constructor.name}()["${key}"] => ${e}`)
                 };
                 if (value === undefined) {
                     return Reflect.deleteProperty(target, key);
@@ -151,11 +159,11 @@ export class Model {
         }
 
         if (errors.length > 0) {
-            let msg = ``;
+            let msg: string;
             for (const error of errors) {
                 msg += `\n- ${error}`
             }
-            throw new ModelError(msg);
+            throw new ModelError(`new ${this.constructor.name}(data) ${msg}`);
         }
 
          /** If there's no data left, return proxy */
@@ -168,7 +176,10 @@ export class Model {
 
         /** If Model is stricted, throw ModelError */
         if (this._option.strict) {
-            throw new ModelError(`Data keys [${keys}] exeeds defined fields`)
+            throw new ModelError(
+                `new ${this.constructor.name}(data):`
+                + `\ndata[${keys}] exeeds defined fields`
+            )
         }
 
         /** Model is not stricted. Assign data to Model() */
@@ -186,7 +197,10 @@ export class Model {
         try {
             new class_({ ...this.object(), ...data });
         } catch (e) {
-            throw new UpdateError(e.message);
+            throw new UpdateError(
+                `${this.constructor.name}().update(data)\n`
+                + `${e.message}`
+            );
         }
         for (const key in data) {
             this[key] = data[key];
