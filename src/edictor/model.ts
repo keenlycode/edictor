@@ -33,25 +33,24 @@ interface ModelOption {
     strict?: boolean
 }
 
-interface UpdateOption {
-    atomic?: boolean;
-}
 
 export class Model {
     static _define = {};
     static _option: ModelOption = {strict: true};
 
     static define(model: Object = {}, option: ModelOption = {}) {
-        if (this.name === 'Model') {
+        const superClass = Object.getPrototypeOf(this);
+        this._option = {...superClass._option, ...option};
+        this._define = {...superClass._define};
+        const errors = [];
+
+        if (superClass.name === '') {
             throw new DefineError(
                 `Model.define() is prohibited. `
                 + `It must be called from a subclass`
             )
         }
-        const superClass = Object.getPrototypeOf(this);
-        this._option = {...superClass._option, ...option};
-        this._define = {...superClass._define};
-        const errors = [];
+
         for (let [key, defineField] of Object.entries(model)) {
 
             /** Get Field() instance if value is DefineField() */
