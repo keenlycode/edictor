@@ -161,9 +161,9 @@ export class Model {
             }
             delete data[key];
         }
-
+        
+        let msg: string = '';
         if (errors.length > 0) {
-            let msg: string;
             for (const error of errors) {
                 msg += `\n- ${error}`
             }
