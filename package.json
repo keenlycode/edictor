@@ -2,6 +2,7 @@
     "name": "edictor",
     "version": "0.0.1",
     "description": "Smart & Simple Javascript data schema and validation",
+    "type": "module",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/nitipit/edictor.git"
