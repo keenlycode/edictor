@@ -42,8 +42,8 @@
     },
     "scripts": {
         "test": "jest",
-        "watch": "parcel watch --no-cache",
-        "build": "parcel build --no-cache"
+        "watch": "parcel watch --no-cache --target=es6 --target=types",
+        "build": "parcel build --no-cache --target=es6 --target=types"
     },
     "source": "src/edictor.ts",
     "module": "dist/edictor.js",
@@ -57,9 +57,7 @@
             "isLibrary": true
         },
         "docs": {
-            "distDir": "docs",
-            "outputFormat": "esmodule",
-            "isLibrary": true
+            "distDir": "docs"
         }
     }
 }

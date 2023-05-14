@@ -1,5 +1,5 @@
 ```javascript
-import { Model, defineField } from 'edictor/src/edictor';
+import { Model, defineField } from 'edictor';
 
 class Package extends Model {};
 class People extends Model {};

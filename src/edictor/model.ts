@@ -1,4 +1,5 @@
 import { Field, DefineField, defineField } from './field';
+import { ArrayOf } from './arrayof';
 export { Field, DefineField, defineField };
 
 
@@ -192,7 +193,24 @@ export class Model {
 
     /** Return a new native object with same data */
     object(): Object {
-        return {...this};
+        const object = {...this};
+
+        /** Recursive transform Array() and Model() to native object */
+        for (const key of Object.keys(object)) {
+            if (object[key] instanceof Model) {
+                object[key] = object[key].object();
+            } else if (object[key] instanceof ArrayOf) {
+                object[key] = object[key].object();
+                for (const i in object[key]) {
+                    if (object[key][i] instanceof Model) {
+                        object[key][i] = object[key][i].object();
+                    } else if (object[key][i] instanceof ArrayOf) {
+                        object[key][i] = object[key][i].object();
+                    }
+                }
+            }
+        }
+        return object;
     }
 
     update(data: Object): void {
