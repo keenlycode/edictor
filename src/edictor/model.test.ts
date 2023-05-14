@@ -55,17 +55,25 @@ describe('class Model', () => {
             .instance('string'),
         phone: defineField()
             .instance('string')
-            .regexp(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/)
+            .regexp(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/),
+        enable: defineField({initial: false}).instance('boolean')
     });
 
     test('Model.define()', () => {
-        expect(Object.keys(User._define)).toEqual(['name', 'phone']);
+        expect(Object.keys(User._define)).toEqual(['name', 'phone', 'enable']);
         expect(User._define['name'] instanceof Field);
         expect(User._define['name'].name).toEqual('name');
 
         expect(() => { Model.define() }).toThrow(DefineError);
         class Test extends Model {};
         expect(() => { Test.define({'property': 1}) }).toThrow(DefineError);
+
+        class ModelDefineError extends Model {};
+        expect(() => {
+            ModelDefineError.define({
+                name: defineField({initial: 1}).instance('string')
+            });
+        }).toThrow(DefineError);
     })
 
     test('Model.field()', () => {
@@ -122,9 +130,10 @@ describe('class Model', () => {
         });
         expect(() => { user.update({name: "test", phone: 1}) })
             .toThrow(UpdateError);
-        expect(user).toEqual({name: "First Last"});
+
+        expect(user).toEqual({name: "First Last", enable: false});
 
         user.update({name: "test", phone: "+66 111 1111"});
-        expect(user).toEqual({name: "test", phone: "+66 111 1111"});
+        expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
     })
 })

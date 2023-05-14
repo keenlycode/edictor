@@ -67,14 +67,17 @@ export class Model {
                 try {
                     field.validate(field.option.initial);
                 } catch (e) {
-                    errors.push(`\n- [${key}]: ${e}`);
+                    errors.push(
+                        `\n- Field({initial: ${field.option.initial}})`
+                        + ` conflicts with Field's validation => ${e}`
+                    );
                 }
             }
 
             model[key] = field;
         }
         if (errors.length > 0) {
-            throw new DefineError(`${this}.define ${errors}`);
+            throw new DefineError(`${this.name}.define ${errors}`);
         }
         this._define = model;
     }
