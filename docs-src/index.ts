@@ -48,6 +48,7 @@ const contributor = new People({
 })
 
 edictor.contributors.push(contributor);
+edictor.contributors.push(1);
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;

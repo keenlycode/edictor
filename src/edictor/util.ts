@@ -34,7 +34,7 @@ export class AssertError extends Error {
 
     constructor(message) {
         super(message);
-        this.name = this.constructor.name;
+        this.name = 'AssertError';
     }
 }
 

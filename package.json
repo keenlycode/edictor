@@ -42,14 +42,20 @@
     },
     "scripts": {
         "test": "jest",
-        "watch": "parcel watch",
-        "build": "parcel build"
+        "watch": "parcel watch --target=default",
+        "build": "parcel build --target=default"
     },
     "source": "src/edictor.ts",
-    "main": "dist/main.js",
-    "module": "dist/module.js",
+    "module": "dist/edictor.js",
     "types": "dist/types.d.ts",
     "targets": {
+        "module": false,
+        "es6": {
+            "source": "src/edictor.ts",
+            "distDir": "dist/",
+            "outputFormat":  "esmodule",
+            "isLibrary": true
+        },
         "docs": {
             "distDir": "docs"
         }
