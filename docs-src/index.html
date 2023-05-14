@@ -11,7 +11,7 @@
             <img src="ring.webp?v={{_v}}">
         </div>
         <div class="flex" el="right">
-            <h1 class="width-100">{Edictor}</h1>
+            <h1 class="width-100">{ Edictor }</h1>
             <h2 class="width-100">
                 Modular & Self-Contained<br>
                 Javascript object<br>
@@ -31,18 +31,15 @@
     </div>
 </div>
 <div id="define" class="view">
-    <div class="container">
-        <h2>Define</h2>
+    <div class="containerflex flex-center">
         {{markdown('index.html.define.md')}}
+        </div>
     </div>
 </div>
 
-<div id="assign">
+<div id="create">
     <div class="container flex flex-center" style="margin-top: 5rem;">
-        <h2 class="width-100" style="text-align: center;">
-            Create like an object
-        </h2>
-        {{markdown('index.html.assign.md')}}
+        {{markdown('index.html.create.md')}}
     </div>
 </div>
 
@@ -50,6 +47,13 @@
     <div class="container flex flex-center" style="margin-top: 5rem;">
         <h2 class="width-100" style="text-align: center;">Modular</h2>
         {{markdown('index.html.modular.md')}}
+    </div>
+</div>
+
+<div id="retrieve">
+    <div class="container flex flex-center" style="margin-top: 5rem;">
+        <h2 class="width-100" style="text-align: center;">Retrieve</h2>
+        <div class="p">{{markdown('index.html.retrieve.md')}}</div>
     </div>
 </div>
 

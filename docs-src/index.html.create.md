@@ -1,3 +1,5 @@
+## Create like an object
+
 ```javascript
 const edictor = new Package({
     "name": "Edictor",

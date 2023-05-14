@@ -1,3 +1,7 @@
+## Define
+
+Let's try to define a schema for npm's `package.json`.
+
 ```javascript
 import { Model, defineField } from 'edictor';
 

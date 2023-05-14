@@ -55,12 +55,12 @@ pre > code.hljs {
 code {
     padding: 0.2rem 0.5rem 0.2rem 0.5rem;
     font-size: 0.8rem;
-    line-height: 1.5;
     border-radius: 0.4rem;
+    vertical-align: text-bottom;
     ${bgColor('#3d3846')}
 }
 
-p {
+div.p, p {
     max-width: 45rem;
     width: 100%;
 }

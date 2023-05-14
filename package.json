@@ -1,7 +1,7 @@
 {
     "name": "edictor",
-    "version": "0.0.1",
-    "description": "Smart & Simple Javascript data schema and validation",
+    "version": "0.1.0dev",
+    "description": "Modular & Self-Contained Javascript object definition and validation",
     "type": "module",
     "repository": {
         "type": "git",
@@ -11,11 +11,7 @@
         "url": "https://github.com/nitipit/edictor/issues"
     },
     "homepage": "https://github.com/nitipit/edictor#readme",
-    "keywords": [
-        "schema",
-        "json",
-        "validation"
-    ],
+    "keywords": ["schema", "json", "validation"],
     "author": "Nitipit Nontasuwan",
     "license": "ISC",
     "files": [
