@@ -42,8 +42,8 @@
     },
     "scripts": {
         "test": "jest",
-        "watch": "parcel watch --target=default",
-        "build": "parcel build --target=default"
+        "watch": "parcel watch --no-cache",
+        "build": "parcel build --no-cache"
     },
     "source": "src/edictor.ts",
     "module": "dist/edictor.js",
@@ -53,11 +53,13 @@
         "es6": {
             "source": "src/edictor.ts",
             "distDir": "dist/",
-            "outputFormat":  "esmodule",
+            "outputFormat": "esmodule",
             "isLibrary": true
         },
         "docs": {
-            "distDir": "docs"
+            "distDir": "docs",
+            "outputFormat": "esmodule",
+            "isLibrary": true
         }
     }
 }
