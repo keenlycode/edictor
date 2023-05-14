@@ -44,11 +44,15 @@ describe('class ArrayOf', () => {
         expect(array).toEqual(date_string_array);
     })
     
-    test('ArrayOf().object', () => {
+    test('ArrayOf().object()', () => {
         expect(array.object()).toEqual(values);
     
         /** Return plain Array */
         expect(array.object()).not.toBeInstanceOf(ArrayOf);
         expect(array.object()).toBeInstanceOf(Array);
+    });
+
+    test('ArrayOf().json()', () => {
+        expect(JSON.parse(array.json())).toEqual(array);
     });
 })

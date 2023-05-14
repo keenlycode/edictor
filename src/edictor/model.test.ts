@@ -117,13 +117,6 @@ describe('class Model', () => {
         }).toThrow(ModelError);
     });
 
-    test('Model().object()', () => {
-        let user = new User({
-            "name": "Firstname Lastname"
-        });
-        expect(user.object()).toEqual({...user});
-    })
-
     test('Model().update()', () => {
         let user = new User({
             "name": "First Last"
@@ -135,5 +128,19 @@ describe('class Model', () => {
 
         user.update({name: "test", phone: "+66 111 1111"});
         expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
+    })
+
+    test('Model().object()', () => {
+        let user = new User({
+            "name": "Firstname Lastname"
+        });
+        expect(user.object()).toEqual({...user});
+    })
+
+    test('Model().json()', () => {
+        let user = new User({
+            "name": "Firstname Lastname"
+        });
+        expect(JSON.parse(user.json())).toEqual(user);
     })
 })

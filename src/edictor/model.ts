@@ -191,28 +191,6 @@ export class Model {
         return proxy;
     }
 
-    /** Return a new native object with same data */
-    object(): Object {
-        const object = {...this};
-
-        /** Recursive transform Array() and Model() to native object */
-        for (const key of Object.keys(object)) {
-            if (object[key] instanceof Model) {
-                object[key] = object[key].object();
-            } else if (object[key] instanceof ArrayOf) {
-                object[key] = object[key].object();
-                for (const i in object[key]) {
-                    if (object[key][i] instanceof Model) {
-                        object[key][i] = object[key][i].object();
-                    } else if (object[key][i] instanceof ArrayOf) {
-                        object[key][i] = object[key][i].object();
-                    }
-                }
-            }
-        }
-        return object;
-    }
-
     update(data: Object): void {
         const class_ = this.constructor as typeof Model;
         try {
@@ -226,5 +204,15 @@ export class Model {
         for (const key in data) {
             this[key] = data[key];
         }
+    }
+
+    /** Return a new native object with same data */
+    object(): Object {
+        return JSON.parse(JSON.stringify(this));
+    }
+
+    /** Return JSON */
+    json(): string {
+        return JSON.stringify(this);
     }
 }

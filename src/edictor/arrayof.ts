@@ -57,7 +57,12 @@ export class ArrayOf extends Array {
 
     /** Return a new native object with same data */
     object(): Array<any> {
-        return [...this];
+        return JSON.parse(JSON.stringify(this));
+    }
+
+    /** Return JSON */
+    json(): string {
+        return JSON.stringify(this);
     }
 
     push(...values: any[]): number {
