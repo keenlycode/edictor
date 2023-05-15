@@ -169,6 +169,11 @@ export class DefineField {
         return this._validators;
     }
 
+    /** Check instance type
+     * @param {...(string|Class)} types - type for instance test
+     *     Use string for primative type test, for example:
+     *     'string', 'number', 'boolean'
+     */
     instance(...types) {
         return new DefineField(
             this.option,

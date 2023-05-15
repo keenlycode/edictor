@@ -42,12 +42,18 @@ const edictor = new Package({
     "homepage": "https://github.com/nitipit/edictor"
 });
 
+const author = new People({
+    name: "Author",
+    email: "author@somewhere.com"
+})
+
 const contributor = new People({
-    name: "Someone Contributor",
+    name: "Some Contributor",
     email: "contributor@somewhere.com"
 })
 
-edictor.contributors.push(contributor);
+edictor['author'] = author;
+edictor['contributors'].push(contributor);
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;
