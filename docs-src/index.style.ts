@@ -5,6 +5,11 @@ body {
     color: #f6f5f4;
     background: #241f31;
 }
+
+a {
+    color: #f6f5f4;
+}
+
 #header {
     display: flex;
     flex-wrap: wrap;

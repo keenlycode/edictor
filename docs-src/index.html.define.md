@@ -1,6 +1,7 @@
 ## Define
 
-Let's try to define a model / schema for npm's `package.json`.
+Let's try to define a model / schema for npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
+package.json</a>.
 
 ```javascript
 import { Model, defineField } from 'edictor';
