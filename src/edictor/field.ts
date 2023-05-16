@@ -174,7 +174,7 @@ export class DefineField {
      *     Use string for primative type test, for example:
      *     'string', 'number', 'boolean'
      */
-    instance(...types) {
+    instance(...types): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.instance(...types)]);
