@@ -30,6 +30,8 @@ export interface FieldOption {
     grant?: any[];
 }
 
+type Class = { new(...args: any[]): any; };
+
 
 export class Field {
 
@@ -169,17 +171,21 @@ export class DefineField {
         return this._validators;
     }
 
-    /** Check instance type
-     * @param {...(string|Class)} types - type for instance test
-     *     Use string for primative type test, for example:
-     *     'string', 'number', 'boolean'
+    /** Validate instance type
+     * - Use string for primative type validation, for example:
+     *   'string', 'number', 'boolean'
      */
-    instance(...types): DefineField {
+    instance(...types: Array<string|Class>): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.instance(...types)]);
     }
 
+    /** Validate by regular expression
+     * @param {regexp_} RegExp - type for instance test
+     * - Use string for primative type validation, for example:
+     *   'string', 'number', 'boolean'
+     */
     regexp(regexp_: RegExp) {
         return new DefineField(
             this.option,

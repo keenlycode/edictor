@@ -1,6 +1,6 @@
 {
     "name": "edictor",
-    "version": "0.1.0dev",
+    "version": "0.1.0",
     "description": "Modular & Self-Contained Javascript object definition and validation",
     "type": "module",
     "repository": {
