@@ -171,9 +171,11 @@ export class DefineField {
         return this._validators;
     }
 
-    /** Validate instance type
-     * - Use string for primative type validation, for example:
-     *   'string', 'number', 'boolean'
+    /** Validate field's value to be an instance of provide types or classes.
+     * Use string to validate primative type, for example:
+     * ```
+     * defineField().instance('string', 'number');
+     * ```
      */
     instance(...types: Array<string|Class>): DefineField {
         return new DefineField(
@@ -182,29 +184,49 @@ export class DefineField {
     }
 
     /** Validate by regular expression
-     * @param {regexp_} RegExp - type for instance test
-     * - Use string for primative type validation, for example:
-     *   'string', 'number', 'boolean'
+     * Example:
+     * ```
+     * defineField().regexp(/.*.html$/);
+     * ```
      */
-    regexp(regexp_: RegExp) {
+    regexp(regexp_: RegExp): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.regexp(regexp_)]);
     }
 
-    assert(func: (value: any) => boolean, msg: string|Function = '') {
+    /** Assert field's value with provided function (value) => boolean.
+     * Example:
+     * ```
+     * defineField().assert((value) => { return value <= 10 });
+     * ```
+     */
+    assert(func: (value: any) => boolean, msg: string|Function = ''): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.assert(func, msg)]);
     }
 
-    apply(func: Function) {
+    /** Apply function to field's value. 
+     * Field's value can be changed to the return value from function.
+     * Example:
+     * ```
+     * defineField().instance('string').apply(function string_to_number(value) { return Number(value) });
+     * ```
+     */
+    apply(func: Function): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.apply(func)]);
     }
 
-    arrayOf(...validators: Array<string|Function>|any) {
+    /** Validate fields' value to be array of provided validators as
+     * - Primative types: use string such as 'string', 'number' etc.
+     * - Function which throw error if value is not valid
+     * - Class to check type of field's value.
+     */
+
+    arrayOf(...validators: Array<string|Function>|any): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.arrayOf(...validators)]);
