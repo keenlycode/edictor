@@ -1,4 +1,4 @@
-import { is_class, is_function } from './util';
+import { is_class, is_function, Class } from './util';
 import { Field } from './field';
 import { DefineField, Model } from './model';
 import { ArrayOf as _ArrayOf } from './arrayof';
@@ -46,11 +46,10 @@ export class ArrayOf extends _ArrayOf {
 
 
 /** Check instance type
- * @param {...(string|Class)} types - type for instance test
- *     Use string for primative type test, for example:
- *     'string', 'number', 'boolean'
- */
-export const instance = (...types) => {
+ *  Use string for primative type test, for example:
+ *  'string', 'number', 'boolean'
+  */
+export const instance = (...types: Array<string|Class>) => {
     const wrapper = (value, types): void => {
         let valid = false;
         for (const type of types) {
@@ -113,12 +112,12 @@ export const apply = (func: Function): any => {
 
 /** Check if value is array of something. */
 export const arrayOf = (
-        ...validators: Array<string|Function|DefineField|Field>
+        ...validators: Array<string|Function|Class|DefineField|Field>
     ) : (values) => ArrayOf => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
             values,
-            validators: Array<string|Function|DefineField|Field>
+            validators: Array<string|Function|Class|DefineField|Field>
         ): ArrayOf => {
         if (!(values instanceof Array)) {
             throw new ValidationError(`${values} is not iterable`);

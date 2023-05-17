@@ -1,6 +1,7 @@
 import * as Validator from './validator';
 import { ArrayOf } from './validator';
 import { Model } from './model';
+import { Class } from './util';
 
 
 /** Error class to show when setting value doesn't pass validation. */
@@ -29,8 +30,6 @@ export interface FieldOption {
     initial?: any;
     grant?: any[];
 }
-
-type Class = { new(...args: any[]): any; };
 
 
 export class Field {
@@ -220,24 +219,27 @@ export class DefineField {
             [...this.validators, Validator.apply(func)]);
     }
 
-    /** Validate fields' value to be array of provided validators as
-     * - Primative types: use string such as 'string', 'number' etc.
-     * - Function which throw error if value is not valid
-     * - Class to check type of field's value.
+    /** Validate field's value to be an array of provided validators
+     * - To validate primative types: use string such as 'string', 'number' etc.
+     * - Function validator must throw error if value is not valid.
+     * - Class validator.
      */
-
-    arrayOf(...validators: Array<string|Function>|any): DefineField {
+    arrayOf(...validators: Array<string|Function|Class|DefineField|Field>): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.arrayOf(...validators)]);
     }
 
+    /** Validate object to pass the Model validation
+     * Useful for nested data.
+     */
     model(model_class: typeof Model): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.model(model_class)]);
     }
 
+    /** Get Field() instance */
     field(option: FieldOption = {}): Field {
         option = {...this.option, ...option};
         const field = new Field(option);

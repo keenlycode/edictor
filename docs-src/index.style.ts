@@ -57,15 +57,12 @@ a {
         margin-top: 2rem;
     }
 }
-.view {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    height: auto;
+
+.section {
     h2 {
-        text-align: center;
         width: 100%;
+        text-align: center;
+        max-width: 45rem;
     }
 }
 

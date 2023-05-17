@@ -49,7 +49,7 @@ pre > code.hljs {
     max-width: 45rem;
     font-size: 0.8rem;
     margin: auto;
-    padding: 1.5rem 1rem;
+    padding: 1rem 1rem;
 }
 
 code {

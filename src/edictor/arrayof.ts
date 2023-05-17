@@ -1,7 +1,8 @@
 import {
     is_function,
     is_class,
-    assert
+    assert,
+    Class
 } from './util';
 
 
@@ -19,12 +20,7 @@ export class ArrayOfError extends Error {
 /** Modified array which check it's members instance. */
 export class ArrayOf extends Array {
 
-    /**
-     * @param validator
-     * @param {Array<any>} values - values in an array. 
-     * @returns {ArrayOf}
-     */
-    constructor(...validators: Array<string|Function>) {
+    constructor(...validators: Array<string|Function|Class>) {
         super();
         this._validators = validators; // keep validators for setting a new value.
 
@@ -53,7 +49,7 @@ export class ArrayOf extends Array {
     }
 
     /** propery to keep validators */
-    _validators: Array<string|Function>;
+    _validators: Array<string|Function|Class>;
 
     /** Return a new native object with same data */
     object(): Array<any> {
@@ -92,7 +88,7 @@ export class ArrayOf extends Array {
     /** validate all values */
     _validate_values(
             values: Array<any>,
-            validators_: Array<string|Function>) {
+            validators_: Array<string|Function|Class>) {
 
         /** Isolate validators by cloning to a new one */
         const validators = [...validators_];

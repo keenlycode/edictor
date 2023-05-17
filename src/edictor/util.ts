@@ -1,3 +1,5 @@
+export type Class = { new(...args: any[]): any; };
+
 /** Utility function to check if instance is a Function */
 export function is_function(instance) {
     if (!(instance instanceof Function)) {
