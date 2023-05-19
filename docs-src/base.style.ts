@@ -76,6 +76,12 @@ el-icon {
     margin: auto;
 }
 
+.block-text {
+    max-width: 45rem;
+    min-width: 300px;
+    margin: auto;
+}
+
 .flex {
     display: flex;
     flex-wrap: wrap;

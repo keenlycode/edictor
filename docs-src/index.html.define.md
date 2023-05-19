@@ -1,9 +1,12 @@
-## Define
+<div class="flex flex-center width-100">
+    <h2>Define</h2>
+</div>
 
 Let's try to define a model / schema for npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
 package.json</a>.
 
 ```javascript
+/** ES Module */
 import { Model, defineField } from 'edictor';
 
 class Package extends Model {};

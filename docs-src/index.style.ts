@@ -65,7 +65,7 @@ a {
     }
 }
 
-#define {
+#install {
     background: rgb(0,0,0);
     background: linear-gradient(180deg, rgba(0,0,0,1) 0%, #241f31 80%);
 }
