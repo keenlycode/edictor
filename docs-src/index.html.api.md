@@ -1,3 +1,5 @@
+<h2 class="width-100" style="text-align: center;">Concise APIs</h2>
+
 Did you notice ? There are only fews and concise validation APIs:
 `instance()`, `regexp()`, `assert()`, `apply()`, `arrayOf()`, `model()`
 to validate any kind of javascript object. These APIs make

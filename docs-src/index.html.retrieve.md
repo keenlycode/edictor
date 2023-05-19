@@ -1,3 +1,7 @@
+<h2 class="width-100" style="text-align: center;">
+Retrieve
+</h2>
+
 <h3 class="width-100">Object</h3>
 
 ```js

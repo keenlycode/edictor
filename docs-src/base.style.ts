@@ -79,6 +79,7 @@ el-icon {
 .block-text {
     max-width: 45rem;
     min-width: 300px;
+    width: 100%;
     margin: auto;
 }
 
