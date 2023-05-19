@@ -1,8 +1,7 @@
 {
     "name": "edictor",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Modular & Self-Contained Javascript object definition and validation",
-    "type": "module",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/nitipit/edictor.git"
@@ -11,7 +10,11 @@
         "url": "https://github.com/nitipit/edictor/issues"
     },
     "homepage": "https://github.com/nitipit/edictor#readme",
-    "keywords": ["schema", "json", "validation"],
+    "keywords": [
+        "schema",
+        "json",
+        "validation"
+    ],
     "author": "Nitipit Nontasuwan",
     "license": "ISC",
     "files": [
@@ -38,17 +41,24 @@
     },
     "scripts": {
         "test": "jest",
-        "watch": "parcel watch --no-cache --target=es6 --target=types",
-        "build": "parcel build --no-cache --target=es6 --target=types"
+        "watch": "parcel watch --no-cache --target=es --target=cjs --target=types",
+        "build": "parcel build --no-cache --target=es --target=cjs --target=types"
     },
     "source": "src/edictor.ts",
-    "module": "dist/edictor.js",
+    "main": "dist/cjs/edictor.js",
+    "module": "dist/es/edictor.js",
     "types": "dist/types.d.ts",
     "targets": {
         "module": false,
-        "es6": {
+        "cjs": {
             "source": "src/edictor.ts",
-            "distDir": "dist/",
+            "distDir": "dist/cjs/",
+            "outputFormat": "commonjs",
+            "isLibrary": true
+        },
+        "es": {
+            "source": "src/edictor.ts",
+            "distDir": "dist/es/",
             "outputFormat": "esmodule",
             "isLibrary": true
         },
