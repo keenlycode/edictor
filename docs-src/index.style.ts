@@ -60,7 +60,6 @@ a {
 
 .section {
     h2 {
-        width: 100%;
         text-align: center;
         max-width: 45rem;
     }
