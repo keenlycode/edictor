@@ -39,7 +39,7 @@ Package.define({
 
 const edictor = new Package({
     "name": "Edictor",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "homepage": "https://github.com/nitipit/edictor"
 });
 
@@ -55,6 +55,15 @@ const contributor = new People({
 
 edictor['author'] = author;
 edictor['contributors'].push(contributor);
+
+try {
+    edictor.update({
+        name: "{ Edictor }",
+        version: "a.b.c"
+    });
+} catch (e) {};
+
+console.log(edictor.object());
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;
