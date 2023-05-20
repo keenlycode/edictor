@@ -80,7 +80,7 @@ export class Model {
         if (errors.length > 0) {
             throw new DefineError(`${this.name}.define ${errors}`);
         }
-        this._define = model;
+        this._define = {...this._define, ...model};
     }
 
     static field() {

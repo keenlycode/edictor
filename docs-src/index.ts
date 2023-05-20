@@ -43,6 +43,15 @@ const edictor = new Package({
     "homepage": "https://github.com/nitipit/edictor"
 });
 
+class PackageFlexy extends Package {};
+PackageFlexy.define({}, {strict: false});
+
+const edictorFlexy = new PackageFlexy({
+    name: "edictor-flexy",
+    version: "0.1.2",
+    phone: "+66 123 4567",
+});
+
 const author = new People({
     name: "Author",
     email: "author@somewhere.com"
@@ -55,15 +64,6 @@ const contributor = new People({
 
 edictor['author'] = author;
 edictor['contributors'].push(contributor);
-
-try {
-    edictor.update({
-        name: "{ Edictor }",
-        version: "a.b.c"
-    });
-} catch (e) {};
-
-console.log(edictor.object());
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;
