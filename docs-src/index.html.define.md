@@ -9,21 +9,30 @@ package.json</a>.
 /** ES Module */
 import { Model, defineField } from 'edictor';
 
+/** define class `Package` & `People` to ba a schema */
 class Package extends Model {};
 class People extends Model {};
 
+/** Define reusable `defineField()` as `urlDef`
+ * - Data must be string instance.
+ * - Validate url by `apply()` which expect function to throw error
+ *   if data is not valid.
+ */
+const urlDef = defineField()
+    .instance('string')
+    .apply((value) => { new URL(value) })
+
+/** Define `People` model structure */
 People.define({
     name: defineField({required: true})
         .instance('string'),
     email: defineField()
         .instance('string')
         .regexp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
-    url: /** RegExp might be too slow, let's use URL() and throw Error */
-        defineField()
-        .instance('string')
-        .apply((value) => { new URL(value) })
+    url: urlDef
 })
 
+/** Define `Package` model structure */
 Package.define({
     name: defineField({required: true})
         .instance('string')
@@ -33,9 +42,7 @@ Package.define({
         defineField({required: true})
         .instance('string')
         .regexp(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/),
-    homepage: defineField()
-        .instance('string')
-        .apply((value) => { new URL(value) }),
+    homepage: urlDef,
     author: /** Nested data */
         defineField()
         .model(People),
