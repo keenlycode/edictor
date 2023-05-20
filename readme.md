@@ -5,6 +5,12 @@
 > with concise APIs</h2>
 
 ---
+## Documentation
+---
+Please read usage documentation at
+https://nitipit.github.io/edictor/
+
+---
 ## Features
 ---
 - Object definition is easy to use.
