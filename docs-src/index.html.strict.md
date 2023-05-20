@@ -1,5 +1,5 @@
 <div class="flex flex-center width-100">
-<h2>Strict or flexy schema</h2>
+<h2>Strict or Flexy schema</h2>
 </div>
 
 ### Strict
@@ -27,7 +27,7 @@ PackageFlexy.define({}, {strict: false});
 
 const edictorFlexy = new PackageFlexy({
     name: "edictor-flexy",
-    version: "0.1.2",
+    version: "0.1.3",
     phone: "+66 123 4567" // Now can set a value to undefined fields.
 });
 ```
