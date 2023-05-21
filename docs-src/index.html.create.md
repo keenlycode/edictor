@@ -5,7 +5,7 @@
 ```javascript
 const edictor = new Package({
     "name": "Edictor",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "homepage": "https://github.com/nitipit/edictor"
 })
 ```
