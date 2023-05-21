@@ -22,8 +22,8 @@ The code below will extend `Package` and make it a flexy schema.
 /** `PackageFlexy` will inherit all defined fields from `Package` */
 class PackageFlexy extends Package {};
 
-/** More fields can be defined. However in this case,
- * we just pass define option to make it flexible 
+/** More fields can be defined. However, this case,
+ * the code just shows how to set option to make the schema flexible.
  */
 PackageFlexy.define({}, {strict: false});
 
@@ -34,7 +34,8 @@ const edictorFlexy = new PackageFlexy({
 });
 ```
 
-Another option is to create an object from a model with option `{strict: false}`
+Another option is to create an object from a model and set option  
+`{strict: false}`
 
 ```js
 const somePackage = new Package({
@@ -43,5 +44,6 @@ const somePackage = new Package({
     phone: "+66 123 4567"
 }, {strict: false})
 /** Set option after data object.
-It has the same pattern like setting option in Model.define(); */
+ * It has the same pattern like setting option in Model.define();
+ */
 ```

@@ -38,15 +38,16 @@ Package.define({
         .instance('string')
         .assert((value) => { return value.length <= 214 },
             "The name must be less than or equal to 214 characters"),
-    version: /** https://ihateregex.io/expr/semver/ */
+    version: // https://ihateregex.io/expr/semver/
         defineField({required: true})
         .instance('string')
         .regexp(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/),
     homepage: urlDef,
-    author: /** Nested data */
+    author: // Nesting data using `model()`
         defineField()
         .model(People),
-    contributors: defineField({initial: []})
+    contributors: // Array data using `arrayOf()`
+        defineField({initial: []}) // Also set initial data
         .arrayOf(People)
 })
 ```
