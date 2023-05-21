@@ -78,7 +78,7 @@ Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)
 ```
 
 ---
-## Contributing
+## Contribution
 ---
 Contributions are what make the open source community such an amazing place to learn,
 inspire, and create. Any contributions you make are greatly appreciated.
