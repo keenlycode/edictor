@@ -96,7 +96,7 @@ describe('class Model', () => {
         delete user['phone'];
         expect(user['phone']).toEqual(undefined);
 
-        /** Unstricted model */
+        /** Flexy model */
         user = new User({
             "name": "Firstname Lastname",
             "gender": "m"
@@ -117,19 +117,6 @@ describe('class Model', () => {
         }).toThrow(ModelError);
     });
 
-    test('Model().update()', () => {
-        let user = new User({
-            "name": "First Last"
-        });
-        expect(() => { user.update({name: "test", phone: 1}) })
-            .toThrow(UpdateError);
-
-        expect(user).toEqual({name: "First Last", enable: false});
-
-        user.update({name: "test", phone: "+66 111 1111"});
-        expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
-    })
-
     test('Model().object()', () => {
         let user = new User({
             "name": "Firstname Lastname"
@@ -142,5 +129,20 @@ describe('class Model', () => {
             "name": "Firstname Lastname"
         });
         expect(JSON.parse(user.json())).toEqual(user);
+    })
+
+    test('Model().update()', () => {
+        let user = new User({
+            "name": "First Last"
+        });
+        expect(() => { user.update({name: "test", phone: 1}) })
+            .toThrow(UpdateError);
+
+        expect(user).toEqual({name: "First Last", enable: false});
+
+        console.log(user['_option']);
+
+        user.update({name: "test", phone: "+66 111 1111"});
+        expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
     })
 })

@@ -139,9 +139,9 @@ export class Model {
             },
             ownKeys(target) {
                 /** Remove protected _option */
-                delete target['_option'];
-                return Reflect.ownKeys(target);
-            },
+                return Object.keys(target)
+                    .filter(item => item != '_option');
+            }
         });
 
         const errors = [];
@@ -191,6 +191,16 @@ export class Model {
         return proxy;
     }
 
+    /** Return a new native object with same data */
+    object(): Object {
+        return JSON.parse(JSON.stringify(this));
+    }
+
+    /** Return JSON */
+    json(): string {
+        return JSON.stringify(this);
+    }
+
     update(data: Object): void {
         const class_ = this.constructor as typeof Model;
         try {
@@ -204,15 +214,5 @@ export class Model {
         for (const key in data) {
             this[key] = data[key];
         }
-    }
-
-    /** Return a new native object with same data */
-    object(): Object {
-        return JSON.parse(JSON.stringify(this));
-    }
-
-    /** Return JSON */
-    json(): string {
-        return JSON.stringify(this);
     }
 }
