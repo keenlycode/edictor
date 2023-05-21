@@ -52,6 +52,12 @@ const edictorFlexy = new PackageFlexy({
     phone: "+66 123 4567",
 });
 
+const somePackage = new Package({
+    name: "some-package",
+    version: "1.0.0",
+    phone: "+66 123 4567"
+}, {strict: false})
+
 const author = new People({
     name: "Author",
     email: "author@somewhere.com"
@@ -71,3 +77,4 @@ window.defineField = defineField;
 window.Package = Package;
 window.People = People;
 window.edictor = edictor;
+window.somePackage = somePackage;

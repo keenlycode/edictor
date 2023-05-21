@@ -12,5 +12,5 @@ try {
     })
 } catch (e) {};
 
-edictor.object(); // Get same data as before `update()`.
+edictor.object(); // Return same data without any update.
 ```
