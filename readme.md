@@ -99,5 +99,5 @@ Open a Pull Request
 
 Nitipit Nontasuwan - nitipit@gmail.com
 
-Project repository: https://github.com/nitipit/edictor
+Project repository: https://github.com/nitipit/edictor  
 Project website: https://nitipit.github.io/edictor/
