@@ -1,6 +1,6 @@
 import { is_class, is_function, Class } from './util';
-import { Field } from './field';
-import { DefineField, Model } from './model';
+import { Field, DefineField } from './field';
+import { Model } from './model';
 import { ArrayOf as _ArrayOf } from './arrayof';
 
 

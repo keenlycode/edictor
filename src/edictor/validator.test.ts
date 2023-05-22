@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from './validator';
 import { ArrayOf } from './validator';
-import { Model, defineField, ModelError } from './model';
+import { Model, ModelError } from './model';
+import { defineField } from './field';
 
 
 test('instance', () => {
