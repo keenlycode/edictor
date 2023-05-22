@@ -1,6 +1,4 @@
-import { Field, DefineField, defineField } from './field';
-import { ArrayOf } from './arrayof';
-export { Field, DefineField, defineField };
+import { Field, DefineField } from './field';
 
 
 export class ModelError extends Error {
@@ -182,7 +180,7 @@ export class Model {
         if (this._option.strict) {
             throw new ModelError(
                 `new ${this.constructor.name}(data):`
-                + `\ndata[${keys}] exeeds defined fields`
+                + `\ndata[${keys}] is not defined`
             )
         }
 
