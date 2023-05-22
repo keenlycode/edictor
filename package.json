@@ -54,13 +54,15 @@
             "source": "src/edictor.ts",
             "distDir": "dist/cjs/",
             "outputFormat": "commonjs",
-            "isLibrary": true
+            "isLibrary": true,
+            "optimize": true
         },
         "es": {
             "source": "src/edictor.ts",
             "distDir": "dist/es/",
             "outputFormat": "esmodule",
-            "isLibrary": true
+            "isLibrary": true,
+            "optimize": true
         },
         "docs": {
             "distDir": "docs"

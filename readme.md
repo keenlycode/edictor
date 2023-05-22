@@ -19,8 +19,8 @@ https://nitipit.github.io/edictor/
 - **Modular** : `Model` and `Field` can be extends and reused as class and object in ES6.
 - **Self-contained** : object created from definition will validate
   itself when object's data changed.
-- **Atomic Update** : `Model().update(data)` will update data as all or nothing
-  according to validations.
+- **Atomic Update** : `Model().update(data)` will update data as all or nothingaccording to validations.
+- Tiny & Compact : ~2kB minify + gzip
   
 
 ---
