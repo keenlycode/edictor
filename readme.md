@@ -39,14 +39,16 @@ $ git clone git@github.com:nitipit/edictor.git
 $ cd edictor
 $ npm install
 ```
-### Run development process
+### Run test for development process
 ```shell
-$ npm run jest
-$ npm run watch
+$ npm run test
 ```
-The command above will run
-- Jest test framework in watch mode.
-- Parcel bundle for Typescript in watch mode.
+The command above will run [jest](https://jestjs.io/) testing framework in watch mode.
+
+To test individual file:
+```shell
+$ npx jest --watch src/edictor/field.test.ts
+```
 
 ### Build { edictor } library
 ```shell

@@ -103,8 +103,15 @@ describe('Field Unit Test', () => {
         /** field.validators contain `arrayOf` */
         field = defineField().arrayOf('string').field();
         field.validate(['a', 'b']);
-
     });
+
+    test('Field().test()', () => {
+        field = defineField().instance('string').field();
+        let result = field.test('test');
+        expect(result).toBeNull();
+        result = field.test(1);
+        expect(typeof result).toEqual("string");
+    })
 })
 
 describe('DefineField Unit Test', () => {

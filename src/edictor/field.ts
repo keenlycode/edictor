@@ -135,6 +135,15 @@ export class Field {
         }
         return value;
     }
+
+    test(value): string|null {
+        try {
+            this.validate(value)
+        } catch (e) {
+            return e.message;
+        }
+        return null;
+    }
 }
 
 
