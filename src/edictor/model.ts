@@ -66,7 +66,7 @@ export class Model {
         }
 
         const errorMessage = {
-            info: '',
+            info: `${this.name}.define() throw errors`,
             field: {}
         };
 
@@ -93,7 +93,6 @@ export class Model {
             model[key] = field;
         }
         if (Object.keys(errorMessage['field']).length > 0) {
-            errorMessage['info'] = `${this.name}.define()`;
             throw new DefineJsonError(JSON.stringify(errorMessage));
         }
         this._define = {...this._define, ...model};
@@ -157,28 +156,28 @@ export class Model {
         });
 
         const errorMessage = {
-            info: "",
+            info: `new ${this.constructor.name}(data) throw errors`,
             field: {}
         };
 
         /** Iterate defined field to validate and assign data.
          * - Also delete data[key] after assigned.
         */
-        for (const key in _class._define) {
+        for (const key in _class.field) {
             if (data[key] === undefined) {
-                proxy[key] = _class._define[key].option.initial;
+                proxy[key] = _class.field[key].option.initial;
                 continue;
             }
             try {
                 proxy[key] = data[key];
             } catch (e) {
+                // console.log(e);
                 errorMessage['field'][key] = e.message;
             }
             delete data[key];
         }
         
         if (Object.keys(errorMessage["field"]).length > 0) {
-            errorMessage['info'] = `new ${this.constructor.name}(data)`;
             throw new ModelJsonError(JSON.stringify(errorMessage));
         }
 
@@ -195,7 +194,6 @@ export class Model {
                 errorMessage['field'][key] = `Field is not defined`
             }
             if (Object.keys(errorMessage["field"]).length > 0) {
-                errorMessage["info"] = `new ${this.constructor.name}(data)`
                 throw new ModelJsonError(JSON.stringify(errorMessage));
             }
         }
@@ -220,10 +218,12 @@ export class Model {
         try {
             new class_({ ...this.object(), ...data });
         } catch (e) {
-            throw new UpdateJsonError(JSON.stringify({
-                info: `${this.constructor.name}().update(data)\n`,
-                field: e.message["field"]
-            }));
+            const message = JSON.parse(e.message);
+            const errorMessage = {
+                info: `${this.constructor.name}().update(data)\n throw errors`,
+                field: message["field"]
+            }
+            throw new UpdateJsonError(JSON.stringify(errorMessage));
         }
         for (const key in data) {
             this[key] = data[key];

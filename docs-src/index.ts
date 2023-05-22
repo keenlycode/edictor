@@ -71,6 +71,16 @@ const contributor = new People({
 edictor['author'] = author;
 edictor['contributors'].push(contributor);
 
+try {
+    edictor.update({
+        name: "{ Edictor }",
+        version: "a.b.c", // Validation error
+        homepage: "invalid url"
+    })
+} catch (error) { // error is an instance of UpdateJsonError
+    console.log(JSON.parse(error.message));
+};
+
 window.Model = Model;
 window.ArrayOf = ArrayOf;
 window.defineField = defineField;
