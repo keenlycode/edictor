@@ -41,7 +41,7 @@ $ npm install
 ```
 ### Run test for development process
 ```shell
-$ npm run test
+$ npm run test-watch
 ```
 The command above will run [jest](https://jestjs.io/) testing framework in watch mode.
 
