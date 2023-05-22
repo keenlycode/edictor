@@ -1,12 +1,12 @@
 import { Field, DefineField, FieldError } from './field';
 
 
-export class ModelError extends Error {
+export class ModelJsonError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'ModelError';
+        this.name = 'ModelJsonError';
     }
 };
 
@@ -28,12 +28,12 @@ export class DefineCallError extends Error {
     }
 }
 
-export class DefineError extends Error {
+export class DefineJsonError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'DefineError';
+        this.name = 'DefineJsonError';
     }
 };
 
@@ -94,7 +94,7 @@ export class Model {
         }
         if (Object.keys(errorMessage['field']).length > 0) {
             errorMessage['info'] = `${this.name}.define()`;
-            throw new DefineError(JSON.stringify(errorMessage));
+            throw new DefineJsonError(JSON.stringify(errorMessage));
         }
         this._define = {...this._define, ...model};
     }
@@ -179,7 +179,7 @@ export class Model {
         
         if (Object.keys(errorMessage["field"]).length > 0) {
             errorMessage['info'] = `new ${this.constructor.name}(data)`;
-            throw new ModelError(JSON.stringify(errorMessage));
+            throw new ModelJsonError(JSON.stringify(errorMessage));
         }
 
          /** If there's no data left, return proxy */
@@ -189,14 +189,14 @@ export class Model {
 
         /** Program reach here if there's some data left */
         
-        /** If Model is stricted, throw ModelError */
+        /** If Model is stricted, throw ModelJsonError */
         if (this._option.strict) {
             for (const key of Object.keys(data)) {
                 errorMessage['field'][key] = `Field is not defined`
             }
             if (Object.keys(errorMessage["field"]).length > 0) {
                 errorMessage["info"] = `new ${this.constructor.name}(data)`
-                throw new ModelError(JSON.stringify(errorMessage));
+                throw new ModelJsonError(JSON.stringify(errorMessage));
             }
         }
 

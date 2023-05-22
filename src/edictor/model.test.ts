@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import {
-    DefineError,
+    DefineJsonError,
     DefineCallError,
-    ModelError,
+    ModelJsonError,
     UpdateError,
     DataError,
     Model
@@ -84,19 +84,19 @@ describe('class Model', () => {
         try {
             Test.define({'property': 1})
         } catch (error) {
-            expect(error).toBeInstanceOf(DefineError);
+            expect(error).toBeInstanceOf(DefineJsonError);
             /** Test that error.message is a valid JSON */
             JSON.parse(error.message);
         }
 
-        class ModelDefineError extends Model {};
+        class ModelDefineJsonError extends Model {};
 
         try {
-            ModelDefineError.define({
+            ModelDefineJsonError.define({
                 name: defineField({initial: 1}).instance('string')
             })
         } catch (error) {
-            expect(error).toBeInstanceOf(DefineError);
+            expect(error).toBeInstanceOf(DefineJsonError);
             /** Test that error.message is a valid JSON */
             JSON.parse(error.message);
         }
@@ -137,7 +137,7 @@ describe('class Model', () => {
         expect({...user}).toEqual(user);
         
         /** Error on initial data */
-        expect(() => { new User({name: 1}) }).toThrow(ModelError);
+        expect(() => { new User({name: 1}) }).toThrow(ModelJsonError);
 
         /** Initial data with undefined field */
         expect(() => { 
@@ -145,7 +145,7 @@ describe('class Model', () => {
                 "name": "Firstname Lastname",
                 "gender": "m"
             })
-        }).toThrow(ModelError);
+        }).toThrow(ModelJsonError);
     });
 
     test('Model().object()', () => {
