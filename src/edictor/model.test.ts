@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { DefineError, Model, ModelError, UpdateError } from './model';
-import { defineField, Field } from './field';
+import {
+    DefineError,
+    DefineCallError,
+    ModelError,
+    UpdateError,
+    DataError,
+    Model
+} from './model';
+import { defineField, Field, FieldError } from './field';
 
 
 test('Usage Test', () => {
@@ -18,7 +25,8 @@ test('Usage Test', () => {
     Account.define({
         name: defineField({required: true})
             .instance('string')
-            .assert((value) => { return value.length <= 250 }),
+            .assert((value) => { return value.length <= 250 },
+                "The name must be less than or equal to 250 characters"),
 
         emails: defineField({required: true})
             .arrayOf(email),
@@ -40,7 +48,7 @@ test('Usage Test', () => {
         age: 30
     });
 
-    expect(() => {account['name'] = 1}).toThrow(ModelError);
+    expect(() => {account['name'] = 1}).toThrow(FieldError);
     let emails = account['emails'];
     emails.push('test@email.com');
     account['emails'].push('test@email.com');
@@ -64,16 +72,34 @@ describe('class Model', () => {
         expect(User.field['name'] instanceof Field);
         expect(User.field['name'].name).toEqual('name');
 
-        expect(() => { Model.define() }).toThrow(DefineError);
+        try {
+            Model.define()
+        } catch (error) {
+            expect(error).toBeInstanceOf(DefineCallError);
+            // console.log(error.message);
+        }
+
         class Test extends Model {};
-        expect(() => { Test.define({'property': 1}) }).toThrow(DefineError);
+
+        try {
+            Test.define({'property': 1})
+        } catch (error) {
+            expect(error).toBeInstanceOf(DefineError);
+            /** Test that error.message is a valid JSON */
+            JSON.parse(error.message);
+        }
 
         class ModelDefineError extends Model {};
-        expect(() => {
+
+        try {
             ModelDefineError.define({
                 name: defineField({initial: 1}).instance('string')
-            });
-        }).toThrow(DefineError);
+            })
+        } catch (error) {
+            expect(error).toBeInstanceOf(DefineError);
+            /** Test that error.message is a valid JSON */
+            JSON.parse(error.message);
+        }
     })
 
     test('Model.field()', () => {
@@ -82,17 +108,22 @@ describe('class Model', () => {
     })
 
     test('Model.constructor()', () => {
-        expect(() => { new User([1,2,3]) }).toThrow(ModelError);
-        expect(() => { new User(1)}).toThrow(ModelError);
+        try {
+            new User([1,2,3]);
+        } catch (error) {
+            expect(error).toBeInstanceOf(DataError);
+            // console.log(error);
+        }
+        expect(() => { new User(1)}).toThrow(DataError);
 
         let user = new User({
             "name": "Firstname Lastname"
         });
         user['phone'] = '+11 111 1111';
-        expect(() => {user['name'] = 1}).toThrow(ModelError);
-        expect(() => {user['phone'] = '124abc'}).toThrow(ModelError);
-        expect(() => { new User([1,2,3]) }).toThrow(ModelError);
-        expect(() => { user['gender'] = 'm' }).toThrow(ModelError);
+        expect(() => {user['name'] = 1}).toThrow(FieldError);
+        expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
+        expect(() => { new User([1,2,3]) }).toThrow(DataError);
+        expect(() => { user['gender'] = 'm' }).toThrow(FieldError);
         delete user['phone'];
         expect(user['phone']).toEqual(undefined);
 

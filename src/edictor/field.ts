@@ -128,7 +128,7 @@ export class Field {
         }
         let msg = `Field({name: "${this.name}"})`;
         for (const error of errors) {
-            msg += `\n  - ${error}`
+            msg += `\n - ${error}`
         }
         if (errors.length > 0) {
             throw new FieldError(msg);
@@ -200,7 +200,7 @@ export class DefineField {
      * defineField().assert((value) => { return value <= 10 });
      * ```
      */
-    assert(func: (value: any) => boolean, msg: string|Function = ''): DefineField {
+    assert(func: (value: any) => boolean, msg: string|Function = 'Assertion error'): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.assert(func, msg)]);
