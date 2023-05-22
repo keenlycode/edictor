@@ -41,6 +41,7 @@ $ npm install
 ```
 ### Run development process
 ```shell
+$ npm run jest
 $ npm run watch
 ```
 The command above will run

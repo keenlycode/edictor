@@ -36,7 +36,7 @@ interface ModelOption {
 
 
 export class Model {
-    static _define = {};
+    protected static _define = {};
     static _option: ModelOption = {strict: true};
 
     static define(model: Object = {}, option: ModelOption = {}) {
@@ -83,7 +83,7 @@ export class Model {
         this._define = {...this._define, ...model};
     }
 
-    static field() {
+    static get field() {
         return {...this._define};
     }
 

@@ -60,9 +60,9 @@ describe('class Model', () => {
     });
 
     test('Model.define()', () => {
-        expect(Object.keys(User._define)).toEqual(['name', 'phone', 'enable']);
-        expect(User._define['name'] instanceof Field);
-        expect(User._define['name'].name).toEqual('name');
+        expect(Object.keys(User.field)).toEqual(['name', 'phone', 'enable']);
+        expect(User.field['name'] instanceof Field);
+        expect(User.field['name'].name).toEqual('name');
 
         expect(() => { Model.define() }).toThrow(DefineError);
         class Test extends Model {};
@@ -77,8 +77,8 @@ describe('class Model', () => {
     })
 
     test('Model.field()', () => {
-        const field = User.field();
-        expect(field).toEqual(User._define);
+        const field = User.field;
+        expect(field).toEqual(User.field);
     })
 
     test('Model.constructor()', () => {
@@ -139,8 +139,6 @@ describe('class Model', () => {
             .toThrow(UpdateError);
 
         expect(user).toEqual({name: "First Last", enable: false});
-
-        console.log(user['_option']);
 
         user.update({name: "test", phone: "+66 111 1111"});
         expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
