@@ -30,7 +30,9 @@
     </div>
 </div>
 
-<div id="install" class="section" style="padding-top: 5rem;">
+<div class="black-to-gray" style="height: 50vh;"></div>
+
+<div id="install" class="section">
     <div class="container flex flex-center">
         <div class="block-text">
         {{markdown('index.html.install.md')}}
@@ -86,16 +88,23 @@
     </div>
 </div>
 
-<div id="atomic" class="section">
-    <div class="container flex flex-center" style="margin-top: 5rem;">
+<div class="gray-to-black" style="height: 40vh;"></div>
+
+<div id="atomic" class="section bg-black">
+    <div class="container flex flex-center">
+        <video autoplay muted loop el="atomic-footage">
+            <source src="atomic.webm" type="video/webm">
+        </video>
         <div class="block-text">
         {{markdown('index.html.atomic.md')}}
         </div>
     </div>
 </div>
 
+<div class="black-to-gray" style="height: 40vh;"></div>
+
 <div id="api" class="section">
-    <div class="container flex flex-center" style="margin-top: 5rem;">
+    <div class="container flex flex-center">
         <div class="block-text">
         {{markdown('index.html.api.md')}}
         </div>
@@ -103,7 +112,7 @@
 </div>
 
 <div id="try" class="section">
-    <div class="container flex flex-center" style="margin-top: 5rem;">
+    <div class="container flex flex-center" style="padding-top: 5rem;">
         <div class="flex flex-center width-100">
             <h2 style="text-align: center;">Try</h2>
         </div>

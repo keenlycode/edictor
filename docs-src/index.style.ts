@@ -65,9 +65,36 @@ a {
     }
 }
 
-#install {
+.bg-black {
+    background-color: black;
+}
+
+.gray-to-black {
     background: rgb(0,0,0);
-    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, #241f31 80%);
+    background: linear-gradient(180deg, #241f31 0%, rgba(0,0,0,1) 50%);
+}
+
+.black-to-gray {
+    background: rgb(0,0,0);
+    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, #241f31 50%);
+}
+
+#install {
+    margin-top: -25vh;
+}
+
+#atomic {
+    margin-top: -20vh;
+    [el="atomic-footage"] {
+        width: 25em;
+    }
+    .block-text {
+        margin-top: -5vh;
+    }
+}
+
+#api {
+    margin-top: -15vh;
 }
 
 #try {
