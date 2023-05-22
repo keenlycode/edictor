@@ -24,7 +24,7 @@ https://nitipit.github.io/edictor/
   
 
 ---
-## Development
+## Library Development
 ---
 
 ### Environment
@@ -53,7 +53,7 @@ npm run build
 ```
 
 ---
-## Documentation website
+## Documentation Development
 ---
 
 ### Environment
