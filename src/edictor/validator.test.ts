@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from './validator';
 import { ArrayOf } from './validator';
-import { Model, ModelError } from './model';
+import { Model, ModelJsonError } from './model';
 import { defineField } from './field';
 
 
@@ -65,5 +65,5 @@ test('model()', () => {
     const userModel = model(User);
     const user_data = {"name": "User Name"};
     let user = userModel(user_data);
-    expect(() => { user = userModel({"name": 1}) }).toThrow(ModelError);
+    expect(() => { user = userModel({"name": 1}) }).toThrow(ModelJsonError);
 });

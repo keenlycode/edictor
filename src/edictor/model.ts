@@ -37,12 +37,12 @@ export class DefineJsonError extends Error {
     }
 };
 
-export class UpdateError extends Error {
+export class UpdateJsonError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'UpdateError';
+        this.name = 'UpdateJsonError';
     }
 };
 
@@ -220,7 +220,7 @@ export class Model {
         try {
             new class_({ ...this.object(), ...data });
         } catch (e) {
-            throw new UpdateError(JSON.stringify({
+            throw new UpdateJsonError(JSON.stringify({
                 info: `${this.constructor.name}().update(data)\n`,
                 field: e.message["field"]
             }));

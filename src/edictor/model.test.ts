@@ -3,7 +3,7 @@ import {
     DefineJsonError,
     DefineCallError,
     ModelJsonError,
-    UpdateError,
+    UpdateJsonError,
     DataError,
     Model
 } from './model';
@@ -167,7 +167,7 @@ describe('class Model', () => {
             "name": "First Last"
         });
         expect(() => { user.update({name: "test", phone: 1}) })
-            .toThrow(UpdateError);
+            .toThrow(UpdateJsonError);
 
         expect(user).toEqual({name: "First Last", enable: false});
 

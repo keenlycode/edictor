@@ -1,21 +1,21 @@
 import asyncio
 
 
-async def unittest():
-    cmd = "npx jest --watch src/edictor/*.test.ts"
+async def test():
+    cmd = "npm run test-watch"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
-async def dist(mode='watch'):
-    cmd = f"npm run {mode}"
+async def dist():
+    cmd = f"npm run build-watch"
     print(f'{cmd} ...')
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
 
 async def main():
     await asyncio.gather(
-        unittest(),
+        test(),
         dist(),
     )
 

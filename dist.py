@@ -1,10 +1,16 @@
 import asyncio
-from dev import dist
+
+
+async def build():
+    cmd = f"npm run build"
+    print(f'{cmd} ...')
+    proc = await asyncio.create_subprocess_shell(cmd)
+    await proc.communicate()
 
 
 async def main():
     await asyncio.gather(
-        dist(mode='build'),
+        build(),
     )
 
 

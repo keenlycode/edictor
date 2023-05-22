@@ -40,9 +40,10 @@
         "typescript": "^5.0.4"
     },
     "scripts": {
+        "build": "parcel build --no-cache --target=es --target=cjs --target=types",
+        "build-watch": "parcel watch --no-cache --target=es --target=cjs --target=types",
         "test": "jest",
-        "watch": "parcel watch --no-cache --target=es --target=cjs --target=types",
-        "build": "parcel build --no-cache --target=es --target=cjs --target=types"
+        "test-watch": "jest --watch"
     },
     "source": "src/edictor.ts",
     "main": "dist/cjs/edictor.js",
