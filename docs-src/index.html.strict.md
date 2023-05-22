@@ -29,7 +29,7 @@ PackageFlexy.define({}, {strict: false});
 
 const edictorFlexy = new PackageFlexy({
     name: "edictor-flexy",
-    version: "0.1.4",
+    version: "0.2.0",
     phone: "+66 123 4567" // Now can set a value to undefined fields.
 });
 ```

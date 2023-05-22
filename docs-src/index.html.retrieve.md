@@ -12,7 +12,7 @@ result
 ```js
 {
     "name": "Edictor",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "homepage": "https://github.com/nitipit/edictor",
     "contributors": [
         {
@@ -35,5 +35,5 @@ edictor.json();
 
 result
 ```js
-'{"name":"Edictor","version":"0.1.4","homepage":"https://github.com/nitipit/edictor","contributors":[{"name":"Some Contributor","email":"contributor@somewhere.com"}],"author":{"name":"Author","email":"author@somewhere.com"}}'
+'{"name":"Edictor","version":"0.2.0","homepage":"https://github.com/nitipit/edictor","contributors":[{"name":"Some Contributor","email":"contributor@somewhere.com"}],"author":{"name":"Author","email":"author@somewhere.com"}}'
 ```
