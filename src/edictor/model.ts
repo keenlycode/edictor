@@ -84,6 +84,7 @@ export class Model {
             if (defineField instanceof DefineField) {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
+                result["valid"][key] = true;
             } else {
                 result["error"][key] = 'Assigned value is not an instance of DefineField'
                 continue;
@@ -91,6 +92,7 @@ export class Model {
             if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
+                    result["valid"][key] = true;
                 } catch (e) {
                     result["error"][key] = `Field({initial: ${field.option.initial}})`
                     + ` conflicts with Field's validation => ${e}`
