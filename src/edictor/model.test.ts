@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import {
-    DefineJsonError,
-    DefineCallError,
-    ModelJsonError,
-    UpdateJsonError,
-    DataError,
+    DefineError,
+    CallError,
+    ModelError,
+    UpdateError,
+    InputDataError,
     Model
 } from './model';
 import { defineField, Field, FieldError } from './field';
@@ -75,7 +75,7 @@ describe('class Model', () => {
         try {
             Model.define()
         } catch (error) {
-            expect(error).toBeInstanceOf(DefineCallError);
+            expect(error).toBeInstanceOf(CallError);
             // console.log(error.message);
         }
 
@@ -84,19 +84,19 @@ describe('class Model', () => {
         try {
             Test.define({'property': 1})
         } catch (error) {
-            expect(error).toBeInstanceOf(DefineJsonError);
+            expect(error).toBeInstanceOf(DefineError);
             /** Test that error.message is a valid JSON */
             JSON.parse(error.message);
         }
 
-        class ModelDefineJsonError extends Model {};
+        class ModelDefineError extends Model {};
 
         try {
-            ModelDefineJsonError.define({
+            ModelDefineError.define({
                 name: defineField({initial: 1}).instance('string')
             })
         } catch (error) {
-            expect(error).toBeInstanceOf(DefineJsonError);
+            expect(error).toBeInstanceOf(DefineError);
             /** Test that error.message is a valid JSON */
             JSON.parse(error.message);
         }
@@ -111,10 +111,10 @@ describe('class Model', () => {
         try {
             new User([1,2,3]);
         } catch (error) {
-            expect(error).toBeInstanceOf(DataError);
+            expect(error).toBeInstanceOf(InputDataError);
             // console.log(error);
         }
-        expect(() => { new User(1)}).toThrow(DataError);
+        expect(() => { new User(1)}).toThrow(InputDataError);
 
         let user = new User({
             "name": "Firstname Lastname"
@@ -122,7 +122,7 @@ describe('class Model', () => {
         user['phone'] = '+11 111 1111';
         expect(() => {user['name'] = 1}).toThrow(FieldError);
         expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
-        expect(() => { new User([1,2,3]) }).toThrow(DataError);
+        expect(() => { new User([1,2,3]) }).toThrow(InputDataError);
         expect(() => { user['gender'] = 'm' }).toThrow(FieldError);
         delete user['phone'];
         expect(user['phone']).toEqual(undefined);
@@ -137,7 +137,7 @@ describe('class Model', () => {
         expect({...user}).toEqual(user);
         
         /** Error on initial data */
-        expect(() => { new User({name: 1}) }).toThrow(ModelJsonError);
+        expect(() => { new User({name: 1}) }).toThrow(ModelError);
 
         /** Initial data with undefined field */
         expect(() => { 
@@ -145,7 +145,7 @@ describe('class Model', () => {
                 "name": "Firstname Lastname",
                 "gender": "m"
             })
-        }).toThrow(ModelJsonError);
+        }).toThrow(ModelError);
     });
 
     test('Model().object()', () => {
@@ -167,7 +167,7 @@ describe('class Model', () => {
             "name": "First Last"
         });
         expect(() => { user.update({name: "test", phone: 1}) })
-            .toThrow(UpdateJsonError);
+            .toThrow(UpdateError);
 
         expect(user).toEqual({name: "First Last", enable: false});
 

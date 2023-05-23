@@ -1,48 +1,48 @@
 import { Field, DefineField, FieldError } from './field';
 
 
-export class ModelJsonError extends Error {
+export class ModelError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'ModelJsonError';
+        this.name = 'ModelError';
     }
 };
 
-export class DataError extends Error {
+export class InputDataError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'DataError';
+        this.name = 'InputDataError';
     }
 }
 
-export class DefineCallError extends Error {
+export class CallError extends Error {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'DefineCallError';
+        this.name = 'CallError';
     }
 }
 
-export class DefineJsonError extends Error {
+export class DefineError extends ModelError {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'DefineJsonError';
+        this.name = 'DefineError';
     }
 };
 
-export class UpdateJsonError extends Error {
+export class UpdateError extends ModelError {
     name: string;
     message: string;
     constructor(message='') {
         super(message);
-        this.name = 'UpdateJsonError';
+        this.name = 'UpdateError';
     }
 };
 
@@ -61,7 +61,7 @@ export class Model {
         this._define = {...superClass._define};
 
         if (superClass.name === '') {
-            throw new DefineCallError(`Model.define() is prohibited. `
+            throw new CallError(`Model.define() is prohibited. `
             + `It must be called from a subclass`);
         }
 
@@ -93,7 +93,7 @@ export class Model {
             model[key] = field;
         }
         if (Object.keys(errorMessage['field']).length > 0) {
-            throw new DefineJsonError(JSON.stringify(errorMessage));
+            throw new DefineError(JSON.stringify(errorMessage));
         }
         this._define = {...this._define, ...model};
     }
@@ -106,11 +106,11 @@ export class Model {
 
     constructor(data: Object = {}, option: ModelOption = {}) {
         if (data instanceof Array) {
-            throw new DataError(`new ${this.constructor.name}(data) => `
+            throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
         }
         if (!(data instanceof Object)) {
-            throw new DataError(`new ${this.constructor.name}(data) => `
+            throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object, Received ${typeof(data)}`);
         }
 
@@ -178,7 +178,7 @@ export class Model {
         }
         
         if (Object.keys(errorMessage["field"]).length > 0) {
-            throw new ModelJsonError(JSON.stringify(errorMessage));
+            throw new ModelError(JSON.stringify(errorMessage));
         }
 
          /** If there's no data left, return proxy */
@@ -188,13 +188,13 @@ export class Model {
 
         /** Program reach here if there's some data left */
         
-        /** If Model is stricted, throw ModelJsonError */
+        /** If Model is stricted, throw ModelError */
         if (this._option.strict) {
             for (const key of Object.keys(data)) {
                 errorMessage['field'][key] = `Field is not defined`
             }
             if (Object.keys(errorMessage["field"]).length > 0) {
-                throw new ModelJsonError(JSON.stringify(errorMessage));
+                throw new ModelError(JSON.stringify(errorMessage));
             }
         }
 
@@ -223,7 +223,7 @@ export class Model {
                 info: `${this.constructor.name}().update(data)\n throw errors`,
                 field: message["field"]
             }
-            throw new UpdateJsonError(JSON.stringify(errorMessage));
+            throw new UpdateError(JSON.stringify(errorMessage));
         }
         for (const key in data) {
             this[key] = data[key];
