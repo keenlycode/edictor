@@ -11,7 +11,7 @@ DataTestResult.define({
     error: defineField()
         .instance('object'),
     errorMessage: defineField()
-        .apply((value) => { JSON.parse(value) })
+        .instance('string')
 })
 
 export { DataTestResult };

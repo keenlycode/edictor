@@ -68,9 +68,12 @@ export class Model {
             + `It must be called from a subclass`);
         }
 
-        const errorMessage = {
-            info: `${this.name}.define() throw errors`,
-            field: {}
+        const result = {
+            // errorMessage: `${this.name}.define() throw errors`,
+            valid: {},
+            invalid: {},
+            error: {},
+            errorMessage: ''
         };
 
         for (let [key, defineField] of Object.entries(model)) {
@@ -82,21 +85,21 @@ export class Model {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
             } else {
-                errorMessage["field"][key] = 'Assigned value is not an instance of DefineField'
+                result["error"][key] = 'Assigned value is not an instance of DefineField'
                 continue;
             }
             if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
                 } catch (e) {
-                    errorMessage["field"][key] = `Field({initial: ${field.option.initial}})`
+                    result["error"][key] = `Field({initial: ${field.option.initial}})`
                     + ` conflicts with Field's validation => ${e}`
                 }
             }
             model[key] = field;
         }
-        if (Object.keys(errorMessage["field"]).length > 0) {
-            throw new DefineError(JSON.stringify(errorMessage));
+        if (Object.keys(result["error"]).length > 0) {
+            throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
     }
