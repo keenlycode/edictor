@@ -129,17 +129,18 @@ export class Model {
          * - Also delete data[key] after assigned.
          */
         for (const key in this.field) {
-            if (data[key] === undefined) {
+            const value = data[key];
+            delete data[key];
+            if (value === undefined) {
                 result["valid"][key] = this.field[key].option.initial;
                 continue;
             }
             try {
-                result["valid"][key] = this.field[key].validate(data[key]);
+                result["valid"][key] = this.field[key].validate(value);
             } catch (e) {
-                result["invalid"][key] = data[key];
+                result["invalid"][key] = value;
                 result["error"][key] = e.message;
             }
-            delete data[key];
         }
 
          /** If there's no data left, return void */
@@ -213,47 +214,6 @@ export class Model {
         });
 
         return proxy;
-
-        // /** Iterate defined field to validate and assign data.
-        //  * - Also delete data[key] after assigned.
-        //  */
-        // for (const key in _class.field) {
-        //     if (data[key] === undefined) {
-        //         proxy[key] = _class.field[key].option.initial;
-        //         continue;
-        //     }
-        //     try {
-        //         proxy[key] = data[key];
-        //     } catch (e) {
-        //         errorMessage["field"][key] = e.message;
-        //     }
-        //     delete data[key];
-        // }
-        
-        // if (Object.keys(errorMessage["field"]).length > 0) {
-        //     throw new InitError(JSON.stringify(errorMessage));
-        // }
-
-        //  /** If there's no data left, return proxy */
-        // if (Object.keys(data).length === 0) {
-        //     return proxy;
-        // }
-
-        // /** Program reach here if there's some data left */
-        
-        // /** If Model is stricted, throw InitError */
-        // if (this._option.strict) {
-        //     for (const key of Object.keys(data)) {
-        //         errorMessage["field"][key] = `Field is not defined`
-        //     }
-        //     if (Object.keys(errorMessage["field"]).length > 0) {
-        //         throw new InitError(JSON.stringify(errorMessage));
-        //     }
-        // }
-
-        // /** Model is not stricted. Assign data to Model() */
-        // Object.assign(proxy, data);
-        // return proxy;
     }
 
     /** Return a new native object with same data */
@@ -270,12 +230,9 @@ export class Model {
         const class_ = this.constructor as typeof Model;
         try {
             new class_({ ...this.object(), ...data });
-        } catch (e) {
-            const message = JSON.parse(e.message);
-            const errorMessage = {
-                info: `${this.constructor.name}().update(data)\n throw errors`,
-                field: message["field"]
-            }
+        } catch (error) {
+            const errorMessage = JSON.parse(error.message);
+            errorMessage["info"] = `${this.constructor.name}().update(data)\n throw errors`;
             throw new UpdateError(JSON.stringify(errorMessage));
         }
         for (const key in data) {

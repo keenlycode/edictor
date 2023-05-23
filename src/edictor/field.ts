@@ -164,7 +164,7 @@ export class DefineField {
         return this._option;
     }
 
-    protected _validators: Array<(value) => (void|ArrayOf|Model)>;
+    protected _validators: Array<(value) => any>;
 
     get validators() {
         return this._validators;
@@ -224,7 +224,7 @@ export class DefineField {
      * - Function validator must throw error if value is not valid.
      * - Class validator.
      */
-    arrayOf(...validators: Array<string|Function|Class|DefineField|Field>): DefineField {
+    arrayOf(...validators: Array<string|Function|Class|DefineField|Model>): DefineField {
         return new DefineField(
             this.option,
             [...this.validators, Validator.arrayOf(...validators)]);

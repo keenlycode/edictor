@@ -67,7 +67,8 @@ export class ArrayOf extends Array {
     }
 
     /** validate a value with a validator */
-    _validate_each(value, validator) {
+    _validate_each(value, validator): void {
+
         // If validator is a primative type.
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator);
