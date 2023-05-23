@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test } from '@jest/globals';
 import {
     DefineError,
     CallError,
-    ModelError,
+    InitError,
     UpdateError,
     InputDataError,
     Model
@@ -137,7 +137,7 @@ describe('class Model', () => {
         expect({...user}).toEqual(user);
         
         /** Error on initial data */
-        expect(() => { new User({name: 1}) }).toThrow(ModelError);
+        expect(() => { new User({name: 1}) }).toThrow(InitError);
 
         /** Initial data with undefined field */
         expect(() => { 
@@ -145,7 +145,7 @@ describe('class Model', () => {
                 "name": "Firstname Lastname",
                 "gender": "m"
             })
-        }).toThrow(ModelError);
+        }).toThrow(InitError);
     });
 
     test('Model().object()', () => {

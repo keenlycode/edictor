@@ -1,8 +1,9 @@
 <div class="flex flex-center width-100">
-<h2>Atomic update</h2>
+<h2>Atomic Update</h2>
 </div>
 
-`Model().update(data: object)` operates as all or nothing.
+`Model().update(data: object)` updates the `data` into instance
+only if the whole `data` doens't break the defined schema.
 
 ```js
 try {

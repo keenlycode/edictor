@@ -1,18 +1,35 @@
 import { Field, DefineField, FieldError } from './field';
 
 
-export class ModelError extends Error {
-    name: string;
-    message: string;
+class ModelError extends Error {
     constructor(message='') {
         super(message);
         this.name = 'ModelError';
     }
-};
+}
+
+export class DefineError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'DefineError';
+    }
+}
+
+export class InitError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'InitError';
+    }
+}
+
+export class UpdateError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'UpdateError';
+    }
+}
 
 export class InputDataError extends Error {
-    name: string;
-    message: string;
     constructor(message='') {
         super(message);
         this.name = 'InputDataError';
@@ -20,31 +37,11 @@ export class InputDataError extends Error {
 }
 
 export class CallError extends Error {
-    name: string;
-    message: string;
     constructor(message='') {
         super(message);
         this.name = 'CallError';
     }
 }
-
-export class DefineError extends ModelError {
-    name: string;
-    message: string;
-    constructor(message='') {
-        super(message);
-        this.name = 'DefineError';
-    }
-};
-
-export class UpdateError extends ModelError {
-    name: string;
-    message: string;
-    constructor(message='') {
-        super(message);
-        this.name = 'UpdateError';
-    }
-};
 
 interface ModelOption {
     strict?: boolean
@@ -178,7 +175,7 @@ export class Model {
         }
         
         if (Object.keys(errorMessage["field"]).length > 0) {
-            throw new ModelError(JSON.stringify(errorMessage));
+            throw new InitError(JSON.stringify(errorMessage));
         }
 
          /** If there's no data left, return proxy */
@@ -188,13 +185,13 @@ export class Model {
 
         /** Program reach here if there's some data left */
         
-        /** If Model is stricted, throw ModelError */
+        /** If Model is stricted, throw InitError */
         if (this._option.strict) {
             for (const key of Object.keys(data)) {
                 errorMessage['field'][key] = `Field is not defined`
             }
             if (Object.keys(errorMessage["field"]).length > 0) {
-                throw new ModelError(JSON.stringify(errorMessage));
+                throw new InitError(JSON.stringify(errorMessage));
             }
         }
 

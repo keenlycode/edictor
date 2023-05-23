@@ -2,10 +2,15 @@
 <h2>Error Handling</h2>
 </div>
 
-**Error Handling** is another key feature of **{ Edictor }**. To let developer easily manage errors which related to a schema structure, there're some `Error` class which have error message in `JSON` format, consist of:
-- `ModelJsonError` from `new Model()`.
-- `DefineJsonError` from `Model.define()`
-- `UpdateJsonError` from `Model().update(data)`.
+**Error Handling** is another key feature of **{ Edictor }**.
+`ModelError` class and it's subclasses contains error information according
+to the Model structure.
+```shell
+ModelError
+├── DefineError
+├── InitError
+└── UpdateError
+```
 
 JSON message has a structure as:
 ```js

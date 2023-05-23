@@ -1,4 +1,4 @@
-<h2 class="width-100" style="text-align: center;">Concise APIs for validation</h2>
+<h2 class="width-100" style="text-align: center;">Concise APIs for Validation</h2>
 
 Did you notice ? There are only fews and concise validation APIs:
 `instance()`, `regexp()`, `assert()`, `apply()`, `arrayOf()`, `model()`
