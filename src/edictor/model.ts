@@ -1,6 +1,5 @@
 import { Field, DefineField, FieldError } from './field';
 
-
 class ModelError extends Error {
     constructor(message='') {
         super(message);

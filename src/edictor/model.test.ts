@@ -8,6 +8,7 @@ import {
     Model
 } from './model';
 import { defineField, Field, FieldError } from './field';
+import { DataTestResult } from './schema';
 
 
 test('Usage Test', () => {
