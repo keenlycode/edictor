@@ -70,20 +70,18 @@ const contributor = new People({
 
 edictor['author'] = author;
 edictor['contributors'].push(contributor);
-console.log(edictor.object());
 
 new Package(edictor.object());
 
-// try {
-//     edictor.update({
-//         name: "{ Edictor }",
-//         // version: "a.b.c", // Validation error
-//         // homepage: "invalid url" // Validation error
-//     })
-// } catch (error) { // error is an instance of UpdateError
-//     const errorMessage = JSON.parse(error.message);
-//     console.log(errorMessage);
-// };
+try {
+    edictor.update({
+        name: "{ Edictor }",
+        version: "a.b.c", // Validation error
+        homepage: "invalid url" // Validation error
+    })
+} catch (error) { // error is an instance of UpdateError
+    const errorMessage = JSON.parse(error.message);
+};
 
 window.Model = Model;
 window.ArrayOf = ArrayOf;
