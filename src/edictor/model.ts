@@ -8,6 +8,13 @@ class ModelError extends Error {
     }
 }
 
+export class TestDataError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'TestDataError';
+    }
+}
+
 export class DefineError extends ModelError {
     constructor(message='') {
         super(message);
@@ -76,20 +83,20 @@ export class Model {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
             } else {
-                errorMessage['field'][key] = 'Assigned value is not an instance of DefineField'
+                errorMessage["field"][key] = 'Assigned value is not an instance of DefineField'
                 continue;
             }
             if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
                 } catch (e) {
-                    errorMessage['field'][key] = `Field({initial: ${field.option.initial}})`
+                    errorMessage["field"][key] = `Field({initial: ${field.option.initial}})`
                     + ` conflicts with Field's validation => ${e}`
                 }
             }
             model[key] = field;
         }
-        if (Object.keys(errorMessage['field']).length > 0) {
+        if (Object.keys(errorMessage["field"]).length > 0) {
             throw new DefineError(JSON.stringify(errorMessage));
         }
         this._define = {...this._define, ...model};
@@ -97,6 +104,66 @@ export class Model {
 
     static get field() {
         return {...this._define};
+    }
+
+    static test(data: Object): Object | undefined {
+        if (data instanceof Array) {
+            throw new InputDataError(`new ${this.constructor.name}(data) => `
+            + `data must be an instance of object. Received Array`);
+        }
+        if (!(data instanceof Object)) {
+            throw new InputDataError(`new ${this.constructor.name}(data) => `
+            + `data must be an instance of object, Received ${typeof(data)}`);
+        }
+
+        /** Isolate recevied data */
+        data = {...data};
+        const errorMessage = {
+            info: "",
+            field: {}
+        };
+
+        /** Iterate defined field to validate and assign data.
+         * - Also delete data[key] after assigned.
+         */
+        for (const key in this.field) {
+            if (data[key] === undefined) {
+                data[key] = this.field[key].option.initial;
+                continue;
+            }
+            try {
+                this.field[key].validate(data[key]);
+            } catch (e) {
+                errorMessage["field"][key] = e.message;
+            }
+            delete data[key];
+        }
+        
+        if (Object.keys(errorMessage["field"]).length > 0) {
+            return errorMessage;
+        }
+
+         /** If there's no data left, return void */
+        if (Object.keys(data).length === 0) {
+            return;
+        }
+
+        /** Program reach here if there's some data left */
+
+        /** If Model is stricted, add errors information */
+        if (this._option.strict) {
+            for (const key of Object.keys(data)) {
+                errorMessage["field"][key] = undefined;
+            }
+        }
+
+        /** If there're some errors */
+        if (Object.keys(errorMessage["field"]).length > 0) {
+            return errorMessage;
+        }
+
+        /** data pass all validations, return undefined */
+        return;
     }
 
     protected _option: ModelOption;
@@ -113,6 +180,7 @@ export class Model {
 
         /** Isolate recevied data */
         data = {...data};
+
         const _class = this.constructor as typeof Model;
         this._option = {..._class._option, ...option};
 
@@ -159,7 +227,7 @@ export class Model {
 
         /** Iterate defined field to validate and assign data.
          * - Also delete data[key] after assigned.
-        */
+         */
         for (const key in _class.field) {
             if (data[key] === undefined) {
                 proxy[key] = _class.field[key].option.initial;
@@ -169,7 +237,7 @@ export class Model {
                 proxy[key] = data[key];
             } catch (e) {
                 // console.log(e);
-                errorMessage['field'][key] = e.message;
+                errorMessage["field"][key] = e.message;
             }
             delete data[key];
         }
@@ -188,7 +256,7 @@ export class Model {
         /** If Model is stricted, throw InitError */
         if (this._option.strict) {
             for (const key of Object.keys(data)) {
-                errorMessage['field'][key] = `Field is not defined`
+                errorMessage["field"][key] = `Field is not defined`
             }
             if (Object.keys(errorMessage["field"]).length > 0) {
                 throw new InitError(JSON.stringify(errorMessage));
