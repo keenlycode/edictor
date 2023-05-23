@@ -112,7 +112,6 @@ describe('class Model', () => {
             new User([1,2,3]);
         } catch (error) {
             expect(error).toBeInstanceOf(InputDataError);
-            // console.log(error);
         }
         expect(() => { new User(1)}).toThrow(InputDataError);
 

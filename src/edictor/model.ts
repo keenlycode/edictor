@@ -106,7 +106,7 @@ export class Model {
         return {...this._define};
     }
 
-    static test(data: Object): Object | undefined {
+    static test(data: Object = {}, option: ModelOption = {}): Object {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
@@ -118,9 +118,11 @@ export class Model {
 
         /** Isolate recevied data */
         data = {...data};
-        const errorMessage = {
-            info: "",
-            field: {}
+        option = {...this._option, ...option};
+        const result = {
+            valid: {},
+            invalid: {},
+            error: {}
         };
 
         /** Iterate defined field to validate and assign data.
@@ -128,61 +130,51 @@ export class Model {
          */
         for (const key in this.field) {
             if (data[key] === undefined) {
-                data[key] = this.field[key].option.initial;
+                result["valid"][key] = this.field[key].option.initial;
                 continue;
             }
             try {
-                this.field[key].validate(data[key]);
+                result["valid"][key] = this.field[key].validate(data[key]);
             } catch (e) {
-                errorMessage["field"][key] = e.message;
+                result["invalid"][key] = data[key];
+                result["error"][key] = e.message;
             }
             delete data[key];
-        }
-        
-        if (Object.keys(errorMessage["field"]).length > 0) {
-            return errorMessage;
         }
 
          /** If there's no data left, return void */
         if (Object.keys(data).length === 0) {
-            return;
+            return result;
         }
 
         /** Program reach here if there's some data left */
 
-        /** If Model is stricted, add errors information */
-        if (this._option.strict) {
+        /** If option {strict: true}, add more errors for undefined fields */
+        if (option.strict) {
             for (const key of Object.keys(data)) {
-                errorMessage["field"][key] = undefined;
+                result["invalid"] = data[key];
+                result["error"][key] = undefined;
+                delete data[key];
             }
+        } else {
+            Object.assign(result['valid'], data);
         }
-
-        /** If there're some errors */
-        if (Object.keys(errorMessage["field"]).length > 0) {
-            return errorMessage;
-        }
-
-        /** data pass all validations, return undefined */
-        return;
+        return result;
     }
 
     protected _option: ModelOption;
 
     constructor(data: Object = {}, option: ModelOption = {}) {
-        if (data instanceof Array) {
-            throw new InputDataError(`new ${this.constructor.name}(data) => `
-            + `data must be an instance of object. Received Array`);
-        }
-        if (!(data instanceof Object)) {
-            throw new InputDataError(`new ${this.constructor.name}(data) => `
-            + `data must be an instance of object, Received ${typeof(data)}`);
-        }
-
-        /** Isolate recevied data */
-        data = {...data};
-
         const _class = this.constructor as typeof Model;
         this._option = {..._class._option, ...option};
+
+        let result = _class.test(data, option);
+        if (Object.keys(result["error"]).length > 0) {
+            result["errorMessage"] = `new ${_class.name}() throws errors.`
+            throw new InitError(JSON.stringify(result));
+        }
+
+        Object.assign(this, result["valid"]);
 
         /** Setup Proxy */
         const proxy = new Proxy(this, {
@@ -220,52 +212,48 @@ export class Model {
             }
         });
 
-        const errorMessage = {
-            info: `new ${this.constructor.name}(data) throw errors`,
-            field: {}
-        };
-
-        /** Iterate defined field to validate and assign data.
-         * - Also delete data[key] after assigned.
-         */
-        for (const key in _class.field) {
-            if (data[key] === undefined) {
-                proxy[key] = _class.field[key].option.initial;
-                continue;
-            }
-            try {
-                proxy[key] = data[key];
-            } catch (e) {
-                // console.log(e);
-                errorMessage["field"][key] = e.message;
-            }
-            delete data[key];
-        }
-        
-        if (Object.keys(errorMessage["field"]).length > 0) {
-            throw new InitError(JSON.stringify(errorMessage));
-        }
-
-         /** If there's no data left, return proxy */
-        if (Object.keys(data).length === 0) {
-            return proxy;
-        }
-
-        /** Program reach here if there's some data left */
-        
-        /** If Model is stricted, throw InitError */
-        if (this._option.strict) {
-            for (const key of Object.keys(data)) {
-                errorMessage["field"][key] = `Field is not defined`
-            }
-            if (Object.keys(errorMessage["field"]).length > 0) {
-                throw new InitError(JSON.stringify(errorMessage));
-            }
-        }
-
-        /** Model is not stricted. Assign data to Model() */
-        Object.assign(proxy, data);
         return proxy;
+
+        // /** Iterate defined field to validate and assign data.
+        //  * - Also delete data[key] after assigned.
+        //  */
+        // for (const key in _class.field) {
+        //     if (data[key] === undefined) {
+        //         proxy[key] = _class.field[key].option.initial;
+        //         continue;
+        //     }
+        //     try {
+        //         proxy[key] = data[key];
+        //     } catch (e) {
+        //         errorMessage["field"][key] = e.message;
+        //     }
+        //     delete data[key];
+        // }
+        
+        // if (Object.keys(errorMessage["field"]).length > 0) {
+        //     throw new InitError(JSON.stringify(errorMessage));
+        // }
+
+        //  /** If there's no data left, return proxy */
+        // if (Object.keys(data).length === 0) {
+        //     return proxy;
+        // }
+
+        // /** Program reach here if there's some data left */
+        
+        // /** If Model is stricted, throw InitError */
+        // if (this._option.strict) {
+        //     for (const key of Object.keys(data)) {
+        //         errorMessage["field"][key] = `Field is not defined`
+        //     }
+        //     if (Object.keys(errorMessage["field"]).length > 0) {
+        //         throw new InitError(JSON.stringify(errorMessage));
+        //     }
+        // }
+
+        // /** Model is not stricted. Assign data to Model() */
+        // Object.assign(proxy, data);
+        // return proxy;
     }
 
     /** Return a new native object with same data */
