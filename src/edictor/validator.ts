@@ -15,16 +15,19 @@ export class ValidationError extends Error {
 
 
 export class ArrayOf extends _ArrayOf {
-    constructor(...validators: Array<string|Function|DefineField|Field|any>) {
+    constructor(...validators: Array<string|Function|DefineField|Model|any>) {
         super(...validators);
     }
 
     _validate_each(value: any, validator: any): void {
         if (validator instanceof DefineField) {
             validator = validator.field();
+            validator.validate(value);
+            return;
         }
-        if (validator instanceof Field) {
-           validator.validate(value);
+        if (validator.prototype instanceof Model) {
+            new validator(value);
+            return;
         }
         super._validate_each(value, validator);
     }
@@ -112,12 +115,12 @@ export const apply = (func: Function): any => {
 
 /** Check if value is array of something. */
 export const arrayOf = (
-        ...validators: Array<string|Function|Class|DefineField|Field>
+        ...validators: Array<string|Function|Class|DefineField|Model>
     ) : (values) => ArrayOf => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
             values,
-            validators: Array<string|Function|Class|DefineField|Field>
+            validators: Array<string|Function|Class|DefineField|Model>
         ): ArrayOf => {
         if (!(values instanceof Array)) {
             throw new ValidationError(`${values} is not iterable`);

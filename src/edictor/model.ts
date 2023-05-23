@@ -8,6 +8,13 @@ class ModelError extends Error {
     }
 }
 
+export class TestDataError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'TestDataError';
+    }
+}
+
 export class DefineError extends ModelError {
     constructor(message='') {
         super(message);
@@ -76,20 +83,20 @@ export class Model {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
             } else {
-                errorMessage['field'][key] = 'Assigned value is not an instance of DefineField'
+                errorMessage["field"][key] = 'Assigned value is not an instance of DefineField'
                 continue;
             }
             if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
                 } catch (e) {
-                    errorMessage['field'][key] = `Field({initial: ${field.option.initial}})`
+                    errorMessage["field"][key] = `Field({initial: ${field.option.initial}})`
                     + ` conflicts with Field's validation => ${e}`
                 }
             }
             model[key] = field;
         }
-        if (Object.keys(errorMessage['field']).length > 0) {
+        if (Object.keys(errorMessage["field"]).length > 0) {
             throw new DefineError(JSON.stringify(errorMessage));
         }
         this._define = {...this._define, ...model};
@@ -99,9 +106,7 @@ export class Model {
         return {...this._define};
     }
 
-    protected _option: ModelOption;
-
-    constructor(data: Object = {}, option: ModelOption = {}) {
+    static test(data: Object = {}, option: ModelOption = {}): Object {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
@@ -113,8 +118,64 @@ export class Model {
 
         /** Isolate recevied data */
         data = {...data};
+        option = {...this._option, ...option};
+        const result = {
+            valid: {},
+            invalid: {},
+            error: {}
+        };
+
+        /** Iterate defined field to validate and assign data.
+         * - Also delete data[key] after assigned.
+         */
+        for (const key in this.field) {
+            const value = data[key];
+            delete data[key];
+            if (value === undefined) {
+                result["valid"][key] = this.field[key].option.initial;
+                continue;
+            }
+            try {
+                result["valid"][key] = this.field[key].validate(value);
+            } catch (e) {
+                result["invalid"][key] = value;
+                result["error"][key] = e.message;
+            }
+        }
+
+         /** If there's no data left, return void */
+        if (Object.keys(data).length === 0) {
+            return result;
+        }
+
+        /** Program reach here if there's some data left */
+
+        /** If option {strict: true}, add more errors for undefined fields */
+        if (option.strict) {
+            for (const key of Object.keys(data)) {
+                result["invalid"] = data[key];
+                result["error"][key] = undefined;
+                delete data[key];
+            }
+        } else {
+            Object.assign(result['valid'], data);
+        }
+        return result;
+    }
+
+    protected _option: ModelOption;
+
+    constructor(data: Object = {}, option: ModelOption = {}) {
         const _class = this.constructor as typeof Model;
         this._option = {..._class._option, ...option};
+
+        let result = _class.test(data, option);
+        if (Object.keys(result["error"]).length > 0) {
+            result["errorMessage"] = `new ${_class.name}() throws errors.`
+            throw new InitError(JSON.stringify(result));
+        }
+
+        Object.assign(this, result["valid"]);
 
         /** Setup Proxy */
         const proxy = new Proxy(this, {
@@ -152,51 +213,6 @@ export class Model {
             }
         });
 
-        const errorMessage = {
-            info: `new ${this.constructor.name}(data) throw errors`,
-            field: {}
-        };
-
-        /** Iterate defined field to validate and assign data.
-         * - Also delete data[key] after assigned.
-        */
-        for (const key in _class.field) {
-            if (data[key] === undefined) {
-                proxy[key] = _class.field[key].option.initial;
-                continue;
-            }
-            try {
-                proxy[key] = data[key];
-            } catch (e) {
-                // console.log(e);
-                errorMessage['field'][key] = e.message;
-            }
-            delete data[key];
-        }
-        
-        if (Object.keys(errorMessage["field"]).length > 0) {
-            throw new InitError(JSON.stringify(errorMessage));
-        }
-
-         /** If there's no data left, return proxy */
-        if (Object.keys(data).length === 0) {
-            return proxy;
-        }
-
-        /** Program reach here if there's some data left */
-        
-        /** If Model is stricted, throw InitError */
-        if (this._option.strict) {
-            for (const key of Object.keys(data)) {
-                errorMessage['field'][key] = `Field is not defined`
-            }
-            if (Object.keys(errorMessage["field"]).length > 0) {
-                throw new InitError(JSON.stringify(errorMessage));
-            }
-        }
-
-        /** Model is not stricted. Assign data to Model() */
-        Object.assign(proxy, data);
         return proxy;
     }
 
@@ -214,12 +230,9 @@ export class Model {
         const class_ = this.constructor as typeof Model;
         try {
             new class_({ ...this.object(), ...data });
-        } catch (e) {
-            const message = JSON.parse(e.message);
-            const errorMessage = {
-                info: `${this.constructor.name}().update(data)\n throw errors`,
-                field: message["field"]
-            }
+        } catch (error) {
+            const errorMessage = JSON.parse(error.message);
+            errorMessage["info"] = `${this.constructor.name}().update(data)\n throw errors`;
             throw new UpdateError(JSON.stringify(errorMessage));
         }
         for (const key in data) {

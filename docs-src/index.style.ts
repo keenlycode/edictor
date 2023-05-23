@@ -40,8 +40,11 @@ a {
         min-width: 300px;
         align-content: center;
         z-index: 1;
-        h1, h2 {
+        h1, h2, h3 {
             text-align: center;
+        }
+        h3 {
+            margin-top: -1rem;
         }
         @media screen and (max-width: 600px) {
             h1 {
