@@ -13,20 +13,26 @@ export class ArrayOfError extends Error {
     }
 }
 
-export class ArrayOfSetValueError extends Error {
+export class SetValueError extends Error {
     constructor(message) {
         super(message);
-        this.name = 'ArrayOfSetValueError';
+        this.name = 'SetValueError';
     }
 }
+
+type ValidatorTypes = Array<string|Function|Class|Array<string|Function|Class>>;
 
 
 /** Modified array which check it's members instance. */
 export class ArrayOf extends Array {
 
-    constructor(...validators: Array<string|Function|Class>) {
+    /** propery to keep validators */
+    protected _validators: ValidatorTypes = [];
+
+    constructor(...validators: ValidatorTypes) {
         super();
-        this._validators = validators; // keep validators for setting a new value.
+        // keep validators for setting a new value.
+        this._validators = [...validators];
 
         return new Proxy(this, {
             get(target, key: PropertyKey, receiver): any {
@@ -34,15 +40,16 @@ export class ArrayOf extends Array {
             },
             set(target, key: string, value): boolean {
                 /** Check if key is instance of Number */
-                if (!(isNaN(Number(key)))) {
-                    try {
-                        target._validate_values([value], target._validators);
-                    } catch (error) {
-                        const errorMessage = `[${key}] => ${value}`;
-                        const validators_names = target._validators_to_names(validators);
-                        throw new ArrayOfSetValueError(`Expect (${validators_names}), got errors at:`
-                            + `\n   ${errorMessage}`);
-                    }
+                if (isNaN(Number(key))) {
+                    return Reflect.set(target, key, value);
+                }
+                try {
+                    target._validate_values([value], target.validators);
+                } catch (error) {
+                    const errorMessage = `[${key}] => ${value}`;
+                    const validators_names = target.validators_to_names(validators);
+                    throw new SetValueError(`Expect (${validators_names}), got errors at:`
+                        + `\n   ${errorMessage}`);
                 }
                 return Reflect.set(target, key, value);
             },
@@ -56,8 +63,9 @@ export class ArrayOf extends Array {
         });
     }
 
-    /** propery to keep validators */
-    _validators: Array<string|Function|Class>;
+    get validators() {
+        return this._validators;
+    }
 
     /** Return a new native object with same data */
     object(): Array<any> {
@@ -70,7 +78,7 @@ export class ArrayOf extends Array {
     }
 
     push(...values: any[]): number {
-        this._validate_values(values, this._validators);
+        this._validate_values(values, this.validators);
         return super.push(...values);
     }
 
@@ -82,11 +90,11 @@ export class ArrayOf extends Array {
             return;
         }
 
-        if (validator instanceof ArrayOf) {
+        if (validator instanceof Array) {
             assert(value instanceof Array,
                 `value must be instance of Array`)
-            validator.push(...value);
-            return validator;
+            const array = new ArrayOf(...validator);
+            array.push(...value);
         }
         // If validator is a Function
         if (is_function(validator)) {
@@ -103,22 +111,18 @@ export class ArrayOf extends Array {
     /** validate all values */
     _validate_values(
             values: Array<any>,
-            validators_: Array<string|Function|Class>) {
+            validators: ValidatorTypes) {
 
         /** Isolate validators by cloning to a new one */
-        const validators = [...validators_];
+        validators = [...validators];
         const errors = [];
 
         for (const i in values) {
             let value_pass_once = false;
             for (const validator of validators) {
                 try {
-                    const value = this._validate_each(values[i], validator);
+                    this._validate_each(values[i], validator);
                     value_pass_once = true;
-                    // if (value instanceof ArrayOf) {
-                    //     console.log('return ArrayOf');
-                    //     console.log(value.object());
-                    // }
                     break;
                 } catch {};
             }
@@ -127,19 +131,19 @@ export class ArrayOf extends Array {
             }
 
         }
-        const validators_names = this._validators_to_names(validators);
+        const validators_names = this.validators_to_names(validators);
         const msg = `Expect (${validators_names}), got errors at: ${errors}`;
         if (errors.length > 0) {
             throw new ArrayOfError(msg);
         }
     }
     
-    _validators_to_names(validators_) {
+    validators_to_names(validators_) {
         const validators = [...validators_];
         for (let i in validators) {
             const validator = validators[i];
-            if (validator instanceof ArrayOf) {
-                validators[i] = `ArrayOf(${validator._validators})`;
+            if (validator instanceof Array) {
+                validators[i] = `[${validator}]`;
                 continue;
             }
             if ((is_function(validator)) || is_class(validators)) {
