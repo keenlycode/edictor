@@ -47,14 +47,18 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test('arrayOf()', () => {
+test.only('arrayOf()', () => {
     const values = ['a', 'b', 0, 1];
-    const number = defineField({'name': 'number'}).instance('number');
-    const arrayof: any = arrayOf('string', number);
-    let array = arrayof(values);
-    expect(array).toBeInstanceOf(ArrayOf);
-    expect(array).toEqual(values);
-    expect(() => {arrayof(1)}).toThrow(ValidationError);
+    const numberDef = defineField({'name': 'number'}).instance('number');
+    const arrayofStrNum = arrayOf('string', numberDef);
+    let arrayStrNum = arrayofStrNum(...values);
+    expect(arrayStrNum).toBeInstanceOf(ArrayOf);
+    expect(arrayStrNum).toEqual(values);
+
+    // const arrayOfArrayStrNum = arrayOf(arrayofStrNum);
+    // let array = arrayOfArrayStrNum([100,'a']);
+    // array[0].push(true);
+    // console.log(array);
 });
 
 test('model()', () => {

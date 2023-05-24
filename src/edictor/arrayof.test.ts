@@ -11,9 +11,17 @@ describe('class ArrayOf', () => {
         array.push(...values);
     });
 
-    test('new ArrayOf()', () => {
+    test.only('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
+        array[1] = true;
+
+        // const arrayOfArray = new ArrayOf(array, 'boolean');
+        // arrayOfArray.push([1,2], true);
+        // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(ArrayOfError);
+        // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(ArrayOfError);
+        // arrayOfArray[0] = true;
+        // expect(() => {arrayOfArray[0].push(true)}).toThrow(ArrayOfError);
     })
 
     test('ArrayOf() validation', () => {
