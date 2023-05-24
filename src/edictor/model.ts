@@ -224,9 +224,9 @@ export class Model {
         try {
             new class_({ ...this.object(), ...data });
         } catch (error) {
-            const errorMessage = JSON.parse(error.message);
-            errorMessage["info"] = `${this.constructor.name}().update(data)\n throw errors`;
-            throw new UpdateError(JSON.stringify(errorMessage));
+            const validationResult = JSON.parse(error.message);
+            validationResult["errorMessage"] = `${this.constructor.name}().update(data)\n throw errors`;
+            throw new UpdateError(JSON.stringify(validationResult));
         }
         for (const key in data) {
             this[key] = data[key];

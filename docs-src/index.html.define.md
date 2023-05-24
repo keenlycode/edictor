@@ -2,7 +2,7 @@
     <h2>Define</h2>
 </div>
 
-Let's try to define a model / schema for npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
+Let's try to define a model / schema for some part of npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
 package.json</a>.
 
 ```javascript

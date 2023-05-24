@@ -41,7 +41,7 @@
     },
     "scripts": {
         "build": "parcel build --no-cache --target=es --target=cjs --target=types",
-        "build-watch": "parcel watch --no-cache --target=es --target=cjs --target=types",
+        "build-watch": "parcel watch -p 1235 --no-cache --target=es --target=cjs --target=types",
         "test": "jest",
         "test-watch": "jest --watch"
     },

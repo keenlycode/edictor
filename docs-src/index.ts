@@ -80,7 +80,8 @@ try {
         homepage: "invalid url" // Validation error
     })
 } catch (error) { // error is an instance of UpdateError
-    const errorMessage = JSON.parse(error.message);
+    const validationResult = JSON.parse(error.message);
+    console.log(validationResult);
 };
 
 window.Model = Model;
