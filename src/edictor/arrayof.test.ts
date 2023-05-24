@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, ArrayOfError } from './arrayof';
+import { ArrayOf, ArrayOfError, ArrayOfSetValueError } from './arrayof';
 
 describe('class ArrayOf', () => {
     let array;
@@ -14,13 +14,15 @@ describe('class ArrayOf', () => {
     test.only('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
-        array[1] = true;
+        expect(() => {array[1] = true}).toThrow(ArrayOfSetValueError);
 
-        // const arrayOfArray = new ArrayOf(array, 'boolean');
-        // arrayOfArray.push([1,2], true);
+        const arrayOfArray = new ArrayOf(array, 'boolean');
+        arrayOfArray.push([1,2], true);
         // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(ArrayOfError);
         // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(ArrayOfError);
         // arrayOfArray[0] = true;
+
+        /** fix this line */
         // expect(() => {arrayOfArray[0].push(true)}).toThrow(ArrayOfError);
     })
 

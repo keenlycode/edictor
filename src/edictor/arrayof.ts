@@ -33,7 +33,6 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string, value): boolean {
-                console.log('set', key, value);
                 /** Check if key is instance of Number */
                 if (!(isNaN(Number(key)))) {
                     try {
@@ -82,8 +81,8 @@ export class ArrayOf extends Array {
             assert(typeof(value) === validator);
             return;
         }
+
         if (validator instanceof ArrayOf) {
-            console.log('ArrayOf');
             assert(value instanceof Array,
                 `value must be instance of Array`)
             validator.push(...value);
@@ -111,17 +110,22 @@ export class ArrayOf extends Array {
         const errors = [];
 
         for (const i in values) {
-            let value_pass = false;
+            let value_pass_once = false;
             for (const validator of validators) {
                 try {
-                    this._validate_each(values[i], validator);
-                    value_pass = true;
+                    const value = this._validate_each(values[i], validator);
+                    value_pass_once = true;
+                    // if (value instanceof ArrayOf) {
+                    //     console.log('return ArrayOf');
+                    //     console.log(value.object());
+                    // }
                     break;
                 } catch {};
             }
-            if (!value_pass) {
+            if (!value_pass_once) {
                 errors.push(`\n    [${i}] => ${values[i]}`);
             }
+
         }
         const validators_names = this._validators_to_names(validators);
         const msg = `Expect (${validators_names}), got errors at: ${errors}`;
