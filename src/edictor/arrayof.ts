@@ -39,10 +39,10 @@ export class ArrayOf extends Array {
                     try {
                         target._validate_values([value], target._validators);
                     } catch (error) {
-                        const errorMessage = ` got errors at:` +
-                            `[${key}] => ${value}`;
-                        throw new ArrayOfSetValueError(`${error.message} ${errorMessage}`);
-                        // console.log('error at ', key);
+                        const errorMessage = `[${key}] => ${value}`;
+                        const validators_names = target._validators_to_names(validators);
+                        throw new ArrayOfSetValueError(`Expect (${validators_names}), got errors at:`
+                            + `\n   ${errorMessage}`);
                     }
                 }
                 return Reflect.set(target, key, value);
