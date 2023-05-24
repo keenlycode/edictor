@@ -7,13 +7,6 @@ class ModelError extends Error {
     }
 }
 
-export class TestDataError extends ModelError {
-    constructor(message='') {
-        super(message);
-        this.name = 'TestDataError';
-    }
-}
-
 export class DefineError extends ModelError {
     constructor(message='') {
         super(message);
@@ -69,7 +62,6 @@ export class Model {
         }
 
         const result = {
-            // errorMessage: `${this.name}.define() throw errors`,
             valid: {},
             invalid: {},
             error: {},
@@ -101,6 +93,7 @@ export class Model {
             model[key] = field;
         }
         if (Object.keys(result["error"]).length > 0) {
+            result["errorMessage"] = `${this.name}.define() throw errors`;
             throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
@@ -157,9 +150,8 @@ export class Model {
         /** If option {strict: true}, add more errors for undefined fields */
         if (option.strict) {
             for (const key of Object.keys(data)) {
-                result["invalid"] = data[key];
+                result["invalid"][key] = data[key];
                 result["error"][key] = undefined;
-                delete data[key];
             }
         } else {
             Object.assign(result['valid'], data);
@@ -199,15 +191,12 @@ export class Model {
                 }
                 /** Validate value => Throw FieldError is invalid */
                 value = field.validate(value);
-                if (value === undefined) {
-                    return Reflect.deleteProperty(target, key);
-                }
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
                 const _class = target.constructor as typeof Model;
-                const field = _class._define[key] as Field;
-                if (field) { field.validate(undefined)};
+                const field = _class.field[key] as Field;
+                if (field) { field.validate(undefined) };
                 return Reflect.deleteProperty(target, key);
             },
             ownKeys(target) {

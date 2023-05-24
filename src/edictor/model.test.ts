@@ -8,7 +8,7 @@ import {
     Model
 } from './model';
 import { defineField, Field, FieldError } from './field';
-import { DataTestResult } from './schema';
+import * as schema from './schema';
 
 
 test('Usage Test', () => {
@@ -65,8 +65,9 @@ test('Usage Test', () => {
     const somePackage = new Package({
         name: "some-package",
         version: "1.0.0",
-        phone: "+66 123 4567"
-    }, {strict: false})
+        phone: "+66 123 4567" // Can set data to undefined fields.
+    }, {strict: false});
+    somePackage["undef"] = "Can set data to undefined fields";
 
     const author = new People({
         name: "Author",
@@ -105,7 +106,6 @@ describe('class Model', () => {
             Model.define()
         } catch (error) {
             expect(error).toBeInstanceOf(CallError);
-            // console.log(error.message);
         }
 
         class Test extends Model {};
@@ -129,6 +129,16 @@ describe('class Model', () => {
             /** Test that error.message is a valid JSON */
             JSON.parse(error.message);
         }
+    })
+
+    test('Model.test()', () => {
+        let result: any = User.test({
+            name: 'Test User',
+            phone: '+66 123 4567',
+            enable: 1,
+            test: true,
+        })
+        result = new schema.DataTestResult(result);
     })
 
     test('Model.field()', () => {
