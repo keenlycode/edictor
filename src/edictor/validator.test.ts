@@ -47,18 +47,25 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test.only('arrayOf()', () => {
+test('arrayOf()', () => {
     const values = ['a', 'b', 0, 1];
     const numberDef = defineField({'name': 'number'}).instance('number');
-    const arrayofStrNum = arrayOf('string', numberDef);
-    let arrayStrNum = arrayofStrNum(...values);
-    expect(arrayStrNum).toBeInstanceOf(ArrayOf);
-    expect(arrayStrNum).toEqual(values);
+    let array: any = arrayOf('string', numberDef);
+    array = array(...values);
+    expect(array).toBeInstanceOf(ArrayOf);
+    expect(array).toEqual(values);
 
-    // const arrayOfArrayStrNum = arrayOf(arrayofStrNum);
-    // let array = arrayOfArrayStrNum([100,'a']);
-    // array[0].push(true);
-    // console.log(array);
+    class User extends Model {};
+    User.define({
+        'name': defineField().instance('string')
+    })
+    array = arrayOf(User);
+    const user_data = {"name": "User Name"};
+    let user = new User(user_data);
+    array = array(user);
+    console.log(array.object());
+
+    array = arrayOf(['string', 'number'])
 });
 
 test('model()', () => {

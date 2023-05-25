@@ -1,7 +1,10 @@
 import * as util from './util';
 import { Field, DefineField } from './field';
 import { Model } from './model';
-import { ArrayOf as _ArrayOf } from './arrayof';
+import {
+    ArrayOf as _ArrayOf,
+    ValidatorType
+} from './arrayof';
 
 
 export class ValidationError extends Error {
@@ -13,13 +16,12 @@ export class ValidationError extends Error {
     }
 }
 
-
 export class ArrayOf extends _ArrayOf {
-    constructor(...validators: Array<string|Function|DefineField|Model|any>) {
+    constructor(...validators: Array<ValidatorType|DefineField|Model>) {
         super(...validators);
     }
 
-    _validate_each(value: any, validator: any): void {
+    _validate(value: any, validator: any): void {
         if (validator instanceof DefineField) {
             validator = validator.field();
             validator.validate(value);
@@ -29,34 +31,30 @@ export class ArrayOf extends _ArrayOf {
             new validator(value);
             return;
         }
+
         if (util.is_function(validator)) {
             if (validator.name === "arrayOf") {
                 util.assert(value instanceof Array,
                     `value must be instance of ${validator}`);
-                console.log(validator.name);
-                console.log(value);
                 validator(...value);
                 return;
             }
         }
-        super._validate_each(value, validator);
+        super._validate(value, validator);
     }
 
-    _validators_to_names(validators_: any): any[] {
-        let validators = [...validators_];
-        validators = super._validators_to_names(validators);
-        for (let i in validators) {
-            if (validators[i] instanceof DefineField) {
-                validators[i] = validators[i].field();
+    get validators_names() {
+        const validators = [...this.validators];
+        const names = validators.map((validator)  => {
+            if (validator instanceof DefineField) {
+                const field = validator.field();
+                return `Field({name: ${field.name}})`;
             }
-            if (validators[i] instanceof Field) {
-                validators[i] = `Field({name: ${validators[i].name}})`;
-            }
-        }
-        return validators;
+            return super.get_validator_name(validator);
+        })
+        return names;
     }
 }
-
 
 /** Check instance type
  *  Use string for primative type test, for example:
@@ -82,6 +80,7 @@ export const instance = (...types: Array<string|util.Class>) => {
     }
     return function instance(value) { wrapper(value, types) };
 }
+
 
 /** Validate with Regular Expression */
 export const regexp = (regexp_: RegExp) => {
@@ -125,12 +124,12 @@ export const apply = (func: Function): any => {
 
 /** Check if value is array of something. */
 export const arrayOf = (
-        ...validators: Array<string|Function|util.Class|DefineField|Model>
+        ...validators: Array<ValidatorType|DefineField|Model>
     ) : (...values) => ArrayOf => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
             values,
-            validators: Array<string|Function|util.Class|DefineField|Model>
+            validators: Array<ValidatorType|DefineField|Model>
         ): ArrayOf => {
         if (!(values instanceof Array)) {
             throw new ValidationError(`${values} is not iterable`);

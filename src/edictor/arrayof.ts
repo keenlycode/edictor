@@ -20,18 +20,17 @@ export class PushError extends Error {
     }
 }
 
-type ValidatorTypes = Array<string|Function|Class|Array<string|Function|Class>>;
-
+export type ValidatorType = string|Function|Class|any|Array<any>;
 
 /** Modified array which check it's members instance. */
 export class ArrayOf extends Array {
 
     /** propery to keep validators */
-    protected _validators: ValidatorTypes = [];
+    protected _validators: Array<ValidatorType> = [];
     proxy;
     revoke;
 
-    constructor(...validators: ValidatorTypes) {
+    constructor(...validators: Array<ValidatorType>) {
         super();
         // keep validators for setting a new value.
         this._validators = [...validators];
@@ -66,17 +65,22 @@ export class ArrayOf extends Array {
 
     get validators_names() {
         const validators = [...this.validators];
-        for (let i in validators) {
-            const validator = validators[i];
-            if (validator instanceof Array) {
-                validators[i] = `[${validator}]`;
-                continue;
-            }
-            if ((is_function(validator)) || is_class(validators)) {
-                validators[i] = (validators[i] as Function).name;
-            }
+        const names = validators.map((validator)  => {
+            return this.get_validator_name(validator);
+        })
+        return names;
+    }
+
+    get_validator_name(validator: ValidatorType) {
+        let name;
+        if (validator instanceof Array) {
+            name = `[${validator}]`;
+            return name;
         }
-        return validators;
+        if ((is_function(validator)) || is_class(validator)) {
+            name = (validator as Function).name;
+            return name;
+        }
     }
 
     _push_skip_proxy(...values): number {
