@@ -63,9 +63,9 @@ test('arrayOf()', () => {
     const user_data = {"name": "User Name"};
     let user = new User(user_data);
     array = array(user);
-    console.log(array.object());
 
     array = arrayOf(['string', 'number'])
+    array = array([1,2]);
 });
 
 test('model()', () => {
