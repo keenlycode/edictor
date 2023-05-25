@@ -104,7 +104,11 @@ export class ArrayOf extends Array {
                     values[i] = value;
                 }  
             } catch (error) {
-                errors.push(`\n    [${i}] => ${values[i]}`)
+                let value_string = values[i];
+                if (value_string instanceof Array) {
+                    value_string = `[${value_string}]`;
+                }
+                errors.push(`\n    [${i}] => ${value_string}`)
             }
         }
         if (errors.length > 0) {
