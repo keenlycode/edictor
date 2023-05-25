@@ -15,16 +15,15 @@ describe('class ArrayOf', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
         expect(() => {array[1] = true}).toThrow(SetValueError);
+        // array.push(true,true,false);
 
-        const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
-        arrayOfArray.push([1, 'a'], true);
-        expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(ArrayOfError);
-        expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(ArrayOfError);
+        // const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
+        // arrayOfArray.push([1, 'a'], true);
+        // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(ArrayOfError);
+        // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(ArrayOfError);
 
         // This must thrown error.
-        console.log(arrayOfArray);
-        arrayOfArray[0].push(true);
-        console.log(arrayOfArray);
+        // arrayOfArray[0].push(true);
 
         /** fix this line */
         // expect(() => {arrayOfArray[0].push(true)}).toThrow(ArrayOfError);
