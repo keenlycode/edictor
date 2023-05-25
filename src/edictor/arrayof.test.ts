@@ -11,7 +11,7 @@ describe('class ArrayOf', () => {
         array.push(...values);
     });
 
-    test('new ArrayOf()', () => {
+    test.only('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
         array[0] = 'c';

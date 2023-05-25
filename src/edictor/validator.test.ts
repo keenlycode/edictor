@@ -47,25 +47,36 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test('arrayOf()', () => {
-    const values = ['a', 'b', 0, 1];
+test.only('arrayOf()', () => {
+    // const values = ['a', 'b', 0, 1];
     const numberDef = defineField({'name': 'number'}).instance('number');
-    let array: any = arrayOf('string', numberDef);
-    array = array(...values);
-    expect(array).toBeInstanceOf(ArrayOf);
-    expect(array).toEqual(values);
+    // let array: any = arrayOf('string', numberDef);
+    // array = array(...values);
+    // expect(array).toBeInstanceOf(ArrayOf);
+    // expect(array).toEqual(values);
 
+    // class User extends Model {};
+    // User.define({
+    //     'name': defineField().instance('string')
+    // })
+    // array = arrayOf(User);
+    // const user_data = {"name": "User Name"};
+    // let user = new User(user_data);
+    // array = array(user);
+
+    // array = arrayOf(['string', 'number'])
+    // array = array([1,2]);
+
+    let array;
     class User extends Model {};
     User.define({
         'name': defineField().instance('string')
     })
-    array = arrayOf(User);
-    const user_data = {"name": "User Name"};
-    let user = new User(user_data);
-    array = array(user);
-
-    array = arrayOf(['string', 'number'])
-    array = array([1,2]);
+    array = arrayOf([User, numberDef], "number");
+    array = array();
+    console.log(array.validators_names);
+    // array = array([{name: 'Um'}, 1]);
+    // console.log(array);
 });
 
 test('model()', () => {

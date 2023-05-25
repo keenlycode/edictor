@@ -1,5 +1,5 @@
 import * as util from './util';
-import { Field, DefineField } from './field';
+import { DefineField } from './field';
 import { Model } from './model';
 import {
     ArrayOf as _ArrayOf,
@@ -21,7 +21,7 @@ export class ArrayOf extends _ArrayOf {
         super(...validators);
     }
 
-    _validate(value: any, validator: any): void {
+    _validate(value: any, validator: any): void|ArrayOf {
         if (validator instanceof DefineField) {
             validator = validator.field();
             validator.validate(value);
@@ -31,28 +31,21 @@ export class ArrayOf extends _ArrayOf {
             new validator(value);
             return;
         }
-
-        if (util.is_function(validator)) {
-            if (validator.name === "arrayOf") {
-                util.assert(value instanceof Array,
-                    `value must be instance of ${validator}`);
-                validator(...value);
-                return;
-            }
+        if (validator instanceof Array) {
+            util.assert(value instanceof Array,
+                `value must be instance of Array`)
+            const array = new ArrayOf(...validator);
+            array.push(...value);
+            return array;
         }
         super._validate(value, validator);
     }
 
-    get validators_names() {
-        const validators = [...this.validators];
-        const names = validators.map((validator)  => {
-            if (validator instanceof DefineField) {
-                const field = validator.field();
-                return `Field({name: ${field.name}})`;
-            }
-            return super.get_validator_name(validator);
-        })
-        return names;
+    get_validator_name(validator: ValidatorType) {
+        if (validator instanceof DefineField) {
+            return `defineField({name: ${validator.field().name}})`;
+        }
+        return super.get_validator_name(validator);
     }
 }
 
@@ -69,7 +62,7 @@ export const instance = (...types: Array<string|util.Class>) => {
                 if (value instanceof type) { valid = true };
             }
             /** When type is primative. */
-            if (typeof(type) === 'string') {
+            if (typeof(type) === "string") {
                 if (typeof(value) === type) { valid = true };
             }
         }

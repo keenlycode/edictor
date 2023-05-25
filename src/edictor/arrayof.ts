@@ -44,7 +44,7 @@ export class ArrayOf extends Array {
                     target._validate_value_with_all_validators(key, value);
                 } catch (error) {
                     const errorMessage = `[${key}] => ${value}`;
-                    throw new SetValueError(`Expect (${this.validators_names}), got errors at:`
+                    throw new SetValueError(`Expect (${target.validators_names}), got errors at:`
                         + `\n   ${errorMessage}`);
                 }
                 return Reflect.set(target, key, value, receiver);
@@ -68,19 +68,23 @@ export class ArrayOf extends Array {
         const names = validators.map((validator)  => {
             return this.get_validator_name(validator);
         })
+        console.log(names);
         return names;
     }
 
     get_validator_name(validator: ValidatorType) {
-        let name;
+        console.log(validator);
         if (validator instanceof Array) {
-            name = `[${validator}]`;
-            return name;
+            let names = [];
+            for (const v of validator) {
+                names.push(this.get_validator_name(v));
+            }
+            return names;
         }
         if ((is_function(validator)) || is_class(validator)) {
-            name = (validator as Function).name;
-            return name;
+            return (validator as Function).name;
         }
+        return validator;
     }
 
     _push_skip_proxy(...values): number {
@@ -148,10 +152,12 @@ export class ArrayOf extends Array {
             assert(value instanceof validator);
             return;
         }
+
+        console.log(`!!!!!!!!!!!!!!Can't catch validator type`, validator);
     }
 
     /** validate a value */
-    _validate_value_with_all_validators(key, value): void|ArrayOf {
+    _validate_value_with_all_validators(key, value): any {
         /** Isolate validators by cloning to a new one */
         let value_pass_once = false;
         let value_;
