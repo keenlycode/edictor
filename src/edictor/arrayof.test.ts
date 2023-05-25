@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, ArrayOfError, SetValueError } from './arrayof';
+import { ArrayOf, ArrayOfError, SetValueError, PushError } from './arrayof';
 
 describe('class ArrayOf', () => {
     let array;
@@ -15,15 +15,15 @@ describe('class ArrayOf', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
         expect(() => {array[1] = true}).toThrow(SetValueError);
-        // array.push(true,true,false);
+        expect(() => {array.push(true,true,false)}).toThrow(PushError);
 
-        // const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
-        // arrayOfArray.push([1, 'a'], true);
-        // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(ArrayOfError);
-        // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(ArrayOfError);
+        const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
+        arrayOfArray.push([1, 'a'], true);
+        expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
+        expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
 
         // This must thrown error.
-        // arrayOfArray[0].push(true);
+        arrayOfArray[0].push(true);
 
         /** fix this line */
         // expect(() => {arrayOfArray[0].push(true)}).toThrow(ArrayOfError);

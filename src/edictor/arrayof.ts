@@ -20,6 +20,13 @@ export class SetValueError extends Error {
     }
 }
 
+export class PushError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'PushError';
+    }
+}
+
 type ValidatorTypes = Array<string|Function|Class|Array<string|Function|Class>>;
 
 
@@ -28,14 +35,15 @@ export class ArrayOf extends Array {
 
     /** propery to keep validators */
     protected _validators: ValidatorTypes = [];
-    protected _revocable;
+    proxy;
+    revoke;
 
     constructor(...validators: ValidatorTypes) {
         super();
         // keep validators for setting a new value.
         this._validators = [...validators];
 
-        const revocable = Proxy.revocable(this, {
+        return new Proxy(this, {
             get(target, key: PropertyKey, receiver): any {
                 return Reflect.get(target, key, receiver);
             },
@@ -48,8 +56,7 @@ export class ArrayOf extends Array {
                     target._value_pass_one_of_validators(key, value);
                 } catch (error) {
                     const errorMessage = `[${key}] => ${value}`;
-                    const validators_names = target.validators_to_names(validators);
-                    throw new SetValueError(`Expect (${validators_names}), got errors at:`
+                    throw new SetValueError(`Expect (${this.validators_names}), got errors at:`
                         + `\n   ${errorMessage}`);
                 }
                 return Reflect.set(target, key, value, receiver);
@@ -62,12 +69,52 @@ export class ArrayOf extends Array {
                 return Reflect.ownKeys(new Array(...target));
             }
         });
-        this._revocable = revocable;
-        return revocable.proxy;
     }
 
     get validators() {
         return this._validators;
+    }
+
+    get validators_names() {
+        const validators = [...this.validators];
+        for (let i in validators) {
+            const validator = validators[i];
+            if (validator instanceof Array) {
+                validators[i] = `[${validator}]`;
+                continue;
+            }
+            if ((is_function(validator)) || is_class(validators)) {
+                validators[i] = (validators[i] as Function).name;
+            }
+        }
+        return validators;
+    }
+
+    _push_skip_proxy(...values): number {
+        let length = this.length;
+        for (const value of values) {
+            super[length] = value;
+            length += 1;
+        }
+        return length;
+    }
+
+    push(...values): number {
+        values = [...values];
+        let errors = [];
+        for (const i in values) {
+            try {
+                this._value_pass_one_of_validators(i, values[i]);
+            } catch (error) {
+                errors.push(`\n    [${i}] => ${values[i]}`)
+            }
+        }
+        if (errors.length > 0) {
+            throw new PushError(`Expect (${this.validators_names}), got errors:`
+                + `${errors}`
+            )
+        }
+        return this._push_skip_proxy(...values);
     }
 
     /** Return a new native object with same data */
@@ -78,11 +125,6 @@ export class ArrayOf extends Array {
     /** Return JSON */
     json(): string {
         return JSON.stringify(this);
-    }
-
-    push(...values: any[]): any {
-        // this._validate_values(values, this.validators);
-        return super.push(...values);
     }
 
     /** validate a value with a validator */
@@ -129,32 +171,7 @@ export class ArrayOf extends Array {
         if (value_pass_once) {
             return
         }
-        const validators_names = this.validators_to_names(this.validators);
-        const msg = `Expect (${validators_names}), got errors at: ${key} => ${value}`;
+        const msg = `Expect (${this.validators_names}), got errors at: ${key} => ${value}`;
         throw new SetValueError(msg);
     }
-    
-    validators_to_names(validators_) {
-        const validators = [...validators_];
-        for (let i in validators) {
-            const validator = validators[i];
-            if (validator instanceof Array) {
-                validators[i] = `[${validator}]`;
-                continue;
-            }
-            if ((is_function(validator)) || is_class(validators)) {
-                validators[i] = (validators[i] as Function).name;
-            }
-        }
-        return validators;
-    }
 }
-
-/** Working on this line */
-export const ArrayOfProxy = Proxy.revocable(ArrayOf, {
-    get(target, key, receiver) {
-        console.log(target);
-        console.log(key);
-        console.log(receiver);
-    }
-})
