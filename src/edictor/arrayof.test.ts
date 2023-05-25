@@ -11,7 +11,7 @@ describe('class ArrayOf', () => {
         array.push(...values);
     });
 
-    test.only('new ArrayOf()', () => {
+    test('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
         array[0] = 'c';
@@ -22,7 +22,7 @@ describe('class ArrayOf', () => {
         arrayOfArray.push([1, 'a'], true);
         expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
         expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
-        expect(() => {arrayOfArray[0].push(true, false)}).toThrow(PushError);
+        expect(() => {arrayOfArray[0].push(1, true)}).toThrow(PushError);
     })
 
     test('ArrayOf() validation', () => {

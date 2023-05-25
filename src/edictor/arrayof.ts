@@ -20,6 +20,13 @@ export class PushError extends Error {
     }
 }
 
+export class UnExpected extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'UnExpected';
+    }
+}
+
 export type ValidatorType = string|Function|Class|any|Array<any>;
 
 /** Modified array which check it's members instance. */
@@ -68,18 +75,16 @@ export class ArrayOf extends Array {
         const names = validators.map((validator)  => {
             return this.get_validator_name(validator);
         })
-        console.log(names);
         return names;
     }
 
     get_validator_name(validator: ValidatorType) {
-        console.log(validator);
         if (validator instanceof Array) {
             let names = [];
             for (const v of validator) {
                 names.push(this.get_validator_name(v));
             }
-            return names;
+            return `[${names}]`;
         }
         if ((is_function(validator)) || is_class(validator)) {
             return (validator as Function).name;
@@ -152,8 +157,7 @@ export class ArrayOf extends Array {
             assert(value instanceof validator);
             return;
         }
-
-        console.log(`!!!!!!!!!!!!!!Can't catch validator type`, validator);
+        throw new UnExpected(`Can't determine validator type`);
     }
 
     /** validate a value */
