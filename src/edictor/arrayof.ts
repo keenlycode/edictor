@@ -108,7 +108,7 @@ export class ArrayOf extends Array {
                 if (value_string instanceof Array) {
                     value_string = `[${value_string}]`;
                 }
-                errors.push(`\n    [${i}] => ${value_string}`)
+                errors.push(`\n\t[${i}] => ${value_string}`)
             }
         }
         if (errors.length > 0) {
