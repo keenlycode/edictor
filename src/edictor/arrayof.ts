@@ -20,13 +20,6 @@ export class PushError extends Error {
     }
 }
 
-export class UnExpected extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'UnExpected';
-    }
-}
-
 export type ValidatorType = string|Function|Class|any|Array<any>;
 
 /** Modified array which check it's members instance. */
@@ -133,7 +126,7 @@ export class ArrayOf extends Array {
     }
 
     /** validate a value with a validator */
-    _validate(value, validator): void|ArrayOf {
+    _validate(value, validator: ValidatorType): void|ArrayOf {
         // If validator is a primative type.
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator);
@@ -157,7 +150,6 @@ export class ArrayOf extends Array {
             assert(value instanceof validator);
             return;
         }
-        throw new UnExpected(`Can't determine validator type`);
     }
 
     /** validate a value */
