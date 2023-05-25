@@ -6,13 +6,6 @@ import {
 } from './util';
 
 
-export class ArrayOfError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'ArrayOfError';
-    }
-}
-
 export class SetValueError extends Error {
     constructor(message) {
         super(message);
@@ -48,12 +41,8 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string, value, receiver): boolean {
-                /** Check if key is instance of Number */
-                if (isNaN(Number(key))) {
-                    return Reflect.set(target, key, value, receiver);
-                }
                 try {
-                    target._value_pass_one_of_validators(key, value);
+                    target._validate_value_with_all_validators(key, value);
                 } catch (error) {
                     const errorMessage = `[${key}] => ${value}`;
                     throw new SetValueError(`Expect (${this.validators_names}), got errors at:`
@@ -104,7 +93,10 @@ export class ArrayOf extends Array {
         let errors = [];
         for (const i in values) {
             try {
-                this._value_pass_one_of_validators(i, values[i]);
+                const value = this._validate_value_with_all_validators(i, values[i]);
+                if (value !== undefined) {
+                    values[i] = value;
+                }  
             } catch (error) {
                 errors.push(`\n    [${i}] => ${values[i]}`)
             }
@@ -128,7 +120,7 @@ export class ArrayOf extends Array {
     }
 
     /** validate a value with a validator */
-    _validate_each(value, validator): void|ArrayOf {
+    _validate(value, validator): void|ArrayOf {
         // If validator is a primative type.
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator);
@@ -155,21 +147,19 @@ export class ArrayOf extends Array {
     }
 
     /** validate a value */
-    _value_pass_one_of_validators(key, value) {
+    _validate_value_with_all_validators(key, value): void|ArrayOf {
         /** Isolate validators by cloning to a new one */
         let value_pass_once = false;
+        let value_;
         for (const validator of this.validators) {
             try {
-                const value_ = this._validate_each(value, validator);
-                // if (value instanceof ArrayOf) {
-                //     this[i] = value;
-                // }
+                value_ = this._validate(value, validator);
                 value_pass_once = true;
                 break;
             } catch {};
         }
         if (value_pass_once) {
-            return
+            return value_;
         }
         const msg = `Expect (${this.validators_names}), got errors at: ${key} => ${value}`;
         throw new SetValueError(msg);

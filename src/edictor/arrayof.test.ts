@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, ArrayOfError, SetValueError, PushError } from './arrayof';
+import { ArrayOf, SetValueError, PushError } from './arrayof';
 
 describe('class ArrayOf', () => {
     let array;
@@ -11,9 +11,10 @@ describe('class ArrayOf', () => {
         array.push(...values);
     });
 
-    test.only('new ArrayOf()', () => {
+    test('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
+        array[0] = 'c';
         expect(() => {array[1] = true}).toThrow(SetValueError);
         expect(() => {array.push(true,true,false)}).toThrow(PushError);
 
@@ -21,12 +22,7 @@ describe('class ArrayOf', () => {
         arrayOfArray.push([1, 'a'], true);
         expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
         expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
-
-        // This must thrown error.
-        arrayOfArray[0].push(true);
-
-        /** fix this line */
-        // expect(() => {arrayOfArray[0].push(true)}).toThrow(ArrayOfError);
+        expect(() => {arrayOfArray[0].push(true, false)}).toThrow(PushError);
     })
 
     test('ArrayOf() validation', () => {
@@ -49,9 +45,9 @@ describe('class ArrayOf', () => {
         array = new ArrayOf(is_date_string);
         array.push(...date_string_array);
 
-        /** Invalid date string should return ArrayOfError */
-        expect(() => {array.push('abc')}).toThrow(ArrayOfError);
-        expect(() => {array[1] = 'abc'}).toThrow(ArrayOfError);
+        /** Invalid date string should return Error */
+        expect(() => {array.push('abc')}).toThrow(PushError);
+        expect(() => {array[1] = 'abc'}).toThrow(SetValueError);
         
         /** Array isn't changed after set invalid value */
         expect(array).toEqual(date_string_array);
