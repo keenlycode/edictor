@@ -41,11 +41,14 @@ export class ArrayOf extends Array {
             },
             set(target, key: string, value, receiver): boolean {
                 try {
-                    target._validate_value_with_all_validators(key, value);
+                    const value_ = target._validate_value_with_all_validators(key, value);
+                    if (value_ !== undefined) {
+                        value = value_;
+                    }
                 } catch (error) {
                     const errorMessage = `[${key}] => ${value}`;
                     throw new SetValueError(`Expect (${target.validators_names}), got errors at:`
-                        + `\n   ${errorMessage}`);
+                        + `\n\t${errorMessage}`);
                 }
                 return Reflect.set(target, key, value, receiver);
             },
@@ -102,7 +105,7 @@ export class ArrayOf extends Array {
                 const value = this._validate_value_with_all_validators(i, values[i]);
                 if (value !== undefined) {
                     values[i] = value;
-                }  
+                }
             } catch (error) {
                 let value_string = values[i];
                 if (value_string instanceof Array) {
@@ -171,7 +174,6 @@ export class ArrayOf extends Array {
         if (value_pass_once) {
             return value_;
         }
-        const msg = `Expect (${this.validators_names}), got errors at: ${key} => ${value}`;
-        throw new SetValueError(msg);
+        throw new Error();
     }
 }
