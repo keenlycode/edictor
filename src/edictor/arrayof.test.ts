@@ -5,13 +5,11 @@ describe('class ArrayOf', () => {
     let array;
     let values;
 
-    beforeEach(() => {
+    test('new ArrayOf()', () => {
         values = ['a', 'b', 0, 1];
         array = new ArrayOf('string', 'number');
         array.push(...values);
-    });
 
-    test('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
         array[0] = 'c';
@@ -57,6 +55,10 @@ describe('class ArrayOf', () => {
     })
     
     test('ArrayOf().object()', () => {
+        values = ['a', 'b', 0, 1];
+        array = new ArrayOf('string', 'number');
+        array.push(...values);
+
         expect(array.object()).toEqual(values);
     
         /** Return plain Array */
