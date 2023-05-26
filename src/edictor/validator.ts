@@ -42,11 +42,11 @@ export class ArrayOf extends _ArrayOf {
         return super._validate(value, validator);
     }
 
-    get_validator_name(validator: ValidatorType) {
+    validator_to_name(validator: ValidatorType) {
         if (validator instanceof DefineField) {
             return `defineField({name: ${validator.field().name}})`;
         }
-        return super.get_validator_name(validator);
+        return super.validator_to_name(validator);
     }
 }
 

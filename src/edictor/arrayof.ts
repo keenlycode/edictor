@@ -27,8 +27,6 @@ export class ArrayOf extends Array {
 
     /** propery to keep validators */
     protected _validators: Array<ValidatorType> = [];
-    proxy;
-    revoke;
 
     constructor(...validators: Array<ValidatorType>) {
         super();
@@ -46,7 +44,7 @@ export class ArrayOf extends Array {
                     return Reflect.set(target, key, value, receiver);
                 } else if ("error" in result) {
                     const errorMessage = {
-                        errorMessage: `Expect (${target.validators_names})`,
+                        errorMessage: `${result["error"]}`,
                         error: {[key]: value}
                     }
                     throw new SetValueError(JSON.stringify(errorMessage));
@@ -66,27 +64,22 @@ export class ArrayOf extends Array {
         return this._validators;
     }
 
-    get validators_names() {
-        const validators = [...this.validators];
+    validators_to_names(validators=this.validators) {
+        validators = [...validators];
         const names = validators.map((validator)  => {
-            let name = this.get_validator_name(validator);
-            if (name instanceof Array) {
-                return `[${name}]`;
-            }
-            return name;
+            return this.validator_to_name(validator);
         })
         return names;
     }
 
-    get_validator_name(validator: ValidatorType) {
+    validator_to_name(validator: ValidatorType) {
         if (validator instanceof Array) {
-            let names = [];
-            for (const v of validator) {
-                names.push(this.get_validator_name(v));
-            }
-            return names;
+            return this.validators_to_names(validator);
         }
-        if ((is_function(validator)) || is_class(validator)) {
+        if (is_function(validator)) {
+            return `${(validator as Function).name}()`;
+        }
+        if (is_class(validator)) {
             return (validator as Function).name;
         }
         return validator;
@@ -105,8 +98,9 @@ export class ArrayOf extends Array {
         values = [...values];
         const valid = {};
         const error = {};
+        let result = {};
         for (const i in values) {
-            const result = this._validate_value_with_all_validators(values[i]);
+            result = this._validate_value_with_all_validators(values[i]);
             if ("value" in result) {
                 valid[i] = values[i];
                 values[i] = result["value"];
@@ -116,7 +110,7 @@ export class ArrayOf extends Array {
         }
         if (Object.keys(error).length > 0) {
             const errorMessage = {
-                "errorMessage": `Expect (${this.validators_names})`,
+                "errorMessage": `${result["error"]}`,
                 "valid": valid,
                 "error": error,
             }
@@ -177,6 +171,6 @@ export class ArrayOf extends Array {
         if (value_pass_once) {
             return {"value": value_};
         }
-        return {"error": `Expect (${this.validators_names})`}
+        return {"error": `Expect (${this.validators_to_names()})`}
     }
 }
