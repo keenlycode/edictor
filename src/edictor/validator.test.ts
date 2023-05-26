@@ -52,6 +52,7 @@ test('arrayOf()', () => {
     let array;
     const values = ['a', 'b', true];
     array = arrayOf('string', 'boolean');
+    expect(() => array(1)).toThrow(ValidationError);
     array = array(values);
     expect(array).toBeInstanceOf(ArrayOf);
     expect(array).toEqual(values);
