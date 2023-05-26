@@ -56,6 +56,7 @@ test('arrayOf()', () => {
     array = array(values);
     expect(array).toBeInstanceOf(ArrayOf);
     expect(array).toEqual(values);
+    expect(() => array.push(1)).toThrow(PushError);
 
     /** Test with defineField() */
     const numberDef = defineField({name: 'number'}).instance('number');
@@ -64,7 +65,6 @@ test('arrayOf()', () => {
     array[0] = 1;
     array.push(2);
     expect(array).toEqual([1,2]);
-
     expect(() => {array[0] = true}).toThrow(SetValueError);
     expect(() => array.push(true)).toThrow(PushError);
     expect(array).toEqual([1,2]);
