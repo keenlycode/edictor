@@ -69,7 +69,11 @@ export class ArrayOf extends Array {
     get validators_names() {
         const validators = [...this.validators];
         const names = validators.map((validator)  => {
-            return this.get_validator_name(validator);
+            let name = this.get_validator_name(validator);
+            if (name instanceof Array) {
+                return `[${name}]`;
+            }
+            return name;
         })
         return names;
     }
@@ -80,7 +84,7 @@ export class ArrayOf extends Array {
             for (const v of validator) {
                 names.push(this.get_validator_name(v));
             }
-            return `[${names}]`;
+            return names;
         }
         if ((is_function(validator)) || is_class(validator)) {
             return (validator as Function).name;

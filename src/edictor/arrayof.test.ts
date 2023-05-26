@@ -21,6 +21,8 @@ describe('class ArrayOf', () => {
         arrayOfArray[0] = [1, 'b'];
         arrayOfArray[0].push(2);
 
+        arrayOfArray.push([1, 2, true])
+
         expect(() => {arrayOfArray[0].push(true)}).toThrow(PushError);
         expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
         expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
