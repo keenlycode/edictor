@@ -113,18 +113,6 @@ export class ArrayOf extends Array {
             } else if ("error" in result) {
                 error[i] = values[i];
             }
-            // try {
-            //     const value = this._validate_value_with_all_validators(i, values[i]);
-            //     if (value !== undefined) {
-            //         values[i] = value;
-            //     }
-            // } catch (error) {
-            //     let value_string = values[i];
-            //     if (value_string instanceof Array) {
-            //         value_string = `[${value_string}]`;
-            //     }
-            //     errors.push(`\n\t[${i}] => ${value_string}`)
-            // }
         }
         if (Object.keys(error).length > 0) {
             const errorMessage = {
@@ -134,11 +122,6 @@ export class ArrayOf extends Array {
             }
             throw new PushError(JSON.stringify(errorMessage));
         }
-        // if (errors.length > 0) {
-        //     throw new PushError(`Expect (${this.validators_names}), got errors:`
-        //         + `${errors}`
-        //     )
-        // }
         return this._push_skip_proxy(...values);
     }
 
