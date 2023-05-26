@@ -39,7 +39,7 @@ Package.define({
 
 const edictor = new Package({
     "name": "Edictor",
-    "version": "0.1.2",
+    "version": "0.3.2",
     "homepage": "https://github.com/nitipit/edictor"
 });
 
@@ -55,8 +55,9 @@ const edictorFlexy = new PackageFlexy({
 const somePackage = new Package({
     name: "some-package",
     version: "1.0.0",
-    phone: "+66 123 4567"
-}, {strict: false})
+    phone: "+66 123 4567" // Can set data to undefined fields.
+}, {strict: false});
+somePackage["undef"] = "Can set data to undefined fields";
 
 const author = new People({
     name: "Author",
