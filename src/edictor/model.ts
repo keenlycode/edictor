@@ -182,8 +182,8 @@ export class Model {
                 const field = _class.field[key] as Field;
                 /** Check undefined field with Model._option.strict */
                 if (field === undefined) {
-                    if (this._option.strict) {
-                        throw new FieldError(`${this.constructor.name}()["${key}"] is not defined`);
+                    if (target._option.strict) {
+                        throw new FieldError(`${target.constructor.name}()["${key}"] is not defined`);
                     } else {
                         target[key] = value;
                         return true;
