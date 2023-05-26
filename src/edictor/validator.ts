@@ -16,6 +16,7 @@ export class ValidationError extends Error {
     }
 }
 
+/** Extends _ArrayOf to Support DefineField & Model */
 export class ArrayOf extends _ArrayOf {
     constructor(...validators: Array<ValidatorType|DefineField|Model>) {
         super(...validators);
@@ -42,13 +43,6 @@ export class ArrayOf extends _ArrayOf {
     }
 
     get_validator_name(validator: ValidatorType) {
-        if (validator instanceof Array) {
-            let names = [];
-            for (const v of validator) {
-                names.push(this.get_validator_name(v));
-            }
-            return names;
-        }
         if (validator instanceof DefineField) {
             return `defineField({name: ${validator.field().name}})`;
         }
