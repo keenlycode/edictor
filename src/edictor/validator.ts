@@ -25,11 +25,11 @@ export class ArrayOf extends _ArrayOf {
         if (validator instanceof DefineField) {
             validator = validator.field();
             validator.validate(value);
-            return;
+            return value;
         }
         if (validator.prototype instanceof Model) {
             new validator(value);
-            return;
+            return value;
         }
         if (validator instanceof Array) {
             util.assert(value instanceof Array,
@@ -38,10 +38,17 @@ export class ArrayOf extends _ArrayOf {
             array.push(...value);
             return array;
         }
-        super._validate(value, validator);
+        return super._validate(value, validator);
     }
 
     get_validator_name(validator: ValidatorType) {
+        if (validator instanceof Array) {
+            let names = [];
+            for (const v of validator) {
+                names.push(this.get_validator_name(v));
+            }
+            return names;
+        }
         if (validator instanceof DefineField) {
             return `defineField({name: ${validator.field().name}})`;
         }
