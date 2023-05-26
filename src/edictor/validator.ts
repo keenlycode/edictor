@@ -125,7 +125,7 @@ export const apply = (func: Function): any => {
 /** Check if value is array of something. */
 export const arrayOf = (
         ...validators: Array<ValidatorType|DefineField|Model>
-    ) : (...values) => ArrayOf => {
+    ) : (values) => ArrayOf => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
             values,
@@ -139,7 +139,7 @@ export const arrayOf = (
         return array;
     }
 
-    return function arrayOf (...values) { return wrapper(values, validators) };
+    return function arrayOf (values=[]): ArrayOf { return wrapper(values, validators) };
 }
 
 /** Validate that value pass `model_class` validation */

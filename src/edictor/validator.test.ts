@@ -52,7 +52,7 @@ test('arrayOf()', () => {
     let array;
     const values = ['a', 'b', true];
     array = arrayOf('string', 'boolean');
-    array = array(...values);
+    array = array(values);
     expect(array).toBeInstanceOf(ArrayOf);
     expect(array).toEqual(values);
 
@@ -84,7 +84,7 @@ test('arrayOf()', () => {
     const user_data = {"name": "User Name"};
     array = arrayOf(User);
     let user = new User(user_data);
-    array = array(user);
+    array = array([user]);
     expect(array[0].object()).toEqual(user.object());
 
     /** Test with Model() by native object */
