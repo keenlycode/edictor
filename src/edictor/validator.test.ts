@@ -3,6 +3,7 @@ import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from
 import { ArrayOf } from './validator';
 import { Model, InitError } from './model';
 import { defineField } from './field';
+import { SetValueError, PushError } from './arrayof';
 
 
 test('instance', () => {
@@ -48,13 +49,53 @@ test('regexp', () => {
 })
 
 test('arrayOf()', () => {
-    const values = ['a', 'b', 0, 1];
-    const number = defineField({'name': 'number'}).instance('number');
-    const arrayof: any = arrayOf('string', number);
-    let array = arrayof(values);
+    let array;
+    const values = ['a', 'b', true];
+    array = arrayOf('string', 'boolean');
+    expect(() => array(1)).toThrow(ValidationError);
+    array = array(values);
     expect(array).toBeInstanceOf(ArrayOf);
     expect(array).toEqual(values);
-    expect(() => {arrayof(1)}).toThrow(ValidationError);
+    expect(() => array.push(1)).toThrow(PushError);
+
+    /** Test with defineField() */
+    const numberDef = defineField({name: 'number'}).instance('number');
+    array = arrayOf(numberDef);
+    array = array();
+    array[0] = 1;
+    array.push(2);
+    expect(array).toEqual([1,2]);
+    expect(() => {array[0] = true}).toThrow(SetValueError);
+    expect(() => array.push(true)).toThrow(PushError);
+    expect(array).toEqual([1,2]);
+
+    /** Test recursive array */
+    array = arrayOf([numberDef]);
+    array = array();
+    array[0] = [1];
+    array[0].push(2);
+    expect(array).toEqual([[1,2]]);
+    expect(() => array[0].push([true])).toThrow(PushError);
+ 
+    /** Test with Model() */
+    class User extends Model {};
+    User.define({
+        'name': defineField().instance('string')
+    })
+    const user_data = {"name": "User Name"};
+    array = arrayOf(User);
+    let user = new User(user_data);
+    array = array([user]);
+    expect(array[0].object()).toEqual(user.object());
+
+    /** Test with Model() by native object */
+    array[0] = user_data;
+    expect(array[0]).toEqual(user_data);
+
+    /** Test recursive array with Model() and defineField() */
+    array = arrayOf([User, numberDef], "string");
+    array = array();
+    array.push([user_data, 1], 'a');
 });
 
 test('model()', () => {

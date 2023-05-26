@@ -1,19 +1,30 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, ArrayOfError } from './arrayof';
+import { ArrayOf, SetValueError, PushError } from './arrayof';
 
 describe('class ArrayOf', () => {
     let array;
     let values;
 
-    beforeEach(() => {
+    test('new ArrayOf()', () => {
         values = ['a', 'b', 0, 1];
         array = new ArrayOf('string', 'number');
         array.push(...values);
-    });
 
-    test('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf);
         expect(array).toBeInstanceOf(Array);
+        array[0] = 'c';
+        expect(() => {array[1] = true}).toThrow(SetValueError);
+        expect(() => {array.push(true,true,false)}).toThrow(PushError);
+
+        const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
+        arrayOfArray.push([1, 'a'], true);
+        arrayOfArray[0] = [1, 'b'];
+        arrayOfArray[0].push(2);
+
+        expect(() => {arrayOfArray[0].push(true)}).toThrow(PushError);
+        expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
+        expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
+        expect(() => {arrayOfArray[0].push(1, true)}).toThrow(PushError);
     })
 
     test('ArrayOf() validation', () => {
@@ -36,15 +47,19 @@ describe('class ArrayOf', () => {
         array = new ArrayOf(is_date_string);
         array.push(...date_string_array);
 
-        /** Invalid date string should return ArrayOfError */
-        expect(() => {array.push('abc')}).toThrow(ArrayOfError);
-        expect(() => {array[1] = 'abc'}).toThrow(ArrayOfError);
+        /** Invalid date string should return Error */
+        expect(() => {array.push('abc')}).toThrow(PushError);
+        expect(() => {array[1] = 'abc'}).toThrow(SetValueError);
         
         /** Array isn't changed after set invalid value */
         expect(array).toEqual(date_string_array);
     })
     
     test('ArrayOf().object()', () => {
+        values = ['a', 'b', 0, 1];
+        array = new ArrayOf('string', 'number');
+        array.push(...values);
+
         expect(array.object()).toEqual(values);
     
         /** Return plain Array */
