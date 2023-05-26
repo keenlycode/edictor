@@ -128,7 +128,7 @@ export class Field {
         }
         let msg = `Field({name: "${this.name}"})`;
         for (const error of errors) {
-            msg += `\n - ${error}`
+            msg += `\n\t- ${error}`
         }
         if (errors.length > 0) {
             throw new FieldError(msg);
