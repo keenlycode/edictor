@@ -20,13 +20,6 @@ export class PushError extends Error {
     }
 }
 
-export class ValidationError extends Error {
-    constructor(message='') {
-        super(message);
-        this.name = 'ValidationError';
-    }
-}
-
 export type ValidatorType = string|Function|Class|any|Array<any>;
 
 /** Modified array which check it's members instance. */
