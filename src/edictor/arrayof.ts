@@ -80,7 +80,7 @@ export class ArrayOf extends Array {
             return `${(validator as Function).name}()`;
         }
         if (is_class(validator)) {
-            return (validator as Function).name;
+            return (validator as Class).name;
         }
         return validator;
     }
@@ -161,6 +161,10 @@ export class ArrayOf extends Array {
     _validate_value_with_all_validators(value): object {
         let value_pass_once = false;
         let value_;
+        if (this.validators.length === 0) {
+            return {"value": value_};
+        }
+
         for (const validator of this.validators) {
             try {
                 value_ = this._validate(value, validator);

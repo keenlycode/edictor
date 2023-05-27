@@ -69,6 +69,7 @@ describe('class ArrayOf', () => {
         class Package {}
         expect(array.validator_to_name(Package))
             .toEqual(Package.name);
+
     })
 
     test('ArrayOf().push()', () => {
