@@ -118,7 +118,9 @@ export class ArrayOf extends Array {
         if (value_pass_once) {
             return {"value": value_};
         }
-        return {"error": `Expect (${this.validators_to_names()})`}
+        return {"error": new ValidationError(
+            `Expect (${this.validators_to_names(validators)})`
+        )}
     }
 
     validators_to_names(validators=this.validators) {
@@ -154,7 +156,7 @@ export class ArrayOf extends Array {
     push(...values): number {
         values = [...values];
         const valid = {};
-        const error = {};
+        const invalid = {};
         let result = {};
         for (const i in values) {
             result = this._validate_value_with_validators(values[i]);
@@ -162,14 +164,14 @@ export class ArrayOf extends Array {
                 valid[i] = values[i];
                 values[i] = result["value"];
             } else if ("error" in result) {
-                error[i] = values[i];
+                invalid[i] = values[i]
             }
         }
-        if (Object.keys(error).length > 0) {
+        if (Object.keys(invalid).length > 0) {
             const errorMessage = {
-                "errorMessage": `${result["error"]}`,
+                "errorMessage": `Expect (${this.validators_to_names()})`,
                 "valid": valid,
-                "error": error,
+                "invalid": invalid
             }
             throw new PushError(JSON.stringify(errorMessage));
         }

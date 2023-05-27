@@ -40,12 +40,11 @@ describe('class ArrayOf', () => {
         expect(() => array._validate('a', Test)).toThrow(AssertError);
     })
 
-    test.only('ArrayOf()._validate_value_with_validators()', () => {
+    test('ArrayOf()._validate_value_with_validators()', () => {
         array = new ArrayOf();
-        array.push(1,2,3);
-        
-        array = new ArrayOf('string', 'number');
-        array.push(1);
+        array._validate_value_with_validators(1, []);
+        array._validate_value_with_validators(true, ['string', 'number']);
+
     })
 
     test('ArrayOf().validators', () => {
@@ -85,36 +84,9 @@ describe('class ArrayOf', () => {
         } catch (error) {
             expect(error).toBeInstanceOf(PushError);
             expect(JSON.parse(error.message)).toBeInstanceOf(Object);
+            console.log(error);
         }
     })
-
-    // test('ArrayOf() validation', () => {
-    //     class A {};
-    //     const a = new A();
-    //     const is_date_string = (value) => {
-    //         let date: any = new Date(value);
-    //         if (isNaN(date)) {
-    //             throw new Error(`value is not a date string`);
-    //         }
-    //     };
-    
-    //     /** Primative types and class Validator */
-    //     array = new ArrayOf('string', A);
-    //     array.push('1', a);
-    //     expect(array).toEqual(['1', a])
-        
-    //     /** Function validator */
-    //     const date_string_array = ['203-04-27'];
-    //     array = new ArrayOf(is_date_string);
-    //     array.push(...date_string_array);
-
-    //     /** Invalid date string should return Error */
-    //     expect(() => {array.push('abc')}).toThrow(PushError);
-    //     expect(() => {array[1] = 'abc'}).toThrow(SetValueError);
-        
-    //     /** Array isn't changed after set invalid value */
-    //     expect(array).toEqual(date_string_array);
-    // })
     
     test('ArrayOf().object()', () => {
         const values = ['a', 'b', 0, 1];
