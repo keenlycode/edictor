@@ -51,7 +51,7 @@ export class Model {
     protected static _define = {};
     static _option: ModelOption = {strict: true};
 
-    static define(model: Object = {}, option: ModelOption = {}) {
+    static define(model: Object = {}, option: ModelOption = {}): typeof Model {
         const superClass = Object.getPrototypeOf(this);
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
@@ -97,6 +97,7 @@ export class Model {
             throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
+        return this;
     }
 
     static get field() {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { ArrayOf, SetValueError, PushError } from './arrayof';
-import { assert } from './util';
+import { AssertError, assert } from './util';
 
 describe('class ArrayOf', () => {
     let validators: any;
@@ -22,24 +22,30 @@ describe('class ArrayOf', () => {
         }
         expect(error_).toBeInstanceOf(SetValueError);
         expect(JSON.parse(error_.message)).toBeInstanceOf(Object);
+    })
 
-        // array.push(...values);
+    test('ArrayOf()._validate()', () => {
+        let validator: any = ['string', 'boolean'];
+        array = new ArrayOf();
+        expect(array._validate([true, 'a'], validator)).toEqual([true, 'a']);
+        expect(() => array._validate([1, 'a'], validator)).toThrow(PushError);
 
-        // expect(array).toBeInstanceOf(ArrayOf);
-        // expect(array).toBeInstanceOf(Array);
-        // array[0] = 'c';
-        // expect(() => {array[1] = true}).toThrow(SetValueError);
-        // expect(() => {array.push(true,true,false)}).toThrow(PushError);
+        validator = (value) => { assert(value <= 100) };
+        expect(array._validate(100, validator)).toEqual(100);
 
-        // const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
-        // arrayOfArray.push([1, 'a'], true);
-        // arrayOfArray[0] = [1, 'b'];
-        // arrayOfArray[0].push(2);
+        class Test {};
+        const test = new Test();
+        validator = Array;
+        expect(array._validate(test, Test)).toEqual(test);
+        expect(() => array._validate('a', Test)).toThrow(AssertError);
+    })
 
-        // expect(() => {arrayOfArray[0].push(true)}).toThrow(PushError);
-        // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
-        // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
-        // expect(() => {arrayOfArray[0].push(1, true)}).toThrow(PushError);
+    test.only('ArrayOf()._validate_value_with_validators()', () => {
+        array = new ArrayOf();
+        array.push(1,2,3);
+        
+        array = new ArrayOf('string', 'number');
+        array.push(1);
     })
 
     test('ArrayOf().validators', () => {
