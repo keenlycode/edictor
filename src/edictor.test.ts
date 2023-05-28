@@ -2,15 +2,21 @@ import { test } from '@jest/globals';
 import { Model, defineField } from './edictor';
 
 test('Usage Test', () => {
+    /** ES Module */
     class Package extends Model {};
     class People extends Model {};
 
 
-    /** Validate url by using URL() and throw error if not valid */
+    /** Define reusable `defineField()` as `urlDef`
+     * - Data must be string instance.
+     * - Validate url by `apply()` which expect function to throw error
+     *   if data is not valid.
+     */
     const urlDef = defineField()
         .instance('string')
         .apply((value) => { new URL(value) })
 
+    /** Define model `People` */
     People.define({
         name: defineField({required: true})
             .instance('string'),
@@ -20,20 +26,22 @@ test('Usage Test', () => {
         url: urlDef
     })
 
+    /** Define model `Package` */
     Package.define({
         name: defineField({required: true})
             .instance('string')
             .assert((value) => { return value.length <= 214 },
                 "The name must be less than or equal to 214 characters"),
-        version: /** https://ihateregex.io/expr/semver/ */
+        version: // https://ihateregex.io/expr/semver/
             defineField({required: true})
             .instance('string')
             .regexp(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/),
         homepage: urlDef,
-        author: /** Nested data */
+        author: // Nesting data using `model()`
             defineField()
             .model(People),
-        contributors: defineField({initial: []})
+        contributors: // Array data using `arrayOf()` which contains `People`
+            defineField({initial: []}) // Set initial data for calling `push()`
             .arrayOf(People)
     })
 

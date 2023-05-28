@@ -22,7 +22,7 @@ const urlDef = defineField()
     .instance('string')
     .apply((value) => { new URL(value) })
 
-/** Define `People` model structure */
+/** Define model `People` */
 People.define({
     name: defineField({required: true})
         .instance('string'),
@@ -32,7 +32,7 @@ People.define({
     url: urlDef
 })
 
-/** Define `Package` model structure */
+/** Define model `Package` */
 Package.define({
     name: defineField({required: true})
         .instance('string')
@@ -47,7 +47,7 @@ Package.define({
         defineField()
         .model(People),
     contributors: // Array data using `arrayOf()`
-        defineField({initial: []}) // Also set initial data
+        defineField({initial: []}) // Set initial data for calling `push()`
         .arrayOf(People)
 })
 ```

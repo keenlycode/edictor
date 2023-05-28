@@ -60,9 +60,17 @@ code {
     ${bgColor('#3d3846')}
 }
 
+video {
+    display: block;
+    width: 100%;
+}
+
 div.p, p {
     max-width: 45rem;
     width: 100%;
+    margin: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 el-icon {
@@ -95,5 +103,11 @@ el-icon {
 
 .width-100 {
     width: 100%;
+    box-sizing: border-box;
+}
+
+.width-50 {
+    width: 50%;
+    box-sizing: border-box;
 }
 `

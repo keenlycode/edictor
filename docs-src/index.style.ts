@@ -19,6 +19,9 @@ a {
     overflow-x: hidden;
     background-color: black;
     color: white;
+    @media screen and (max-width: 600px) {
+        padding-top: 2rem;
+    }
     div[el="left"] {
         width: 40%;
         min-width: 300px;
@@ -61,6 +64,28 @@ a {
     }
 }
 
+#data {
+    padding-top: 2rem;
+    video {
+        max-width: 800px;
+        margin: auto;
+    }
+    h2 {
+        margin: 0;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        display: inline-flex;
+    }
+}
+
+#api {
+    margin-top: -25vh;
+}
+
+#install {
+    padding-top: 5rem;
+}
+
 .section {
     h2 {
         text-align: center;
@@ -82,10 +107,6 @@ a {
     background: linear-gradient(180deg, rgba(0,0,0,1) 0%, #241f31 50%);
 }
 
-#install {
-    margin-top: -25vh;
-}
-
 #atomic {
     margin-top: -20vh;
     [el="atomic-footage"] {
@@ -94,10 +115,6 @@ a {
     .block-text {
         margin-top: -5vh;
     }
-}
-
-#api {
-    margin-top: -25vh;
 }
 
 #try {
