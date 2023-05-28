@@ -1,4 +1,4 @@
-import { Field, DefineField, FieldError } from './field';
+import { Field, DefineField, FieldError, RequiredError } from './field';
 
 class ModelError extends Error {
     constructor(message='') {
@@ -21,10 +21,18 @@ export class InitError extends ModelError {
     }
 }
 
+
 export class UpdateError extends ModelError {
     constructor(message='') {
         super(message);
         this.name = 'UpdateError';
+    }
+}
+
+export class SetValueError extends Error {
+    constructor(message='') {
+        super(message);
+        this.name = 'SetValueError';
     }
 }
 
@@ -46,12 +54,19 @@ interface ModelOption {
     strict?: boolean
 }
 
+interface TestResult {
+    valid: object,
+    invalid: object,
+    error: object,
+    errorMessage: string
+}
+
 
 export class Model {
     protected static _define = {};
     static _option: ModelOption = {strict: true};
 
-    static define(model: Object = {}, option: ModelOption = {}) {
+    static define(model: Object = {}, option: ModelOption = {}): typeof Model {
         const superClass = Object.getPrototypeOf(this);
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
@@ -61,7 +76,7 @@ export class Model {
             + `It must be called from a subclass`);
         }
 
-        const result = {
+        let result: TestResult = {
             valid: {},
             invalid: {},
             error: {},
@@ -76,15 +91,17 @@ export class Model {
             if (defineField instanceof DefineField) {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
-                result["valid"][key] = true;
             } else {
                 result["error"][key] = 'Assigned value is not an instance of DefineField'
                 continue;
             }
-            if (field.option.initial !== undefined) {
+
+            if (field.option.initial === undefined) {
+                result["valid"][key] = defineField;
+            } else if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
-                    result["valid"][key] = true;
+                    result["valid"][key] = defineField;
                 } catch (e) {
                     result["error"][key] = `Field({initial: ${field.option.initial}})`
                     + ` conflicts with Field's validation => ${e}`
@@ -97,13 +114,14 @@ export class Model {
             throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
+        return this;
     }
 
     static get field() {
         return {...this._define};
     }
 
-    static test(data: Object = {}, option: ModelOption = {}): Object {
+    static test(data: Object = {}, option: ModelOption = {}): TestResult {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
@@ -116,10 +134,11 @@ export class Model {
         /** Isolate recevied data */
         data = {...data};
         option = {...this._option, ...option};
-        const result = {
+        const result: TestResult = {
             valid: {},
             invalid: {},
-            error: {}
+            error: {},
+            errorMessage: ''
         };
 
         /** Iterate defined field to validate and assign data.
@@ -134,13 +153,13 @@ export class Model {
             }
             try {
                 result["valid"][key] = this.field[key].validate(value);
-            } catch (e) {
+            } catch (error) {
                 result["invalid"][key] = value;
-                result["error"][key] = e.message;
+                result["error"][key] = error;
             }
         }
 
-         /** If there's no data left, return void */
+         /** If there's no data left, return result */
         if (Object.keys(data).length === 0) {
             return result;
         }
@@ -151,7 +170,7 @@ export class Model {
         if (option.strict) {
             for (const key of Object.keys(data)) {
                 result["invalid"][key] = data[key];
-                result["error"][key] = undefined;
+                result["error"][key] = new RequiredError();
             }
         } else {
             Object.assign(result['valid'], data);
@@ -163,7 +182,8 @@ export class Model {
 
     constructor(data: Object = {}, option: ModelOption = {}) {
         const _class = this.constructor as typeof Model;
-        this._option = {..._class._option, ...option};
+        option = {..._class._option, ...option};
+        this._option = option;
 
         let result = _class.test(data, option);
         if (Object.keys(result["error"]).length > 0) {
@@ -180,10 +200,10 @@ export class Model {
             },
             set: (target, key: string, value: any): boolean => {
                 const field = _class.field[key] as Field;
-                /** Check undefined field with Model._option.strict */
+                /** Check undefined field with Model()._option.strict */
                 if (field === undefined) {
                     if (target._option.strict) {
-                        throw new FieldError(`${target.constructor.name}()["${key}"] is not defined`);
+                        throw new SetValueError(`${target.constructor.name}()["${key}"] is not defined`);
                     } else {
                         target[key] = value;
                         return true;

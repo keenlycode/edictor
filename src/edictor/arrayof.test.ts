@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { ArrayOf, SetValueError, PushError } from './arrayof';
-import { assert } from './util';
+import { AssertError, assert } from './util';
+import { Model, defineField } from '../edictor';
 
 describe('class ArrayOf', () => {
     let validators: any;
@@ -22,24 +23,28 @@ describe('class ArrayOf', () => {
         }
         expect(error_).toBeInstanceOf(SetValueError);
         expect(JSON.parse(error_.message)).toBeInstanceOf(Object);
+    })
 
-        // array.push(...values);
+    test('ArrayOf()._validate()', () => {
+        let validator: any = ['string', 'boolean'];
+        array = new ArrayOf();
+        expect(array._validate([true, 'a'], validator)).toEqual([true, 'a']);
+        expect(() => array._validate([1, 'a'], validator)).toThrow(PushError);
 
-        // expect(array).toBeInstanceOf(ArrayOf);
-        // expect(array).toBeInstanceOf(Array);
-        // array[0] = 'c';
-        // expect(() => {array[1] = true}).toThrow(SetValueError);
-        // expect(() => {array.push(true,true,false)}).toThrow(PushError);
+        validator = (value) => { assert(value <= 100) };
+        expect(array._validate(100, validator)).toEqual(100);
 
-        // const arrayOfArray = new ArrayOf(['string', 'number'], 'boolean');
-        // arrayOfArray.push([1, 'a'], true);
-        // arrayOfArray[0] = [1, 'b'];
-        // arrayOfArray[0].push(2);
+        class Test {};
+        const test = new Test();
+        validator = Array;
+        expect(array._validate(test, Test)).toEqual(test);
+        expect(() => array._validate('a', Test)).toThrow(AssertError);
+    })
 
-        // expect(() => {arrayOfArray[0].push(true)}).toThrow(PushError);
-        // expect(() => {arrayOfArray.push([1, 2, true])}).toThrow(PushError);
-        // expect(() => {arrayOfArray.push([1, 2], 1)}).toThrow(PushError);
-        // expect(() => {arrayOfArray[0].push(1, true)}).toThrow(PushError);
+    test('ArrayOf()._validate_value_with_validators()', () => {
+        array = new ArrayOf();
+        array._validate_value_with_validators(1, []);
+        array._validate_value_with_validators(true, ['string', 'number']);
     })
 
     test('ArrayOf().validators', () => {
@@ -72,6 +77,20 @@ describe('class ArrayOf', () => {
 
     })
 
+    test('ArrayOf().test()', () => {
+        class TestResult extends Model {};
+        TestResult.define({
+            test: defineField({required: true}).instance("string"),
+            valid: defineField().instance("object"),
+            invalid: defineField().instance("object")
+        })
+
+        array = new ArrayOf('string', 'number');
+        let result = array.test([1, true]);
+
+        new TestResult(result);
+    })
+
     test('ArrayOf().push()', () => {
         array.push(1,2);
         try {
@@ -81,34 +100,6 @@ describe('class ArrayOf', () => {
             expect(JSON.parse(error.message)).toBeInstanceOf(Object);
         }
     })
-
-    // test('ArrayOf() validation', () => {
-    //     class A {};
-    //     const a = new A();
-    //     const is_date_string = (value) => {
-    //         let date: any = new Date(value);
-    //         if (isNaN(date)) {
-    //             throw new Error(`value is not a date string`);
-    //         }
-    //     };
-    
-    //     /** Primative types and class Validator */
-    //     array = new ArrayOf('string', A);
-    //     array.push('1', a);
-    //     expect(array).toEqual(['1', a])
-        
-    //     /** Function validator */
-    //     const date_string_array = ['203-04-27'];
-    //     array = new ArrayOf(is_date_string);
-    //     array.push(...date_string_array);
-
-    //     /** Invalid date string should return Error */
-    //     expect(() => {array.push('abc')}).toThrow(PushError);
-    //     expect(() => {array[1] = 'abc'}).toThrow(SetValueError);
-        
-    //     /** Array isn't changed after set invalid value */
-    //     expect(array).toEqual(date_string_array);
-    // })
     
     test('ArrayOf().object()', () => {
         const values = ['a', 'b', 0, 1];

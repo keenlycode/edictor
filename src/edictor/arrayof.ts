@@ -20,6 +20,13 @@ export class PushError extends Error {
     }
 }
 
+export class ValidationError extends Error {
+    constructor(message='') {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
 export type ValidatorType = string|Function|Class|any|Array<any>;
 
 /** Modified array which check it's members instance. */
@@ -38,7 +45,7 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string, value, receiver): boolean {
-                const result = target._validate_value_with_all_validators(value);
+                const result = target._validate_value_with_validators(value);
                 if ("value" in result) {
                     value = result["value"];
                     return Reflect.set(target, key, value, receiver);
@@ -62,6 +69,58 @@ export class ArrayOf extends Array {
 
     get validators() {
         return this._validators;
+    }
+
+    /** validate a value with a validator */
+    _validate(value, validator: ValidatorType): ArrayOf|any {
+        // If validator is a primative type.
+        if (typeof(validator) === "string") {
+            assert(typeof(value) === validator,
+                `${value} => must be instance of ${validator}`);
+            return value;
+        }
+
+        if (validator instanceof Array) {
+            assert(value instanceof Array,
+                `value must be instance of Array`)
+            const array = new ArrayOf(...validator);
+            array.push(...value);
+            return array;
+        }
+        // If validator is a Function
+        if (is_function(validator)) {
+            validator(value);
+            return value;
+        }
+        // If validator is a Class
+        if (is_class(validator)) {
+            assert(value instanceof validator);
+            return value;
+        }
+    }
+
+    /** validate a value */
+    _validate_value_with_validators(value, validators=this.validators): object {
+        validators = [...validators];
+        let value_pass_once = false;
+        let value_;
+        if (validators.length === 0) {
+            return {"value": value_};
+        }
+
+        for (const validator of validators) {
+            try {
+                value_ = this._validate(value, validator);
+                value_pass_once = true;
+                break;
+            } catch {};
+        }
+        if (value_pass_once) {
+            return {"value": value_};
+        }
+        return {"error": new ValidationError(
+            `Expect (${this.validators_to_names(validators)})`
+        )}
     }
 
     validators_to_names(validators=this.validators) {
@@ -94,25 +153,37 @@ export class ArrayOf extends Array {
         return length;
     }
 
-    push(...values): number {
+    test(values, validators=this.validators) {
+        validators = [...validators];
         values = [...values];
         const valid = {};
-        const error = {};
+        const invalid = {};
         let result = {};
         for (const i in values) {
-            result = this._validate_value_with_all_validators(values[i]);
+            result = this._validate_value_with_validators(
+                values[i], validators);
             if ("value" in result) {
                 valid[i] = values[i];
-                values[i] = result["value"];
             } else if ("error" in result) {
-                error[i] = values[i];
+                invalid[i] = values[i]
             }
         }
-        if (Object.keys(error).length > 0) {
+        result = {
+            "test": `Expect (${this.validators_to_names()})`,
+            "valid": valid,
+            "invalid": invalid
+        }
+        return result;
+    }
+
+    push(...values): number {
+        values = [...values];
+        const result = this.test(values);
+        if (Object.keys(result["invalid"]).length > 0) {
             const errorMessage = {
-                "errorMessage": `${result["error"]}`,
-                "valid": valid,
-                "error": error,
+                "errorMessage": result["test"],
+                "valid": result["valid"],
+                "invalid": result["invalid"]
             }
             throw new PushError(JSON.stringify(errorMessage));
         }
@@ -127,54 +198,5 @@ export class ArrayOf extends Array {
     /** Return JSON */
     json(): string {
         return JSON.stringify(this);
-    }
-
-    /** validate a value with a validator */
-    _validate(value, validator: ValidatorType): ArrayOf|any {
-        // If validator is a primative type.
-        if (typeof(validator) === "string") {
-            assert(typeof(value) === validator,
-                `${value} => must be instance of ${validator}`);
-            return value;
-        }
-
-        if (validator instanceof Array) {
-            assert(value instanceof Array,
-                `value must be instance of Array`)
-            const array = new ArrayOf(...validator);
-            array.push(...value);
-            return array;
-        }
-        // If validator is a Function
-        if (is_function(validator)) {
-            validator(value);
-            return value;
-        }
-        // If validator is a Class
-        if (is_class(validator)) {
-            assert(value instanceof validator);
-            return value;
-        }
-    }
-
-    /** validate a value */
-    _validate_value_with_all_validators(value): object {
-        let value_pass_once = false;
-        let value_;
-        if (this.validators.length === 0) {
-            return {"value": value_};
-        }
-
-        for (const validator of this.validators) {
-            try {
-                value_ = this._validate(value, validator);
-                value_pass_once = true;
-                break;
-            } catch {};
-        }
-        if (value_pass_once) {
-            return {"value": value_};
-        }
-        return {"error": `Expect (${this.validators_to_names()})`}
     }
 }

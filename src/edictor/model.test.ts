@@ -9,6 +9,7 @@ import {
 } from './model';
 import { defineField, Field, FieldError } from './field';
 import * as schema from './schema';
+import { SetValueError } from './model';
 
 
 describe('class Model', () => {
@@ -86,7 +87,7 @@ describe('class Model', () => {
         expect(() => {user['name'] = 1}).toThrow(FieldError);
         expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
         expect(() => { new User([1,2,3]) }).toThrow(InputDataError);
-        expect(() => { user['gender'] = 'm' }).toThrow(FieldError);
+        expect(() => { user['gender'] = 'm' }).toThrow(SetValueError);
         delete user['phone'];
         expect(user['phone']).toEqual(undefined);
 
