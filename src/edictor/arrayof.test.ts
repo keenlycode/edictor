@@ -44,7 +44,6 @@ describe('class ArrayOf', () => {
         array = new ArrayOf();
         array._validate_value_with_validators(1, []);
         array._validate_value_with_validators(true, ['string', 'number']);
-
     })
 
     test('ArrayOf().validators', () => {
@@ -77,6 +76,12 @@ describe('class ArrayOf', () => {
 
     })
 
+    test('ArrayOf().test()', () => {
+        array = new ArrayOf('string', 'number');
+        let result = array.test([1, true]);
+        console.log(result);
+    })
+
     test('ArrayOf().push()', () => {
         array.push(1,2);
         try {
@@ -84,7 +89,6 @@ describe('class ArrayOf', () => {
         } catch (error) {
             expect(error).toBeInstanceOf(PushError);
             expect(JSON.parse(error.message)).toBeInstanceOf(Object);
-            console.log(error);
         }
     })
     

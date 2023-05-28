@@ -153,6 +153,29 @@ export class ArrayOf extends Array {
         return length;
     }
 
+    test(values, validators=this.validators) {
+        validators = [...validators];
+        values = [...values];
+        const valid = {};
+        const invalid = {};
+        let result = {};
+        for (const i in values) {
+            result = this._validate_value_with_validators(
+                values[i], validators);
+            if ("value" in result) {
+                valid[i] = values[i];
+            } else if ("error" in result) {
+                invalid[i] = values[i]
+            }
+        }
+        result = {
+            "test": `Expect (${this.validators_to_names()})`,
+            "valid": valid,
+            "invalid": invalid
+        }
+        return result;
+    }
+
     push(...values): number {
         values = [...values];
         const valid = {};
