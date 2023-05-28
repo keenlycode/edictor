@@ -178,23 +178,12 @@ export class ArrayOf extends Array {
 
     push(...values): number {
         values = [...values];
-        const valid = {};
-        const invalid = {};
-        let result = {};
-        for (const i in values) {
-            result = this._validate_value_with_validators(values[i]);
-            if ("value" in result) {
-                valid[i] = values[i];
-                values[i] = result["value"];
-            } else if ("error" in result) {
-                invalid[i] = values[i]
-            }
-        }
-        if (Object.keys(invalid).length > 0) {
+        const result = this.test(values);
+        if (Object.keys(result["invalid"]).length > 0) {
             const errorMessage = {
-                "errorMessage": `Expect (${this.validators_to_names()})`,
-                "valid": valid,
-                "invalid": invalid
+                "errorMessage": result["test"],
+                "valid": result["valid"],
+                "invalid": result["invalid"]
             }
             throw new PushError(JSON.stringify(errorMessage));
         }
