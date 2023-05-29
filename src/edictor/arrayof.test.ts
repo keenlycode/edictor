@@ -82,7 +82,8 @@ describe('class ArrayOf', () => {
         TestResult.define({
             test: defineField({required: true}).instance("string"),
             valid: defineField().instance("object"),
-            invalid: defineField().instance("object")
+            invalid: defineField().instance("object"),
+            error: defineField().instance('object')
         })
 
         array = new ArrayOf('string', 'number');

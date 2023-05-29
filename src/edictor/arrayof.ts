@@ -158,20 +158,23 @@ export class ArrayOf extends Array {
         values = [...values];
         const valid = {};
         const invalid = {};
+        const error = {};
         let result = {};
         for (const i in values) {
             result = this._validate_value_with_validators(
                 values[i], validators);
             if ("value" in result) {
-                valid[i] = values[i];
+                valid[i] = result["value"];
             } else if ("error" in result) {
                 invalid[i] = values[i]
+                error[i] = result["error"];
             }
         }
         result = {
             "test": `Expect (${this.validators_to_names()})`,
             "valid": valid,
-            "invalid": invalid
+            "invalid": invalid,
+            "error": error
         }
         return result;
     }
@@ -187,7 +190,7 @@ export class ArrayOf extends Array {
             }
             throw new PushError(JSON.stringify(errorMessage));
         }
-        return this._push_skip_proxy(...values);
+        return this._push_skip_proxy(...Object.values(result["valid"]));
     }
 
     /** Return a new native object with same data */
