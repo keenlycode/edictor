@@ -2,8 +2,8 @@
     APIs to help, not to mess things up.
 </h2>
 
-No overwhelming APIs, the APIs are simple, easy to use
-but desined to enhance javascript expressions and statements
+No overwhelming APIs, the APIs are simple, easy to use.
+It's designed to enhance javascript expressions and statements
 to validate any kind of javascript object/data.
 
 ```js
@@ -20,7 +20,7 @@ declare class DefineField {
 
 Example usage:
 ```js
-// Please note that APIs are chainable.
+// APIs are chainable.
 urlDef = DefineField().instance("string").apply((value) => new URL(value));
 urlDef.field().validate('abc') // => Uncaught TypeError: Failed to construct 'URL': Invalid URL
 ```

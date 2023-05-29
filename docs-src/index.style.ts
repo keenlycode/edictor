@@ -82,6 +82,18 @@ a {
     margin-top: -25vh;
 }
 
+#powerful {
+    img[src="matrix.svg"] {
+        max-width: 250px;
+    }
+    img[src="data-transfer.svg"] {
+        max-width: 300px;
+    }
+    img[src="data-tree.webp"] {
+        max-width: 1000px;
+    }
+}
+
 #install {
     padding-top: 5rem;
 }
