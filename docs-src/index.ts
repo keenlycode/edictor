@@ -17,7 +17,8 @@ People.define({
     email: defineField()
         .instance('string')
         .regexp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
-    url: urlDef
+    url: urlDef,
+    people: defineField().model(People),
 })
 
 Package.define({
@@ -81,8 +82,6 @@ try {
         homepage: "invalid url" // Validation error
     })
 } catch (error) { // error is an instance of UpdateError
-    const validationResult = JSON.parse(error.message);
-    console.log(validationResult);
 };
 
 window.Model = Model;

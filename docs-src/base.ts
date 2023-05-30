@@ -1,6 +1,7 @@
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import shell from 'highlight.js/lib/languages/shell';
+import typescript from 'highlight.js/lib/languages/typescript';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import { Button } from 'gadjet/src/gadjet';
 import { ButtonSquare } from 'gadjet/src/gadjet';
@@ -12,7 +13,8 @@ let _base_url:any  = document.currentScript.src;
 _base_url = new URL('./', _base_url).toString();
 
 hljs.registerLanguage('javascript', javascript);
-hljs.registerLanguage('shell', javascript);
+hljs.registerLanguage('shell', shell);
+hljs.registerLanguage('typescript', typescript);
 hljs.highlightAll();
 
 Icon.href = `${_base_url}asset/icomoon/symbol-defs.svg`;

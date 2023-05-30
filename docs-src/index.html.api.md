@@ -17,10 +17,3 @@ declare class DefineField {
     model(model_class); // Validate nested data.
 }
 ```
-
-Example usage:
-```js
-// APIs are chainable.
-urlDef = DefineField().instance("string").apply((value) => new URL(value));
-urlDef.field().validate('abc') // => Uncaught TypeError: Failed to construct 'URL': Invalid URL
-```

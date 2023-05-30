@@ -1,7 +1,8 @@
 <div class="flex flex-center" style="margin-top: 2rem;">
-    <h2>Because data is crucial</h2>
+    <h2>"Use data with confidence"</h2>
 </div>
 
-From modular schemas to atomic instances, `{Edictor}` let you build
-and use your data with confidence. It can garantee that the data object
-will always be valid at any point in real-time.
+`{Edictor}` is an essential tool to harness the power of data.
+It ensures data reliability, maintains quality,
+facilitates regulatory compliance, prevents errors. It can unlock the true value
+of data and gain a significant advantage in today's interconnected world.
