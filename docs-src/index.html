@@ -5,6 +5,30 @@
 {% endblock %}
 
 {% block body %}
+
+<script defer src="{{to_root}}_include/sidebar/sidebar.js?v={{_v}}"></script>
+<el-sidebar showAt="0">
+    <div el="content">
+        <div el="header" class="flex flex-center">
+            <h2 class="width-100">{ Edictor }</h2>
+            <el-icon name="open-book"></el-icon>
+        </div>
+        <el-menu><ul>
+            <li>
+                <a>Intro</a>
+                <ul>
+                    <li>
+                        <a>Install</a>
+                    </li>
+                </ul>
+            </li>
+        </ul></el-menu>
+    </div>
+    <div el="overlay">
+    <!-- Overlay when show sidebar -->
+    </div>
+</el-sidebar>
+
 <div id="header" class="view flex">
     <div class="container flex flex-center" style="max-width: 1200px;">
         <div class="flex" el="left">
@@ -49,7 +73,7 @@
     </div>
 </div>
 
-<div id="powerful" class="section">
+<div id="powerful" class="section" style="padding-top: 5rem;">
     <div class="container flex flex-center">
         <div class="block-text">
         {{markdown('index.html.powerful.md')}}
@@ -57,7 +81,7 @@
     </div>
 </div>
 
-<div id="array" class="section">
+<div id="array" class="section" style="padding-top: 5rem;">
     <div class="container flex flex-center">
         <div class="block-text">
         {{markdown('index.html.array.md')}}
@@ -80,13 +104,7 @@
         </div>
         <el-icon name="keyboard-shortcuts" style="font-size: 2em;"></el-icon>
         <strong class="width-100">Shift+Ctrl+I</strong>
-        <p style="text-align: center;">
-            The code above has been loaded into your browser.
-        </p>
-        <p style="text-align: center;">
-            You can play with <code>edictor</code> variable
-            or define your own models in browser console.
-        </p>
+        {{markdown('index.html.try.md')}}
     </div>
 </div>
 {% endblock %}

@@ -77,7 +77,7 @@ describe('class ArrayOf', () => {
 
     })
 
-    test('ArrayOf().test()', () => {
+    test.only('ArrayOf().test()', () => {
         class TestResult extends Model {};
         TestResult.define({
             test: defineField({required: true}).instance("string"),
@@ -86,10 +86,12 @@ describe('class ArrayOf', () => {
             error: defineField().instance('object')
         })
 
-        array = new ArrayOf('string', 'number');
-        let result = array.test([1, true]);
-
-        new TestResult(result);
+        // array = new ArrayOf('string', 'number');
+        // let result = array.test([1, true]);
+        array = new ArrayOf(['string', 'number']);
+        let result = array.test([[1,true]]);
+        result = new TestResult(result);
+        console.log(result);
     })
 
     test('ArrayOf().push()', () => {

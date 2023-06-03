@@ -1,4 +1,4 @@
-<h2 style="margin-top: 5rem;">Flexible & Powerful</h2>
+## Flexible & Powerful
 
 <div class="flex flex-center">
     <img src="data-tree.webp">
@@ -14,13 +14,13 @@ Example usage:
 class Website extends Model {};
 
 Website.define({
-    title: DefineField()
+    title: defineField()
         .instance("string")
         .assert((title) => { title.length <= 250 },
             "Title must have 250 characters or less"),
-    url: DefineField()
+    url: defineField()
         .instance("string")
-        .apply((value) => new URL(value));
+        .apply((value) => {new URL(value)})
 })
 
 /** Validate data, return validation result object */
@@ -28,6 +28,6 @@ const reslt = Website.test({url: 'https://example.com'});
 
 /** Create atomic data instance */
 const website = new Website();
-website.url = 'https://example.com' // valid.
-website.url = 'abc' // => Throw errors.
+website['url'] = 'https://example.com'; // valid.
+website['url'] = 'abc'; // => Throw errors.
 ```

@@ -2,7 +2,7 @@
 <h2>Error Detection</h2>
 </div>
 
-When data validations fail, `{Edictor}` will throw errors and and provide
+When data validations fail, `{Edictor}` throws errors and and provide
 useful information based on the structure of tesing data.
 
 ```ts
