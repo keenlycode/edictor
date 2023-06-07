@@ -1,0 +1,27 @@
+<script defer src="{{to_root}}_include/sidebar/sidebar.js?v={{_v}}"></script>
+<el-sidebar showAt="1170px">
+    <div el="content">
+        <div el="header">
+            <div class="flex flex-center width-100">
+                <a href="{{to_root}}"><h2 class="width: 100%">{ Edictor }</h2></a>
+            </div>
+            <el-icon name="open-book"></el-icon>
+        </div>
+        <el-sidebar-menu class="flat"><ul>
+            <li>
+                <a href="{{to_root}}guide/#installation">Installation</a>
+            </li>
+            <li>
+                <a href="{{to_root}}guide/#import">Import</a>
+                <ul>
+                    <li><a href="{{to_root}}guide/#import-browser">Browser</a></li>
+                    <li><a href="{{to_root}}guide/#import-node">Node</a></li>
+                </ul>
+            </li>
+        </ul></el-sidebar-menu>
+    </div>
+    <div el="overlay">
+    <!-- Overlay when show sidebar -->
+    </div>
+</el-sidebar>
+<el-sidebar-button><el-icon name="menu"></el-icon></el-sidebar-button>

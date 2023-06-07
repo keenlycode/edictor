@@ -5,30 +5,7 @@
 {% endblock %}
 
 {% block body %}
-
-<script defer src="{{to_root}}_include/sidebar/sidebar.js?v={{_v}}"></script>
-<el-sidebar showAt="0">
-    <div el="content">
-        <div el="header" class="flex flex-center">
-            <h2 class="width-100">{ Edictor }</h2>
-            <el-icon name="open-book"></el-icon>
-        </div>
-        <el-menu><ul>
-            <li>
-                <a>Intro</a>
-                <ul>
-                    <li>
-                        <a>Install</a>
-                    </li>
-                </ul>
-            </li>
-        </ul></el-menu>
-    </div>
-    <div el="overlay">
-    <!-- Overlay when show sidebar -->
-    </div>
-</el-sidebar>
-
+{% include '_include/sidebar/sidebar.html' %}
 <div id="header" class="view flex">
     <div class="container flex flex-center" style="max-width: 1200px;">
         <div class="flex" el="left">

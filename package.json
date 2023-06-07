@@ -1,6 +1,6 @@
 {
     "name": "edictor",
-    "version": "0.3.2dev",
+    "version": "0.4.0",
     "description": "Modular & Self-Contained Javascript object definition and validation",
     "repository": {
         "type": "git",
@@ -26,12 +26,14 @@
         "@babel/preset-env": "^7.21.4",
         "@babel/preset-typescript": "^7.21.4",
         "@jest/globals": "^29.5.0",
+        "@nitipit/adapter": "^1.0.1",
         "@nitipit/icon": "^1.0.0",
         "@parcel/packager-ts": "^2.8.3",
         "@parcel/transformer-typescript-types": "^2.8.3",
         "babel-jest": "^29.5.0",
         "color": "^4.2.3",
-        "gadjet": "^1.0.4",
+        "edictor": "file:./",
+        "gadjet": "file:../gadjet",
         "highlight.js": "^11.8.0",
         "jest": "^29.5.0",
         "parcel": "^2.8.3",
@@ -41,8 +43,8 @@
         "typescript": "^5.0.4"
     },
     "scripts": {
-        "build": "parcel build --no-cache --target=es --target=cjs --target=types",
-        "build-watch": "parcel watch -p 1235 --no-cache --target=es --target=cjs --target=types",
+        "build": "parcel build --no-cache --target=es --target=cjs --target=browser --target=types",
+        "build-watch": "parcel watch -p 1235 --no-cache --target=es --target=types",
         "test": "jest",
         "test-watch": "jest --watch"
     },
@@ -55,6 +57,7 @@
         "cjs": {
             "source": "src/edictor.ts",
             "distDir": "dist/cjs/",
+            "context": "node",
             "outputFormat": "commonjs",
             "isLibrary": true,
             "optimize": true
@@ -62,8 +65,17 @@
         "es": {
             "source": "src/edictor.ts",
             "distDir": "dist/es/",
+            "context": "node",
             "outputFormat": "esmodule",
             "isLibrary": true,
+            "optimize": true
+        },
+        "browser": {
+            "source": "src/edictor.ts",
+            "distDir": "dist/browser/",
+            "context": "browser",
+            "outputFormat": "esmodule",
+            "isLibrary": false,
             "optimize": true
         },
         "docs": {

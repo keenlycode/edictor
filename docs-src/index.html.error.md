@@ -5,6 +5,7 @@
 When data validations fail, `{Edictor}` throws errors and and provide
 useful information based on the structure of tesing data.
 
+<el-title-code>typescript</el-title-code>
 ```ts
 interface TestResult {
     valid?: object, // stores valid data object

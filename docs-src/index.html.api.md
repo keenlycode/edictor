@@ -6,6 +6,7 @@ No overwhelming APIs, the APIs are simple, easy to use.
 It's designed to enhance javascript expressions and statements
 to validate any kind of javascript object/data.
 
+<el-title-code>javascript</el-title-code>
 ```js
 declare class DefineField {
     constructor(option = {required: false, grant: [], initial: undefined});

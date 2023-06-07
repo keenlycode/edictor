@@ -4,6 +4,10 @@ import {
     fontFluid
 } from "gadjet/src/gadjet";
 
+import Color from 'color';
+
+import { theme, palette } from './_color';
+
 let _base_url = document.currentScript.src;
 _base_url = new URL('./', _base_url).toString();
 
@@ -50,6 +54,11 @@ pre > code.hljs {
     font-size: 0.8rem;
     margin: auto;
     padding: 1rem 1rem;
+    border-top-left-radius: 0;
+}
+
+p + pre {
+    margin-top: -0.5rem;
 }
 
 code {
@@ -69,12 +78,28 @@ div.p, p {
     max-width: 45rem;
     width: 100%;
     margin: auto;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 el-icon {
     fill: currentColor;
+}
+
+h3 {
+    margin-bottom: 0;
+}
+
+blockquote {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 0.5rem solid ${theme.yellow};
+    border-radius: 1rem;
+    ${bgColor(palette.light)}
+}
+
+code {
+    ${bgColor(new Color(palette.light).toString())}
 }
 
 .container {

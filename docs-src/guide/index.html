@@ -2,8 +2,15 @@
 
 {% set to_root = '../' %}
 
+{% block head %}
+<script defer src="index.js?v={{_v}}"></script>
+{% endblock %}
+
 {% block body %}
-<div class="container">
+{% include '_include/sidebar/sidebar.html' %}
+<div id="guide" class="container">
+    {{markdown('index.html.guide.md')}}
     {{markdown('index.html.install.md')}}
+    {{markdown('index.html.import.md')}}
 </div>
 {% endblock %}

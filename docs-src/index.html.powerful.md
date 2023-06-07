@@ -4,12 +4,14 @@
     <img src="data-tree.webp">
 </div>
 
-`{Edictor}` support building schema for both nested and array data.
+**`{Edictor}`** support building schema for both nested and array data.
 Moreover, data pass through schema can becomes atomic instance
 which can validate itself in real-time when data has been changed,
 garantee that data is always valid.
 
 Example usage:
+
+<el-title-code>javascript</el-title-code>
 ```js
 class Website extends Model {};
 
