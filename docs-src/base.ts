@@ -32,6 +32,24 @@ TitleCode.tagStyle(`
     ${bgColor(theme.yellow)}
 `)
 
+class TitleBlockquote extends Adapter {};
+TitleBlockquote.define('el-title-blockquote');
+TitleBlockquote.tagStyle(`
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1rem 0.5rem 0.3rem 0.5rem;
+    box-sizing: border-box;
+    line-height: 1.5;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+    min-width: 2rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    ${bgColor(theme.purple3)}
+`)
+
 
 let _base_url:any  = document.currentScript.src;
 _base_url = new URL('./', _base_url).toString();

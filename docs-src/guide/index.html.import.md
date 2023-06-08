@@ -34,5 +34,3 @@ const edictor = required('edictor');
 // edictor.Model;
 // edictor.defineField; 
 ```
-
-</div>

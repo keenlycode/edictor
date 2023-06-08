@@ -90,16 +90,28 @@ h3 {
     margin-bottom: 0;
 }
 
+p + blockquote {
+    margin-top: -0.5rem;
+}
+
 blockquote {
     margin: 0;
     padding-left: 1rem;
-    border-left: 0.5rem solid ${theme.yellow};
+    border-left: 0.4rem solid ${theme.purple3};
     border-radius: 1rem;
-    ${bgColor(palette.light)}
+    border-top-left-radius: 0;
+    box-sizing: border-box;
+    ${bgColor(new Color(theme.purple3).lighten(0.5).toString())}
+    ul {
+        padding-left: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin: 0;
+    }
 }
 
 code {
-    ${bgColor(new Color(palette.light).toString())}
+    ${bgColor(new Color(theme.purple2).lighten(0.3).fade(0.2).toString())}
 }
 
 .container {

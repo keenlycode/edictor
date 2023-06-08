@@ -1,38 +1,46 @@
-<div class="flex flex-center width-100">
-    <h2>Define</h2>
-</div>
+<h2 id="define">Define Models / Schemas</h2>
 
-Let's try to define a model / schema for some part of npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
-package.json</a>.
+To begins, let's try to define a models / schemas for some parts of
+npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
+package.json</a>, which is a good example since it has a good documentation and
+complex enough to demonstrate **{Edictor}** APIs.
 
+`class Model` and `defineField()` is two main cores APIs to start with.
+They are carfully designed to be readable by themselve. If you know
+**Javascript**, just read one by one line and you will get an idea how
+**{Edictor}** APIs work in no time at all, trust me ! :)
+
+<el-title-code>javascript / es6+</el-title-code>
 ```javascript
 /** ES Module */
 import { Model, defineField } from 'edictor';
 
-/** define class `Package` & `People` to ba a schema */
+/** Every defined model class must extended from `Model` */
 class Package extends Model {};
 class People extends Model {};
 
-/** Define reusable `defineField()` as `urlDef`
- * - Data must be string instance.
- * - Validate url by `apply()` which expect function to throw error
- *   if data is not valid.
+/** Define reusable `defineField()` as `urlDef` to validates that:
+ * - The value must be a string instance.
+ * - The value is a valid URL by applying value to built-in `URL()`,
+ *   which expect function to throw error if the data is invalid.
  */
 const urlDef = defineField()
     .instance('string')
     .apply((value) => { new URL(value) })
 
-/** Define model `People` */
+/** Define `People` schema
+ * - definedField() can be used directly as a schema's field.
+*/
 People.define({
     name: defineField({required: true})
         .instance('string'),
     email: defineField()
         .instance('string')
         .regexp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
-    url: urlDef
+    url: urlDef // Reuseable `urlDef`
 })
 
-/** Define model `Package` */
+/** Define `Package` schema */
 Package.define({
     name: defineField({required: true})
         .instance('string')
@@ -42,7 +50,7 @@ Package.define({
         defineField({required: true})
         .instance('string')
         .regexp(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/),
-    homepage: urlDef,
+    homepage: urlDef, // Reuseable `urlDef`
     author: // Nesting data using `model()`
         defineField()
         .model(People),
@@ -51,3 +59,8 @@ Package.define({
         .arrayOf(People)
 })
 ```
+<div style="margin-top: 1rem;"></div>
+
+<el-title-blockquote>Tips</el-title-blockquote>
+
+> Notice, 
