@@ -1,4 +1,6 @@
-<h2 id="define">Define Models / Schemas</h2>
+<div id="define" class="link-padding-top"></div>
+
+## Define Models / Schemas
 
 To begins, let's try to define a models / schemas for some parts of
 npm's <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-json/" target=_blank>
@@ -60,7 +62,3 @@ Package.define({
 })
 ```
 <div style="margin-top: 1rem;"></div>
-
-<el-title-blockquote>Tips</el-title-blockquote>
-
-> Notice, 

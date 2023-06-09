@@ -55,6 +55,7 @@ pre > code.hljs {
     margin: auto;
     padding: 1rem 1rem;
     border-top-left-radius: 0;
+    border-left: 0.3rem solid ${theme.yellow};
 }
 
 p + pre {
@@ -66,7 +67,7 @@ code {
     font-size: 0.8rem;
     border-radius: 0.4rem;
     vertical-align: text-bottom;
-    ${bgColor('#3d3846')}
+    ${bgColor(new Color(theme.purple2).lighten(0.3).toString())}
 }
 
 video {
@@ -108,10 +109,6 @@ blockquote {
         padding-bottom: 0.5rem;
         margin: 0;
     }
-}
-
-code {
-    ${bgColor(new Color(theme.purple2).lighten(0.3).fade(0.2).toString())}
 }
 
 .container {

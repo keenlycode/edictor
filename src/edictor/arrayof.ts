@@ -170,7 +170,6 @@ export class ArrayOf extends Array {
                 error[i] = result["error"];
             }
         }
-        console.log(this.validators_to_names());
         result = {
             "test": `Expect (${this.validators_to_names().toString()})`,
             "valid": valid,

@@ -86,12 +86,9 @@ describe('class ArrayOf', () => {
             error: defineField().instance('object')
         })
 
-        // array = new ArrayOf('string', 'number');
-        // let result = array.test([1, true]);
         array = new ArrayOf(['string', 'number']);
         let result = array.test([[1,true]]);
         result = new TestResult(result);
-        console.log(result);
     })
 
     test('ArrayOf().push()', () => {

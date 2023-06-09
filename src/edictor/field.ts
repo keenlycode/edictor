@@ -86,7 +86,7 @@ export class Field {
      */
     get value() {
         if ( (this._option.required) && (this._value === undefined) ) {
-            throw new RequiredError(`Required field is undefined`);
+            throw new RequiredError(`Field is required`);
         }
         return this._value;
     }

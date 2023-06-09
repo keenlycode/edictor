@@ -30,12 +30,12 @@ body {
         }
     }
     h2 {
-        margin-top: 5rem;
         color: ${theme.purple2};
         border-bottom: 2px dashed ${theme.purple2};
     }
-    h3 {
-        margin-top: 1.5rem;
+
+    .link-padding-top {
+        padding-top: 4rem;
     }
 }
 `

@@ -1,4 +1,4 @@
-import { Field, DefineField, FieldError, RequiredError } from './field';
+import { Field, DefineField } from './field';
 
 class ModelError extends Error {
     constructor(message='') {
@@ -11,6 +11,13 @@ export class DefineError extends ModelError {
     constructor(message='') {
         super(message);
         this.name = 'DefineError';
+    }
+}
+
+export class UndefinedError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'UndefinedError';
     }
 }
 
@@ -54,7 +61,7 @@ interface ModelOption {
     strict?: boolean
 }
 
-interface TestResult {
+interface ModelTestResult {
     valid: object,
     invalid: object,
     error: object,
@@ -76,7 +83,7 @@ export class Model {
             + `It must be called from a subclass`);
         }
 
-        let result: TestResult = {
+        let result: ModelTestResult = {
             valid: {},
             invalid: {},
             error: {},
@@ -121,7 +128,7 @@ export class Model {
         return {...this._define};
     }
 
-    static test(data: Object = {}, option: ModelOption = {}): TestResult {
+    static test(data: Object = {}, option: ModelOption = {}): ModelTestResult {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
@@ -134,7 +141,7 @@ export class Model {
         /** Isolate recevied data */
         data = {...data};
         option = {...this._option, ...option};
-        const result: TestResult = {
+        const result: ModelTestResult = {
             valid: {},
             invalid: {},
             error: {},
@@ -148,8 +155,10 @@ export class Model {
             const value = data[key];
             delete data[key];
             if (value === undefined) {
-                result["valid"][key] = this.field[key].option.initial;
-                continue;
+                if (this.field[key].option.initial !== undefined) {
+                    result["valid"][key] = this.field[key].option.initial;
+                    continue;
+                }
             }
             try {
                 result["valid"][key] = this.field[key].validate(value);
@@ -170,7 +179,7 @@ export class Model {
         if (option.strict) {
             for (const key of Object.keys(data)) {
                 result["invalid"][key] = data[key];
-                result["error"][key] = new RequiredError();
+                result["error"][key] = new UndefinedError();
             }
         } else {
             Object.assign(result['valid'], data);
@@ -186,6 +195,8 @@ export class Model {
         this._option = option;
 
         let result = _class.test(data, option);
+        result['error'] = this._traverse_error_to_string(result['error']);
+
         if (Object.keys(result["error"]).length > 0) {
             result["errorMessage"] = `new ${_class.name}() throws errors.`
             throw new InitError(JSON.stringify(result));
@@ -227,6 +238,19 @@ export class Model {
         });
 
         return proxy;
+    }
+
+    _traverse_error_to_string(error) {
+        for (const [key, value] of Object.entries(error)) {
+            if (value instanceof Error) {
+                error[key] = `${value.name}: ${value.message}`
+                continue;
+            }
+            if (value instanceof Object) {
+                error[key] = this._traverse_error_to_string(error[key])
+            }
+        }
+        return error;
     }
 
     /** Return a new native object with same data */

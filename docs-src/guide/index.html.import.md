@@ -1,8 +1,12 @@
-<h2 id="import">Import</h2>
+<div id="import" class="link-padding-top"></div>
+
+## Import
 
 **{ Edictor }** support both Browser & Node environment.
 
-<h3 id="import-browser">Browser (ES6+)</h3>
+<div id="import-browser" class="link-padding-top" style="margin-top: -4rem;"></div>
+
+<h3>Browser (ES6+)</h3>
 
 There's no **javascript** building tool is expected in browser environment.
 Therefore, all dependencies are included in `edictor.js`.
@@ -16,8 +20,9 @@ import { Model, defineField } from 'url/to/edictor';
 </script>
 ```
 
+<div id="import-node" class="link-padding-top" style="margin-top: -4rem;"></div>
 
-<h3 id="import-node">Node (ES6+ & CommonJS)</h3>
+<h3 style="margin-top: 2rem;">Node (ES6+ & CommonJS)</h3>
 
 **ES Module (Preferred)**
 

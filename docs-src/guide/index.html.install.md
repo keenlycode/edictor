@@ -1,4 +1,6 @@
-<h2 id="installation">Installation</h2>
+<div id="installation" class="link-padding-top"></div>
+
+## Installation
 
 <el-title-code>shell</el-title-code>
 ```shell
