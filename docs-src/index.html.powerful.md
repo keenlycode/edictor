@@ -26,7 +26,7 @@ Website.define({
 })
 
 /** Validate data, return validation result object */
-const reslt = Website.test({url: 'https://example.com'});
+const result = Website.test({url: 'https://example.com'});
 
 /** Create atomic data instance */
 const website = new Website();
