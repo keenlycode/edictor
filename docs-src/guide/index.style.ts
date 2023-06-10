@@ -12,12 +12,9 @@ body {
 
 #guide {
     max-width: 850px;
-    @media screen and (min-width: 1190px) {
-        margin-left: 330px;
-        width: calc(850/1190 * 100%);
-    }
-    @media screen and (min-width: 1510px) {
-        margin: auto;
+    @media screen and (min-width: 1230px) {
+        margin-left: calc(330px + 2vw);
+        width: calc(850/1230 * 100%);
     }
     @media screen and (max-width: 600px) {
         padding-top: 3rem;
