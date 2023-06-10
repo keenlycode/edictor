@@ -78,9 +78,13 @@ interface ModelTestResult {
 
 export class Model {
     protected static _define = {};
+    static isDefined = false;
     static _option: ModelOption = {strict: true};
 
     static define(model: Object = {}, option: ModelOption = {}): typeof Model {
+        if (this.isDefined === true) {
+            throw new DefineError(`${this} has been defined already`);
+        }
         const superClass = Object.getPrototypeOf(this);
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
@@ -128,6 +132,7 @@ export class Model {
             throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
+        this.isDefined = true;
         return this;
     }
 
