@@ -81,51 +81,46 @@ describe('class Model', () => {
         expect(field).toEqual(User.field);
     })
 
-    test.only('Model.constructor()', () => {
+    test('Model.constructor()', () => {
         try {
             new User([1,2,3]);
         } catch (error) {
             expect(error).toBeInstanceOf(InputDataError);
         }
         expect(() => { new User(1)}).toThrow(InputDataError);
+        expect(() => { new User()}).toThrow(InitError);
 
-        // let test = JSON.stringify(new RequiredError('test'), (key, value) => {
-        //     return value.name
-        // });
-        // console.log(test);
-        new User();
+        let user = new User({
+            "name": "Firstname Lastname"
+        });
+        user['phone'] = '+11 111 1111';
+        expect(() => {user['name'] = 1}).toThrow(FieldError);
+        expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
+        expect(() => { new User([1,2,3]) }).toThrow(InputDataError);
+        expect(() => { user['gender'] = 'm' }).toThrow(SetValueError);
+        delete user['phone'];
+        expect(user['phone']).toEqual(undefined);
 
-        // let user = new User({
-        //     "name": "Firstname Lastname"
-        // });
-        // user['phone'] = '+11 111 1111';
-        // expect(() => {user['name'] = 1}).toThrow(FieldError);
-        // expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
-        // expect(() => { new User([1,2,3]) }).toThrow(InputDataError);
-        // expect(() => { user['gender'] = 'm' }).toThrow(SetValueError);
-        // delete user['phone'];
-        // expect(user['phone']).toEqual(undefined);
+        /** Flexy model */
+        user = new User({
+            "name": "Firstname Lastname",
+            "gender": "m"
+        }, {strict: false});
+        user["test-undefined"] = "test";
 
-        // /** Flexy model */
-        // user = new User({
-        //     "name": "Firstname Lastname",
-        //     "gender": "m"
-        // }, {strict: false});
-        // user["test-undefined"] = "test";
-
-        // expect(user['gender']).toEqual('m');
-        // expect({...user}).toEqual(user);
+        expect(user['gender']).toEqual('m');
+        expect({...user}).toEqual(user);
         
-        // /** Error on initial data */
-        // expect(() => { new User({name: 1}) }).toThrow(InitError);
+        /** Error on initial data */
+        expect(() => { new User({name: 1}) }).toThrow(InitError);
 
-        // /** Initial data with undefined field */
-        // expect(() => { 
-        //     new User({
-        //         "name": "Firstname Lastname",
-        //         "gender": "m"
-        //     })
-        // }).toThrow(InitError);
+        /** Initial data with undefined field */
+        expect(() => { 
+            new User({
+                "name": "Firstname Lastname",
+                "gender": "m"
+            })
+        }).toThrow(InitError);
     });
 
     test('Model().object()', () => {

@@ -21,6 +21,13 @@ export class UndefinedError extends ModelError {
     }
 }
 
+export class ValidateError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'ValidateError';
+    }
+}
+
 export class InitError extends ModelError {
     constructor(message='') {
         super(message);
@@ -128,6 +135,19 @@ export class Model {
         return {...this._define};
     }
 
+    static _traverse_error_to_string(error) {
+        for (const [key, value] of Object.entries(error)) {
+            if (value instanceof Error) {
+                error[key] = `${value.name}: ${value.message}`
+                continue;
+            }
+            if (value instanceof Object) {
+                error[key] = this._traverse_error_to_string(error[key])
+            }
+        }
+        return error;
+    }
+
     static test(data: Object = {}, option: ModelOption = {}): ModelTestResult {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
@@ -187,6 +207,17 @@ export class Model {
         return result;
     }
 
+    static validate(data: Object = {}, option: ModelOption = {}) {
+        let result = this.test(data, option);
+        result['error'] = this._traverse_error_to_string(result['error']);
+
+        if (Object.keys(result["error"]).length > 0) {
+            result["errorMessage"] = `${this}.validate() throws errors.`
+            throw new ValidateError(JSON.stringify(result));
+        }
+        return result["valid"];
+    }
+
     protected _option: ModelOption;
 
     constructor(data: Object = {}, option: ModelOption = {}) {
@@ -194,15 +225,18 @@ export class Model {
         option = {..._class._option, ...option};
         this._option = option;
 
-        let result = _class.test(data, option);
-        result['error'] = this._traverse_error_to_string(result['error']);
-
-        if (Object.keys(result["error"]).length > 0) {
-            result["errorMessage"] = `new ${_class.name}() throws errors.`
+        try {
+            data = _class.validate(data, option);
+        } catch (error) {
+            if (error.name === "InputDataError") {
+                throw error;
+            }
+            const result = JSON.parse(error.message);
+            result["errorMessage"] = `new ${this}() throws errors.`
             throw new InitError(JSON.stringify(result));
         }
 
-        Object.assign(this, result["valid"]);
+        Object.assign(this, data);
 
         /** Setup Proxy */
         const proxy = new Proxy(this, {
@@ -238,19 +272,6 @@ export class Model {
         });
 
         return proxy;
-    }
-
-    _traverse_error_to_string(error) {
-        for (const [key, value] of Object.entries(error)) {
-            if (value instanceof Error) {
-                error[key] = `${value.name}: ${value.message}`
-                continue;
-            }
-            if (value instanceof Object) {
-                error[key] = this._traverse_error_to_string(error[key])
-            }
-        }
-        return error;
     }
 
     /** Return a new native object with same data */
