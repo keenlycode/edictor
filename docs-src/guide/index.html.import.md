@@ -4,7 +4,7 @@
 
 **{ Edictor }** support both Browser & Node environment.
 
-<div id="import-browser" class="link-padding-top" style="margin-top: -4rem;"></div>
+<div id="import.browser" class="link-padding-top" style="margin-top: -4rem;"></div>
 
 <h3>Browser (ES6+)</h3>
 
@@ -20,7 +20,7 @@ import { Model, defineField } from 'url/to/edictor';
 </script>
 ```
 
-<div id="import-node" class="link-padding-top" style="margin-top: -4rem;"></div>
+<div id="import.node" class="link-padding-top" style="margin-top: -4rem;"></div>
 
 <h3 style="margin-top: 2rem;">Node (ES6+ & CommonJS)</h3>
 

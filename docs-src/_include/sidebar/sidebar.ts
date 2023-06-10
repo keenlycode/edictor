@@ -22,6 +22,10 @@ SidebarMenu.tagStyle({
 SidebarMenu.tagStyle(`
     border-radius: 0;
     border: 0;
+    padding-bottom: 5rem;
+    a {
+        text-decoration: none;
+    }
 `)
 
 Sidebar.define('el-sidebar');
@@ -35,8 +39,8 @@ Sidebar.tagStyle(`
         width: 90%;
         max-width: 300px;
         height: auto;
+        max-height: 100vh;
         border-bottom-right-radius: 1em;
-        overflow: hidden;
     }
     div[el="header"] {
         display: flex;
@@ -56,12 +60,6 @@ Sidebar.tagStyle(`
         }
         el-icon {
             font-size: 3em;
-        }
-    }
-    el-menu {
-        a {
-            color: inherit;
-            text-decoration: none;
         }
     }
 `)

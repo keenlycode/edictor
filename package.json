@@ -46,7 +46,9 @@
         "build": "parcel build --no-cache --target=es --target=cjs --target=browser --target=types",
         "build-watch": "parcel watch -p 1235 --no-cache --target=es --target=types",
         "test": "jest",
-        "test-watch": "jest --watch"
+        "test-watch": "jest --watch",
+        "docs": "parcel build --no-cache --no-scope-hoist --target=docs 'docs-src/**/*.ts'",
+        "docs-watch": "parcel watch --no-cache --target=docs 'docs-src/**/*.ts'"
     },
     "source": "src/edictor.ts",
     "main": "dist/cjs/edictor.js",
