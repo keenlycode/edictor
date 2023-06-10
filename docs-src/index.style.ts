@@ -1,4 +1,5 @@
-import { addStyle as css } from "gadjet/src/gadjet";
+import { bgColorInt, addStyle as css } from "gadjet/src/gadjet";
+import { theme } from './_color';
 
 css`
 body {
@@ -58,9 +59,22 @@ a {
             }
         }
     }
+    
+    a.button {
+        text-decoration: none;
+    }
+
+    button[el="guide"] {
+        ${bgColorInt(theme.purple2)}
+    }
+
     button {
+        display: flex;
         margin: 0.5rem;
         margin-top: 2rem;
+        el-icon {
+            margin-right: 0.2rem;
+        }
     }
 }
 
