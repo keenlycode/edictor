@@ -1,6 +1,12 @@
 # Change Log
 ---
 
+[0.4.0]
+---
+- Better errors information
+- Partial testing
+- Rename TestResult -> ModelTestResult
+
 [0.3.2]
 ---
 ## Better support for `defineField().arrayOf()`
