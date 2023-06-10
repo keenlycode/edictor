@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import {
     DefineError,
-    CallError,
     InitError,
     UpdateError,
     InputDataError,
@@ -29,10 +28,12 @@ describe('class Model', () => {
         expect(User.field['name'] instanceof Field);
         expect(User.field['name'].name).toEqual('name');
 
+        expect(() => { User.define({}) }).toThrow(DefineError);
+
         try {
             Model.define()
         } catch (error) {
-            expect(error).toBeInstanceOf(CallError);
+            expect(error).toBeInstanceOf(DefineError);
         }
 
         class Test extends Model {};
@@ -57,6 +58,22 @@ describe('class Model', () => {
             JSON.parse(error.message);
         }
     })
+
+    test('Model.partial()', () => {
+        let data = {
+            phone: '+66 123 4567',
+            enable: 1,
+            test: true,
+        }
+        let result: any = User.partial(data);
+        expect(result['error']['enable']).toBeInstanceOf(FieldError);
+        expect(result['error']['test']).toBeInstanceOf(UndefinedError);
+
+        result = User.partial(data, {strict: false});
+        expect(result['valid']['test']).toEqual(true);
+    })
+
+
 
     test('Model.test()', () => {
         let result: any = User.test({

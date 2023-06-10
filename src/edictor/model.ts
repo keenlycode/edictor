@@ -14,13 +14,6 @@ export class DefineError extends ModelError {
     }
 }
 
-export class UndefinedError extends ModelError {
-    constructor(message='') {
-        super(message);
-        this.name = 'UndefinedError';
-    }
-}
-
 export class ValidateError extends ModelError {
     constructor(message='') {
         super(message);
@@ -43,6 +36,13 @@ export class UpdateError extends ModelError {
     }
 }
 
+export class UndefinedError extends Error {
+    constructor(message='Field is undeinfed') {
+        super(message);
+        this.name = 'UndefinedError';
+    }
+}
+
 export class SetValueError extends Error {
     constructor(message='') {
         super(message);
@@ -54,13 +54,6 @@ export class InputDataError extends Error {
     constructor(message='') {
         super(message);
         this.name = 'InputDataError';
-    }
-}
-
-export class CallError extends Error {
-    constructor(message='') {
-        super(message);
-        this.name = 'CallError';
     }
 }
 
@@ -78,19 +71,19 @@ interface ModelTestResult {
 
 export class Model {
     protected static _define = {};
-    static isDefined = false;
+    static _definedClass = 'Model';
     static _option: ModelOption = {strict: true};
 
     static define(model: Object = {}, option: ModelOption = {}): typeof Model {
-        if (this.isDefined === true) {
-            throw new DefineError(`${this} has been defined already`);
+        if (this._definedClass === this.name) {
+            throw new DefineError(`${this} has been defined.`);
         }
         const superClass = Object.getPrototypeOf(this);
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
 
         if (superClass.name === '') {
-            throw new CallError(`Model.define() is prohibited. `
+            throw new DefineError(`Model.define() is prohibited. `
             + `It must be called from a subclass`);
         }
 
@@ -132,7 +125,7 @@ export class Model {
             throw new DefineError(JSON.stringify(result));
         }
         this._define = {...this._define, ...model};
-        this.isDefined = true;
+        this._definedClass = this.name;
         return this;
     }
 
@@ -153,7 +146,8 @@ export class Model {
         return error;
     }
 
-    static test(data: Object = {}, option: ModelOption = {}): ModelTestResult {
+
+    static _check_input_data(data: Object) {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object. Received Array`);
@@ -162,8 +156,46 @@ export class Model {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
             + `data must be an instance of object, Received ${typeof(data)}`);
         }
+    }
 
-        /** Isolate recevied data */
+    static partial(data: Object, option: ModelOption = {}) {
+        this._check_input_data(data);
+
+        /** Isolate received data */
+        data = {...data};
+        option = {...this._option, ...option};
+        const result: ModelTestResult = {
+            valid: {},
+            invalid: {},
+            error: {},
+            errorMessage: ''
+        };
+
+        /** Iterate input data object to test */
+        for ( const [key, value] of Object.entries(data) ) {
+            if (!(key in this.field)) {
+                if (option.strict === true) {
+                    result["invalid"][key] = value;
+                    result["error"][key] = new UndefinedError(`Field is undefined`)
+                } else {
+                    result["valid"][key] = value;
+                }
+                continue;
+            }
+            try {
+                result["valid"][key] = this.field[key].validate(value);
+            } catch (error) {
+                result["invalid"][key] = value;
+                result["error"][key] = error;
+            }
+        }
+        return result;
+    }
+
+    static test(data: Object, option: ModelOption = {}): ModelTestResult {
+        this._check_input_data(data);
+
+        /** Isolate received data */
         data = {...data};
         option = {...this._option, ...option};
         const result: ModelTestResult = {
@@ -200,19 +232,19 @@ export class Model {
 
         /** Program reach here if there's some data left */
 
-        /** If option {strict: true}, add more errors for undefined fields */
-        if (option.strict) {
+        /** If option {strict: true}, add errors as undefined fields */
+        if (option.strict === true) {
             for (const key of Object.keys(data)) {
                 result["invalid"][key] = data[key];
-                result["error"][key] = new UndefinedError();
+                result["error"][key] = new UndefinedError(`Field is undefined`);
             }
-        } else {
+        } else { /** If option {strict: false}, add all data left */
             Object.assign(result['valid'], data);
         }
         return result;
     }
 
-    static validate(data: Object = {}, option: ModelOption = {}) {
+    static validate(data: Object, option: ModelOption = {}) {
         let result = this.test(data, option);
         result['error'] = this._traverse_error_to_string(result['error']);
 

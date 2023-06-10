@@ -14,9 +14,6 @@ SidebarButton.tagStyle(`
     font-size: 1.5rem;
     z-index: 100;
 `)
-document.querySelector(SidebarButton.tagName).addEventListener('click', () => {
-    window.sidebar.show();
-})
 
 SidebarMenu.define('el-sidebar-menu');
 SidebarMenu.tagStyle({
@@ -71,8 +68,16 @@ Sidebar.tagStyle(`
 
 window.sidebar = document.querySelector('el-sidebar');
 
+document.querySelector(SidebarButton.tagName).addEventListener('click', () => {
+    window.sidebar.show();
+})
+
 document.querySelector(`el-sidebar-menu`)
 .addEventListener('click', (event) => {
+    if (window.matchMedia("(min-width: 1190px").matches) {
+        console.log('matched')
+        return;
+    }
     const target = event.target as HTMLElement;
     if (target.tagName.toLowerCase() === "a") {
         setTimeout(() => {
