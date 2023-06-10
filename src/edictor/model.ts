@@ -65,7 +65,7 @@ interface ModelTestResult {
     valid: object,
     invalid: object,
     error: object,
-    errorMessage: string
+    errorMessage?: string
 }
 
 
@@ -87,11 +87,10 @@ export class Model {
             + `It must be called from a subclass`);
         }
 
-        let result: ModelTestResult = {
+        const result: ModelTestResult = {
             valid: {},
             invalid: {},
-            error: {},
-            errorMessage: ''
+            error: {}
         };
 
         for (let [key, defineField] of Object.entries(model)) {
@@ -158,7 +157,7 @@ export class Model {
         }
     }
 
-    static partial(data: Object, option: ModelOption = {}) {
+    static partial(data: Object, option: ModelOption = {}): ModelTestResult {
         this._check_input_data(data);
 
         /** Isolate received data */
@@ -167,8 +166,7 @@ export class Model {
         const result: ModelTestResult = {
             valid: {},
             invalid: {},
-            error: {},
-            errorMessage: ''
+            error: {}
         };
 
         /** Iterate input data object to test */
@@ -176,7 +174,7 @@ export class Model {
             if (!(key in this.field)) {
                 if (option.strict === true) {
                     result["invalid"][key] = value;
-                    result["error"][key] = new UndefinedError(`Field is undefined`)
+                    result["error"][key] = new UndefinedError(`Field is undefined.`)
                 } else {
                     result["valid"][key] = value;
                 }
@@ -188,6 +186,9 @@ export class Model {
                 result["invalid"][key] = value;
                 result["error"][key] = error;
             }
+        }
+        if (Object.keys(result['error']).length > 0) {
+            result['errorMessage'] = 'Partial testing contains errors.';
         }
         return result;
     }
@@ -201,8 +202,7 @@ export class Model {
         const result: ModelTestResult = {
             valid: {},
             invalid: {},
-            error: {},
-            errorMessage: ''
+            error: {}
         };
 
         /** Iterate defined field to validate and assign data.
@@ -225,30 +225,28 @@ export class Model {
             }
         }
 
-         /** If there's no data left, return result */
-        if (Object.keys(data).length === 0) {
-            return result;
-        }
-
-        /** Program reach here if there's some data left */
-
         /** If option {strict: true}, add errors as undefined fields */
         if (option.strict === true) {
             for (const key of Object.keys(data)) {
                 result["invalid"][key] = data[key];
-                result["error"][key] = new UndefinedError(`Field is undefined`);
+                result["error"][key] = new UndefinedError(`Field is undefined.`);
             }
         } else { /** If option {strict: false}, add all data left */
             Object.assign(result['valid'], data);
         }
+
+        if (Object.keys(result['error']).length > 0) {
+            result['errorMessage'] = 'Testing contains errors.';
+        }
+
         return result;
     }
 
-    static validate(data: Object, option: ModelOption = {}) {
+    static validate(data: Object, option: ModelOption = {}): Object {
         let result = this.test(data, option);
         result['error'] = this._traverse_error_to_string(result['error']);
 
-        if (Object.keys(result["error"]).length > 0) {
+        if (result['errorMessage'] !== undefined) {
             result["errorMessage"] = `${this}.validate() throws errors.`
             throw new ValidateError(JSON.stringify(result));
         }
