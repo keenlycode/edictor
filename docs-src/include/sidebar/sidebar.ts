@@ -1,5 +1,5 @@
 import Color from 'color';
-import { Sidebar, aspectRatio, bgColor } from 'gadjet/src/gadjet';
+import { Sidebar, aspectRatio, bgColor, lift } from 'gadjet/src/gadjet';
 import { Menu as SidebarMenu, ButtonPin as SidebarButton } from 'gadjet/src/gadjet';
 import { theme } from '../../_color';
 
@@ -23,6 +23,7 @@ SidebarMenu.tagStyle(`
     border-radius: 0;
     border: 0;
     padding-bottom: 5rem;
+    font-size: 0.85rem;
     a {
         text-decoration: none;
     }
@@ -41,6 +42,7 @@ Sidebar.tagStyle(`
         height: auto;
         max-height: 100vh;
         border-bottom-right-radius: 1em;
+        ${lift({level: 3})}
     }
     div[el="header"] {
         display: flex;
