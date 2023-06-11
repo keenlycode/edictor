@@ -77,7 +77,7 @@ describe('Field Unit Test', () => {
         expect(field.value).toEqual(undefined);
     })
 
-    test.only('Field().validate()', () => {
+    test('Field().validate()', () => {
         let def = defineField().instance('string')
             .assert((value) => { return value.length <= 100 })
         /** Valid value */

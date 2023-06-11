@@ -88,7 +88,7 @@ describe('class Model', () => {
             enable: 1,
             test: true
         });
-        expect(result['error']['name']).toBeInstanceOf(RequiredError);
+        expect(result['error']['name']).toBeInstanceOf(FieldError);
         expect(result['error']['enable']).toBeInstanceOf(FieldError);
         expect(result['error']['test']).toBeInstanceOf(UndefinedError);
     })
