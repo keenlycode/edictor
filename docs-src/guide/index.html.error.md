@@ -14,7 +14,7 @@ ModelError
 
 JSON message has a structure as:
 ```js
-interface ValidationResult {
+interface ModelTestResult {
     valid: object // Valid data based on object structure.
     invalid: object // Invalid data based on object structure.
     error: object // Error information base on data structure.
@@ -34,7 +34,7 @@ try {
     })
 } catch (error) { // error is an instance of UpdateError
     const validationResult = JSON.parse(error.message);
-    // Do something with validationResult object
+    // Do something with ModelTestResult object
 };
 ```
 
