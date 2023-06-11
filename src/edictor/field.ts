@@ -1,7 +1,7 @@
 import * as Validator from './validator';
 import { ArrayOf } from './validator';
 import { Model } from './model';
-import { Class } from './util';
+import { Class, TestResult } from './util';
 
 
 /** Error class to show when setting value doesn't pass validation. */
@@ -94,6 +94,16 @@ export class Field {
     /** Reset to initial value */
     reset(): void {
         this._value = this._option.initial;
+    }
+
+    test(value): TestResult {
+        const testResult: TestResult = {
+            valid: {},
+            invalid: {},
+            error: {}
+        }
+        
+        return testResult;
     }
 
     /** Validate field's value

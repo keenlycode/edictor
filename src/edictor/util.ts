@@ -1,5 +1,12 @@
 export type Class = { new(...args: any[]): any; };
 
+export interface TestResult {
+    valid: object,
+    invalid: object,
+    error: object,
+    errorMessage?: string
+}
+
 /** Utility function to check if instance is a Function */
 export function is_function(instance) {
     if (!(instance instanceof Function)) {
