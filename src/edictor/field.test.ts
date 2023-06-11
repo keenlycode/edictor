@@ -78,18 +78,20 @@ describe('Field Unit Test', () => {
     })
 
     test('Field().validate()', () => {
-        field = defineField().instance('string').field();
+        let def = defineField().instance('string')
+            .assert((value) => { return value.length <= 100 })
         /** Valid value */
-        field.validate('test');
+        def.field().validate('test');
 
         /** undefined value */
-        field.validate(undefined);
+        def.field().validate(undefined);
+        expect(() => { def.field().validate(1)} ).toThrow(FieldError);
 
         /** When `field` is required and validate `undefined` value
          * it must throw `RequiredError`
          */
-        field = defineField().instance('string').field({required: true});
-        expect(() => { field.validate(undefined) }).toThrow(RequiredError);
+        field = def.field({required: true});
+        expect(() => { field.validate(undefined) }).toThrow(FieldError);
 
         /** `field.value = null` will throw `FieldError`
          * since it's not passed validations.

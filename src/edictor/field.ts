@@ -24,6 +24,12 @@ export class RequiredError extends Error {
 }
 
 
+export interface FieldTestResult {
+    value?: any;
+    errors?: Array<Error>;
+}
+
+
 export interface FieldOption {
     name?: string;
     required?: boolean;
@@ -96,44 +102,52 @@ export class Field {
         this._value = this._option.initial;
     }
 
-    /** Validate field's value
-     * - Return value if valid.
-     */
-    validate(value): any {
-        const errors = [];
+    test(value): FieldTestResult {
+        const errors: Array<Error> = [];
         if (value === undefined) {
             /** Check required constrain. */
             if (this._option.required) {
-                throw new RequiredError(`Field is required`);
+                return {'errors': [new RequiredError(`Field is required`)]}; 
             } else { /** Return immediatly to skip validations */
-                return;
+                return {'value': value};
             }
         }
 
         /** Check with grant values to skip validations */
         if (this._option.grant.includes(value)) {
-            return value;
+            return {'value': value};
         }
 
         /** Validate and assign return value if undefined */
         for (const validator of this.validators) {
             try {
                 const value_ = validator(value);
-                if (value_ !== undefined) {
-                    value = value_;
-                }
-            } catch (e) {
-                errors.push(e.message);
+                if (value_) { value = value_ };
+            } catch (error) {
+                errors.push(error);
             }
         }
-        let msg = `Field({name: "${this.name}"})`;
-        for (const error of errors) {
-            msg += `\n\t- ${error}`
+
+        if (errors.length == 0) {
+            return {'value': value}
+        } else {
+            return {'errors': errors}
+        };
+    }
+
+    /** Validate field's value
+     * - Return value if valid.
+     */
+    validate(value): any {
+        const fieldTestResult: FieldTestResult = this.test(value);
+        if ('errors' in fieldTestResult) {
+            const errors = [];
+            for ( const error of fieldTestResult['errors'] ) {
+                errors.push(`"${error.message}"`);
+            }
+            throw new FieldError(`[${errors}]`);
         }
-        if (errors.length > 0) {
-            throw new FieldError(msg);
-        }
-        return value;
+        return fieldTestResult['value'];
     }
 }
 
