@@ -227,12 +227,6 @@ export class Model {
                 fieldError.message = fieldError.errors_to_message(result['errors']);
                 modelTestResult['error'][key] = fieldError;
             }
-            // try {
-            //     result["valid"][key] = this.field[key].validate(value);
-            // } catch (error) {
-            //     result["invalid"][key] = value;
-            //     result["error"][key] = error;
-            // }
         }
 
         /** If option {strict: true}, add errors as undefined fields */
