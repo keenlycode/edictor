@@ -1,7 +1,7 @@
 import * as Validator from './validator';
 import { ArrayOf } from './validator';
 import { Model } from './model';
-import { Class, TestResult } from './util';
+import { Class } from './util';
 
 
 /** Error class to show when setting value doesn't pass validation. */
@@ -96,14 +96,32 @@ export class Field {
         this._value = this._option.initial;
     }
 
-    test(value): TestResult {
-        const testResult: TestResult = {
-            valid: {},
-            invalid: {},
-            error: {}
+    test(value): Array<Error> {
+        const errors: Array<Error> = [];
+
+        if (value === undefined) {
+            /** Check required constrain. */
+            if (this._option.required) {
+                return [new RequiredError(`Field is required`)]; 
+            } else { /** Return immediatly to skip validations */
+                return [];
+            }
         }
-        
-        return testResult;
+
+        /** Check with grant values to skip validations */
+        if (this._option.grant.includes(value)) {
+            return [];
+        }
+
+        /** Validate and assign return value if undefined */
+        for (const validator of this.validators) {
+            try {
+                validator(value);
+            } catch (error) {
+                errors.push(error);
+            }
+        }
+        return errors;
     }
 
     /** Validate field's value
