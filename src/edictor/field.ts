@@ -128,48 +128,26 @@ export class Field {
             }
         }
 
-        if (errors.length == 0) { return {'value': value};
-        } else { return {'errors': errors}};
+        if (errors.length == 0) {
+            return {'value': value}
+        } else {
+            return {'errors': errors}
+        };
     }
 
     /** Validate field's value
      * - Return value if valid.
      */
     validate(value): any {
-        const errors = [];
-        if (value === undefined) {
-            /** Check required constrain. */
-            if (this._option.required) {
-                throw new RequiredError(`Field is required`);
-            } else { /** Return immediatly to skip validations */
-                return;
+        const fieldTestResult: FieldTestResult = this.test(value);
+        if ('errors' in fieldTestResult) {
+            const errors = [];
+            for ( const error of fieldTestResult['errors'] ) {
+                errors.push(`"${error.message}"`);
             }
+            throw new FieldError(`[${errors}]`);
         }
-
-        /** Check with grant values to skip validations */
-        if (this._option.grant.includes(value)) {
-            return value;
-        }
-
-        /** Validate and assign return value if undefined */
-        for (const validator of this.validators) {
-            try {
-                const value_ = validator(value);
-                if (value_ !== undefined) {
-                    value = value_;
-                }
-            } catch (e) {
-                errors.push(e.message);
-            }
-        }
-        let msg = `Field({name: "${this.name}"})`;
-        for (const error of errors) {
-            msg += `\n\t- ${error}`
-        }
-        if (errors.length > 0) {
-            throw new FieldError(msg);
-        }
-        return value;
+        return fieldTestResult['value'];
     }
 }
 
