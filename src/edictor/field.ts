@@ -24,6 +24,12 @@ export class RequiredError extends Error {
 }
 
 
+export interface FieldTestResult {
+    value?: any;
+    errors?: Array<Error>;
+}
+
+
 export interface FieldOption {
     name?: string;
     required?: boolean;
@@ -96,32 +102,34 @@ export class Field {
         this._value = this._option.initial;
     }
 
-    test(value): Array<Error> {
+    test(value): FieldTestResult {
         const errors: Array<Error> = [];
-
         if (value === undefined) {
             /** Check required constrain. */
             if (this._option.required) {
-                return [new RequiredError(`Field is required`)]; 
+                return {'errors': [new RequiredError(`Field is required`)]}; 
             } else { /** Return immediatly to skip validations */
-                return [];
+                return {'value': value};
             }
         }
 
         /** Check with grant values to skip validations */
         if (this._option.grant.includes(value)) {
-            return [];
+            return {'value': value};
         }
 
         /** Validate and assign return value if undefined */
         for (const validator of this.validators) {
             try {
-                validator(value);
+                const value_ = validator(value);
+                if (value_) { value = value_ };
             } catch (error) {
                 errors.push(error);
             }
         }
-        return errors;
+
+        if (errors.length == 0) { return {'value': value};
+        } else { return {'errors': errors}};
     }
 
     /** Validate field's value
