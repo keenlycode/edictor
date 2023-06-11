@@ -2,7 +2,8 @@ import {
     is_function,
     is_class,
     assert,
-    Class
+    Class,
+    TestResult
 } from './util';
 
 
@@ -153,28 +154,28 @@ export class ArrayOf extends Array {
         return length;
     }
 
-    test(values, validators=this.validators) {
+    test(values, validators=this.validators): TestResult {
         validators = [...validators];
         values = [...values];
-        let result: any = {
+        let testResult: TestResult = {
             "valid": {},
             "invalid": {},
             "error": {}
         };
         for (const i in values) {
-            let response = this._validate_value_with_validators(
+            let result = this._validate_value_with_validators(
                 values[i], validators);
-            if ("value" in response) {
-                result['valid'][i] = response["value"];
-            } else if ("error" in response) {
-                result['invalid'][i] = values[i];
-                result['error'][i] = response["error"];
+            if ("value" in result) {
+                testResult['valid'][i] = result["value"];
+            } else if ("error" in result) {
+                testResult['invalid'][i] = values[i];
+                testResult['error'][i] = result["error"];
             }
         }
-        if (Object.keys(result['error']).length > 0) {
-            result['errorMessage'] = `ArrayOf Test Error: Expect (${this.validators_to_names().toString()})`;
+        if (Object.keys(testResult['error']).length > 0) {
+            testResult['errorMessage'] = `ArrayOf Test Error: Expect (${this.validators_to_names().toString()})`;
         }
-        return result;
+        return testResult;
     }
 
     push(...values): number {

@@ -87,7 +87,7 @@ describe('class ArrayOf', () => {
         })
 
         array = new ArrayOf(['string', 'number']);
-        let result = array.test([[1,true]]);
+        let result: any = array.test([[1,true]]);
         result = new TestResult(result);
     })
 
