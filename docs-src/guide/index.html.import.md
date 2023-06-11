@@ -35,7 +35,7 @@ import { Model, defineField } from 'edictor';
 
 <el-title-code>CommonJS</el-title-code>
 ```js
-const edictor = required('edictor');
+const edictor = require('edictor');
 // edictor.Model;
 // edictor.defineField; 
 ```
