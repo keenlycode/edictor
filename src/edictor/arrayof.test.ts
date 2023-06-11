@@ -80,10 +80,10 @@ describe('class ArrayOf', () => {
     test('ArrayOf().test()', () => {
         class TestResult extends Model {};
         TestResult.define({
-            test: defineField({required: true}).instance("string"),
             valid: defineField().instance("object"),
             invalid: defineField().instance("object"),
-            error: defineField().instance('object')
+            error: defineField().instance('object'),
+            errorMessage: defineField().instance("string"),
         })
 
         array = new ArrayOf(['string', 'number']);

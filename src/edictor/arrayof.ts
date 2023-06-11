@@ -156,25 +156,23 @@ export class ArrayOf extends Array {
     test(values, validators=this.validators) {
         validators = [...validators];
         values = [...values];
-        const valid = {};
-        const invalid = {};
-        const error = {};
-        let result = {};
+        let result: any = {
+            "valid": {},
+            "invalid": {},
+            "error": {}
+        };
         for (const i in values) {
-            result = this._validate_value_with_validators(
+            let response = this._validate_value_with_validators(
                 values[i], validators);
-            if ("value" in result) {
-                valid[i] = result["value"];
-            } else if ("error" in result) {
-                invalid[i] = values[i]
-                error[i] = result["error"];
+            if ("value" in response) {
+                result['valid'][i] = response["value"];
+            } else if ("error" in response) {
+                result['invalid'][i] = values[i];
+                result['error'][i] = response["error"];
             }
         }
-        result = {
-            "test": `Expect (${this.validators_to_names().toString()})`,
-            "valid": valid,
-            "invalid": invalid,
-            "error": error
+        if (Object.keys(result['error']).length > 0) {
+            result['errorMessage'] = `ArrayOf Test Error: Expect (${this.validators_to_names().toString()})`;
         }
         return result;
     }
