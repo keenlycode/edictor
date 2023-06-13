@@ -11,6 +11,13 @@ export class FieldError extends Error {
         super(message);
         this.name = 'FieldError';
     }
+    errors_to_message(errors) {
+        const errors_ = [];
+        for ( const error of errors ) {
+            errors_.push(`"${error.message}"`);
+        }
+        return `[${errors_}]`;
+    }
 }
 
 
@@ -141,11 +148,9 @@ export class Field {
     validate(value): any {
         const fieldTestResult: FieldTestResult = this.test(value);
         if ('errors' in fieldTestResult) {
-            const errors = [];
-            for ( const error of fieldTestResult['errors'] ) {
-                errors.push(`"${error.message}"`);
-            }
-            throw new FieldError(`[${errors}]`);
+            const fieldError = new FieldError();
+            fieldError.message = fieldError.errors_to_message(fieldTestResult['errors']);
+            throw fieldError;
         }
         return fieldTestResult['value'];
     }

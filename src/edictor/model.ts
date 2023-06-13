@@ -1,4 +1,4 @@
-import { Field, DefineField } from './field';
+import { Field, DefineField, FieldError } from './field';
 
 class ModelError extends Error {
     constructor(message='') {
@@ -62,9 +62,9 @@ interface ModelOption {
 }
 
 interface ModelTestResult {
-    valid: object,
-    invalid: object,
-    error: object,
+    valid?: object,
+    invalid?: object,
+    error?: object,
     errorMessage?: string
 }
 
@@ -199,7 +199,7 @@ export class Model {
         /** Isolate received data */
         data = {...data};
         option = {...this._option, ...option};
-        const result: ModelTestResult = {
+        const modelTestResult: ModelTestResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -213,33 +213,37 @@ export class Model {
             delete data[key];
             if (value === undefined) {
                 if (this.field[key].option.initial !== undefined) {
-                    result["valid"][key] = this.field[key].option.initial;
+                    modelTestResult["valid"][key] = this.field[key].option.initial;
                     continue;
                 }
             }
-            try {
-                result["valid"][key] = this.field[key].validate(value);
-            } catch (error) {
-                result["invalid"][key] = value;
-                result["error"][key] = error;
+            const result = this.field[key].test(value);
+            if ('value' in result) {
+                modelTestResult['valid'][key] = result['value'];
+            }
+            if ('errors' in result) {
+                modelTestResult['invalid'][key] = value;
+                const fieldError = new FieldError();
+                fieldError.message = fieldError.errors_to_message(result['errors']);
+                modelTestResult['error'][key] = fieldError;
             }
         }
 
         /** If option {strict: true}, add errors as undefined fields */
         if (option.strict === true) {
             for (const key of Object.keys(data)) {
-                result["invalid"][key] = data[key];
-                result["error"][key] = new UndefinedError(`Field is undefined.`);
+                modelTestResult["invalid"][key] = data[key];
+                modelTestResult["error"][key] = new UndefinedError(`Field is undefined.`);
             }
         } else { /** If option {strict: false}, add all data left */
-            Object.assign(result['valid'], data);
+            Object.assign(modelTestResult['valid'], data);
         }
 
-        if (Object.keys(result['error']).length > 0) {
-            result['errorMessage'] = 'Testing contains errors.';
+        if (Object.keys(modelTestResult['error']).length > 0) {
+            modelTestResult['errorMessage'] = 'Testing contains errors.';
         }
 
-        return result;
+        return modelTestResult;
     }
 
     static validate(data: Object, option: ModelOption = {}): Object {
