@@ -75,7 +75,7 @@ describe('class Model', () => {
 
 
 
-    test.only('Model.test()', () => {
+    test('Model.test()', () => {
         let result: any = User.test({
             phone: '+66 123 4567',
             enable: 1,
