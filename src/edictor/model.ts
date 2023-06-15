@@ -1,9 +1,45 @@
-import { Field, DefineField, FieldError } from './field';
+import {
+    Field,
+    DefineField,
+    ValidateError as FieldValidateError } from './field';
 
 class ModelError extends Error {
-    constructor(message='') {
+
+    /** return readable error object */
+    static errorInfo(error): Object {
+        const errorInfo = {};
+        for (const [key, value] of Object.entries(error)) {
+            if (value instanceof ModelError) {
+                errorInfo[key] = this.errorInfo(value);
+                continue;
+            }
+            if (value instanceof Error) {
+                errorInfo[key] = `${value.name}(${value.message})`
+                continue;
+            };
+        }
+        return errorInfo;
+    }
+
+    constructor(message='Model contains error') {
         super(message);
         this.name = 'ModelError';
+    }
+
+    /** Error object */
+    error: Object;
+
+    /** Readable error object */
+    errorInfo: Object;
+
+    /** Set error object */
+    setError(error: Object): ModelError {
+        this.error = error;
+        this.errorInfo = ModelError.errorInfo(error);
+        this.message += '\nYou can catch `error` then inspect' +
+            ' `error.error` or `error.errorInfo` for more detail';
+        this.message += "\n" + JSON.stringify(this.errorInfo, null, 4);
+        return this;
     }
 }
 
@@ -61,7 +97,7 @@ interface ModelOption {
     strict?: boolean
 }
 
-interface ModelTestResult {
+interface ModelValidateResult {
     valid?: object,
     invalid?: object,
     error?: object,
@@ -87,7 +123,7 @@ export class Model {
             + `It must be called from a subclass`);
         }
 
-        const result: ModelTestResult = {
+        const result: ModelValidateResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -132,20 +168,6 @@ export class Model {
         return {...this._define};
     }
 
-    static _traverse_error_to_string(error) {
-        for (const [key, value] of Object.entries(error)) {
-            if (value instanceof Error) {
-                error[key] = `${value.name}: ${value.message}`
-                continue;
-            }
-            if (value instanceof Object) {
-                error[key] = this._traverse_error_to_string(error[key])
-            }
-        }
-        return error;
-    }
-
-
     static _check_input_data(data: Object) {
         if (data instanceof Array) {
             throw new InputDataError(`new ${this.constructor.name}(data) => `
@@ -157,13 +179,13 @@ export class Model {
         }
     }
 
-    static partial(data: Object, option: ModelOption = {}): ModelTestResult {
+    static partial(data: Object, option: ModelOption = {}): Object {
         this._check_input_data(data);
 
         /** Isolate received data */
         data = {...data};
         option = {...this._option, ...option};
-        const result: ModelTestResult = {
+        const result: ModelValidateResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -193,13 +215,13 @@ export class Model {
         return result;
     }
 
-    static test(data: Object, option: ModelOption = {}): ModelTestResult {
+    static validate(data: Object, option: ModelOption = {}): Object {
         this._check_input_data(data);
 
         /** Isolate received data */
         data = {...data};
         option = {...this._option, ...option};
-        const modelTestResult: ModelTestResult = {
+        const result: ModelValidateResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -213,48 +235,34 @@ export class Model {
             delete data[key];
             if (value === undefined) {
                 if (this.field[key].option.initial !== undefined) {
-                    modelTestResult["valid"][key] = this.field[key].option.initial;
+                    result['valid'][key] = this.field[key].option.initial;
                     continue;
                 }
             }
-            const result = this.field[key].test(value);
-            if ('value' in result) {
-                modelTestResult['valid'][key] = result['value'];
-            }
-            if ('errors' in result) {
-                modelTestResult['invalid'][key] = value;
-                const fieldError = new FieldError();
-                fieldError.message = fieldError.errors_to_message(result['errors']);
-                modelTestResult['error'][key] = fieldError;
+
+            try {
+                result['valid'][key] = this.field[key].validate(value);
+            } catch (error) {
+                result['invalid'][key] = value;
+                result['error'][key] = error;
             }
         }
 
         /** If option {strict: true}, add errors as undefined fields */
         if (option.strict === true) {
             for (const key of Object.keys(data)) {
-                modelTestResult["invalid"][key] = data[key];
-                modelTestResult["error"][key] = new UndefinedError(`Field is undefined.`);
+                result["invalid"][key] = data[key];
+                result["error"][key] = new UndefinedError(`Field is undefined.`);
             }
         } else { /** If option {strict: false}, add all data left */
-            Object.assign(modelTestResult['valid'], data);
+            Object.assign(result['valid'], data);
         }
 
-        if (Object.keys(modelTestResult['error']).length > 0) {
-            modelTestResult['errorMessage'] = 'Testing contains errors.';
+        if (Object.keys(result['error']).length > 0) {
+            throw new ModelError().setError(result['error']);
         }
 
-        return modelTestResult;
-    }
-
-    static validate(data: Object, option: ModelOption = {}): Object {
-        let result = this.test(data, option);
-        result['error'] = this._traverse_error_to_string(result['error']);
-
-        if (result['errorMessage'] !== undefined) {
-            result["errorMessage"] = `${this}.validate() throws errors.`
-            throw new ValidateError(JSON.stringify(result));
-        }
-        return result["valid"];
+        return result;
     }
 
     protected _option: ModelOption;
@@ -293,7 +301,7 @@ export class Model {
                         return true;
                     }
                 }
-                /** Validate value => Throw FieldError is invalid */
+                /** Validate value => Throw FieldValidateError is invalid */
                 value = field.validate(value);
                 return Reflect.set(target, key, value);
             },

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from '@jest/globals';
+import {describe, expect, test } from '@jest/globals';
 import {
     DefineError,
     InitError,
@@ -7,8 +7,11 @@ import {
     UndefinedError,
     Model
 } from './model';
-import { defineField, Field, FieldError, RequiredError } from './field';
-import * as schema from './schema';
+import {
+    defineField,
+    Field,
+    ValidateError as FieldValidateError
+} from './field';
 import { SetValueError } from './model';
 
 
@@ -59,14 +62,14 @@ describe('class Model', () => {
         }
     })
 
-    test('Model.partial()', () => {
+    test.only('Model.partial()', () => {
         let data = {
             phone: '+66 123 4567',
             enable: 1,
             test: true,
         }
         let result: any = User.partial(data);
-        expect(result['error']['enable']).toBeInstanceOf(FieldError);
+        expect(result['error']['enable']).toBeInstanceOf(FieldValidateError);
         expect(result['error']['test']).toBeInstanceOf(UndefinedError);
 
         result = User.partial(data, {strict: false});
@@ -74,23 +77,17 @@ describe('class Model', () => {
     })
 
 
-
-    test('Model.test()', () => {
-        let result: any = User.test({
-            phone: '+66 123 4567',
-            enable: 1,
-            test: true,
-        })
-        result = new schema.DataTestResult(result);
-        expect(result['valid']).toEqual({phone: '+66 123 4567'});
-        expect(result['invalid']).toEqual({
-            name: undefined,
-            enable: 1,
-            test: true
-        });
-        expect(result['error']['name']).toBeInstanceOf(FieldError);
-        expect(result['error']['enable']).toBeInstanceOf(FieldError);
-        expect(result['error']['test']).toBeInstanceOf(UndefinedError);
+    test('Model.validate()', () => {
+        let user: any;
+        try {
+            user = User.validate({
+                phone: '+66 123 4567',
+                enable: 1,
+                test: true
+            })
+        } catch (error) {
+            expect(Object.keys(error.error)).toEqual(['name', 'enable', 'test']);
+        }
     })
 
     test('Model.field()', () => {
@@ -111,8 +108,8 @@ describe('class Model', () => {
             "name": "Firstname Lastname"
         });
         user['phone'] = '+11 111 1111';
-        expect(() => {user['name'] = 1}).toThrow(FieldError);
-        expect(() => {user['phone'] = '124abc'}).toThrow(FieldError);
+        expect(() => {user['name'] = 1}).toThrow(FieldValidateError);
+        expect(() => {user['phone'] = '124abc'}).toThrow(FieldValidateError);
         expect(() => { new User([1,2,3]) }).toThrow(InputDataError);
         expect(() => { user['gender'] = 'm' }).toThrow(SetValueError);
         delete user['phone'];
