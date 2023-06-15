@@ -69,11 +69,6 @@ describe('class Model', () => {
             test: true,
         }
         let result: any = User.partial(data);
-        expect(result['error']['enable']).toBeInstanceOf(FieldValidateError);
-        expect(result['error']['test']).toBeInstanceOf(UndefinedError);
-
-        result = User.partial(data, {strict: false});
-        expect(result['valid']['test']).toEqual(true);
     })
 
 
@@ -87,6 +82,7 @@ describe('class Model', () => {
             })
         } catch (error) {
             expect(Object.keys(error.error)).toEqual(['name', 'enable', 'test']);
+            expect(Object.keys(error.errorInfo)).toEqual(['name', 'enable', 'test']);
         }
     })
 

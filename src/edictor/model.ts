@@ -29,7 +29,7 @@ class ModelError extends Error {
     /** Error object */
     error: Object;
 
-    /** Readable error object */
+    /** Readable error information */
     errorInfo: Object;
 
     /** Set error object */
@@ -179,43 +179,7 @@ export class Model {
         }
     }
 
-    static partial(data: Object, option: ModelOption = {}): Object {
-        this._check_input_data(data);
-
-        /** Isolate received data */
-        data = {...data};
-        option = {...this._option, ...option};
-        const result: ModelValidateResult = {
-            valid: {},
-            invalid: {},
-            error: {}
-        };
-
-        /** Iterate input data object to test */
-        for ( const [key, value] of Object.entries(data) ) {
-            if (!(key in this.field)) {
-                if (option.strict === true) {
-                    result["invalid"][key] = value;
-                    result["error"][key] = new UndefinedError(`Field is undefined.`)
-                } else {
-                    result["valid"][key] = value;
-                }
-                continue;
-            }
-            try {
-                result["valid"][key] = this.field[key].validate(value);
-            } catch (error) {
-                result["invalid"][key] = value;
-                result["error"][key] = error;
-            }
-        }
-        if (Object.keys(result['error']).length > 0) {
-            result['errorMessage'] = 'Partial testing contains errors.';
-        }
-        return result;
-    }
-
-    static validate(data: Object, option: ModelOption = {}): Object {
+    static _test(data: Object, option: ModelOption = {}): Object {
         this._check_input_data(data);
 
         /** Isolate received data */
@@ -251,18 +215,36 @@ export class Model {
         /** If option {strict: true}, add errors as undefined fields */
         if (option.strict === true) {
             for (const key of Object.keys(data)) {
-                result["invalid"][key] = data[key];
                 result["error"][key] = new UndefinedError(`Field is undefined.`);
             }
-        } else { /** If option {strict: false}, add all data left */
+        } else { /** If option {strict: false}, add all data */
             Object.assign(result['valid'], data);
         }
+
+        return result;
+    }
+
+    static partial(data: Object, option: ModelOption = {}): Object {
+        let result: Object;
+        try {
+            result = this.validate(data);
+            return result;
+        } catch (error) {
+            // if Object.keys(data) intersect Object.keys(error.error)
+            // Throw errors.
+            console.log(error);
+        }
+        return result;
+    }
+
+    static validate(data: Object, option: ModelOption = {}): Object {
+        const result = this._test(data);
 
         if (Object.keys(result['error']).length > 0) {
             throw new ModelError().setError(result['error']);
         }
 
-        return result;
+        return result['valid'];
     }
 
     protected _option: ModelOption;
