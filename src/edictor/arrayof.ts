@@ -2,8 +2,7 @@ import {
     is_function,
     is_class,
     assert,
-    Class,
-    TestResult
+    Class
 } from './util';
 
 
@@ -26,6 +25,13 @@ export class ValidationError extends Error {
         super(message);
         this.name = 'ValidationError';
     }
+}
+
+export interface ArrayTestResult {
+    valid: object,
+    invalid: object,
+    error: object,
+    errorMessage?: string
 }
 
 export type ValidatorType = string|Function|Class|any|Array<any>;
@@ -154,10 +160,10 @@ export class ArrayOf extends Array {
         return length;
     }
 
-    test(values, validators=this.validators): TestResult {
+    test(values, validators=this.validators): ArrayTestResult {
         validators = [...validators];
         values = [...values];
-        let testResult: TestResult = {
+        let testResult: ArrayTestResult = {
             "valid": {},
             "invalid": {},
             "error": {}

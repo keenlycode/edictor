@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, SetValueError, PushError } from './arrayof';
+import { ArrayOf, SetValueError, PushError, ArrayTestResult } from './arrayof';
 import { AssertError, assert } from './util';
 import { Model, defineField } from '../edictor';
 
@@ -78,17 +78,7 @@ describe('class ArrayOf', () => {
     })
 
     test('ArrayOf().test()', () => {
-        class TestResult extends Model {};
-        TestResult.define({
-            valid: defineField().instance("object"),
-            invalid: defineField().instance("object"),
-            error: defineField().instance('object'),
-            errorMessage: defineField().instance("string"),
-        })
-
         array = new ArrayOf(['string', 'number']);
-        let result: any = array.test([[1,true]]);
-        result = new TestResult(result);
     })
 
     test('ArrayOf().push()', () => {
