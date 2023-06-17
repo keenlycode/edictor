@@ -238,12 +238,12 @@ export class Model {
         const result = this.test(data);
         const valid_keys = Object.keys(result['valid']);
         const data_keys = Object.keys(data);
-        if (valid_keys.length !== data_keys.length) {
-            throw new PartialError().setError(result['error'])
-        }
+
+        // Throw error if `data_keys` is not a subset of `valid_keys`.
         if (!(data_keys.every((key) => valid_keys.includes(key)))) {
             throw new PartialError().setError(result['error'])
         }
+        
         return result['valid'];
     }
 

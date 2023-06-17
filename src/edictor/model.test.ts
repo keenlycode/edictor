@@ -76,6 +76,8 @@ describe('class Model', () => {
             })
             expect(error_keys_is_correct).toBeTruthy();
         };
+
+        User.partial({enable : true});
     })
 
 
