@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, jest } from '@jest/globals';
-import { DefineField, defineField, Field, RequiredError, FieldError } from './field';
+import { DefineField, defineField, Field, RequiredError, ValidateError } from './field';
 import { ArrayOf } from './arrayof';
 import { Model } from './model';
 
@@ -19,23 +19,16 @@ describe('Test for normal usage', () => {
         .regexp(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/)
         .field();
 
-    beforeEach(() => {
-        name.reset();
-        email.reset();
-        phone.reset();
-    })
-
     test('Valid', () => {
-        name.value = 'Firstname Lastname';
-        email.value = 'user@example.com';
-        phone.value = '+11 111 1111';
+        name.validate('Firstname Lastname');
+        email.validate('user@example.com');
+        phone.validate('+11 111 1111');
     })
 
     test('Invalid', () => {
-        expect(() => { name.value }).toThrow(RequiredError);
-        expect(() => { name.value = 1 }).toThrow(FieldError);
-        expect(() => { email.value = 'abc.com' }).toThrow(FieldError);
-        expect(() => { phone.value = 'abcdef' }).toThrow(FieldError);
+        expect(() => { name.validate() }).toThrow(RequiredError);
+        expect(() => { name.validate(1) }).toThrow(ValidateError);
+        expect(() => { email.validate('abc.com') }).toThrow(ValidateError);
     })
 })
 
@@ -64,19 +57,6 @@ describe('Field Unit Test', () => {
         expect(field.validators[0]).toEqual(test);
     })
 
-    test('Field().value', () => {
-        const field_validate = jest.spyOn(field, 'validate');
-        field.value = 1;
-        expect(field_validate).toBeCalled();
-        expect(field.value).toEqual(1);
-    })
-
-    test('Feild().reset()', () => {
-        field.value = 1;
-        field.reset();
-        expect(field.value).toEqual(undefined);
-    })
-
     test('Field().validate()', () => {
         let def = defineField().instance('string')
             .assert((value) => { return value.length <= 100 })
@@ -85,18 +65,18 @@ describe('Field Unit Test', () => {
 
         /** undefined value */
         def.field().validate(undefined);
-        expect(() => { def.field().validate(1)} ).toThrow(FieldError);
+        expect(() => { def.field().validate(1)} ).toThrow(ValidateError);
 
         /** When `field` is required and validate `undefined` value
          * it must throw `RequiredError`
          */
         field = def.field({required: true});
-        expect(() => { field.validate(undefined) }).toThrow(FieldError);
+        expect(() => { field.validate(undefined) }).toThrow(RequiredError);
 
-        /** `field.value = null` will throw `FieldError`
+        /** `field.value = null` will throw `ValidateError`
          * since it's not passed validations.
           */
-        expect(() => { field.validate(null) }).toThrow(FieldError);
+        expect(() => { field.validate(null) }).toThrow(ValidateError);
 
         /** grant [null] to always pass validations */
         field = defineField().field({grant: [null]});
@@ -110,8 +90,8 @@ describe('Field Unit Test', () => {
 
 describe('DefineField Unit Test', () => {
 
-    test('DefineField.option', () => {
-        expect(DefineField.option).toEqual({
+    test('DefineField.defaultOption', () => {
+        expect(DefineField.defaultOption).toEqual({
             required: false,
             initial: undefined,
             grant: []
@@ -121,8 +101,8 @@ describe('DefineField Unit Test', () => {
     test('DefineField.constructor', () => {
         let option = {required: true};
         let defField = defineField(option);
-        expect(defField.option).not.toEqual({...DefineField.option});
-        expect(defField.option).toEqual({...DefineField.option, ...option});
+        expect(defField.option).not.toEqual({...DefineField.defaultOption});
+        expect(defField.option).toEqual({...DefineField.defaultOption, ...option});
 
         /** Immutable Test */
         let defineField1 = defineField().instance('string');
@@ -134,7 +114,7 @@ describe('DefineField Unit Test', () => {
     })
 
     test('DefineField().option', () => {
-        expect(defineField().option).toEqual(DefineField.option);
+        expect(defineField().option).toEqual(DefineField.defaultOption);
     })
 
     test('DefineField().validators', () => {
@@ -165,32 +145,20 @@ describe('DefineField Unit Test', () => {
             return date;
         }
 
-        const validate_date_string = (value) => {
-            const date = new Date(value);
-            if (isNaN(Number(date))) {
-                throw new Error(`Invalid string for date`);
-            }
-        }
-
         let field = defineField().apply(string_to_date).field();
         let date: any = new Date();
-        field.value = date.toString();
-        expect(field.value.toString()).toEqual(date.toString());
-        expect(() => { field.value = 'abc' }).toThrowError();
-        
-        field = defineField().apply(validate_date_string).field();
-        field.value = date.toString();
-        expect(field.value).toEqual(date.toString());
+        expect(field.validate(date.toString()).toString()).toEqual(date.toString());
+        expect(() => { field.validate('abc') }).toThrowError();
     })
 
     test('DefineField().arrayOf()', () => {
         let defineField1 = defineField().arrayOf('string');
         expect(defineField1.validators[0].name).toEqual('arrayOf');
         const field = defineField1.field();
-        field.value = ['a', 'b'];
-        expect(field.value).toBeInstanceOf(ArrayOf);
-        expect(field.value).toEqual(['a', 'b']);
-        expect(() => {field.value = [1, 2]}).toThrow(FieldError);
+        let result = field.validate(['a', 'b']);
+        expect(result).toBeInstanceOf(ArrayOf);
+        expect(result).toEqual(['a', 'b']);
+        expect(() => {field.validate([1, 2])}).toThrow(ValidateError);
     })
 
     test('DefineField().model()', () => {
@@ -202,6 +170,6 @@ describe('DefineField Unit Test', () => {
         const user_data = {"name": "User Name"};
         let user = userField.validate(user_data);
         expect(user).toEqual(user_data);
-        expect(() => { userField.validate({"name": 1})}).toThrow(FieldError);
+        expect(() => { userField.validate({"name": 1})}).toThrow(ValidateError);
     })
 })

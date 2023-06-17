@@ -5,18 +5,23 @@ import { Class } from './util';
 
 
 /** Error class to show when setting value doesn't pass validation. */
-export class FieldError extends Error {
+export class ValidateError extends Error {
+    errors: Array<Error>;
     name: string;
+
     constructor(message='') {
         super(message);
-        this.name = 'FieldError';
+        this.name = 'ValidateError';
     }
-    errors_to_message(errors) {
+
+    setErrors(errors: Array<Error>): ValidateError {
+        this.errors = errors;
         const errors_ = [];
         for ( const error of errors ) {
             errors_.push(`"${error.message}"`);
         }
-        return `[${errors_}]`;
+        this.message = `[${errors_}]`;
+        return this;
     }
 }
 
@@ -69,15 +74,12 @@ export class Field {
         this._validators = validators;
     }
 
-    protected _option: FieldOption = DefineField.option;
+    protected _option: FieldOption = DefineField.defaultOption;
 
     protected _setOption(option: FieldOption = {}) {
-        option = {...DefineField.option, ...option};
+        option = {...this._option, ...option};
         if (option.initial !== undefined) {
             this.validate(option.initial);
-        }
-        if (this.value === undefined) {
-            this._value = option.initial;
         }
         this._option = option;
     }
@@ -86,80 +88,49 @@ export class Field {
         return this._option;
     }
 
-    protected _value: any;
-
-    /** Set field's value if pass validators */
-    set value(value) {
-        this._value = this.validate(value);
-    }
-
-    /** Get Field's value
-     * - Required field will throw RequiredError if ask for value
-     *   before assigned.
-     */
-    get value() {
-        if ( (this._option.required) && (this._value === undefined) ) {
-            throw new RequiredError(`Field is required`);
-        }
-        return this._value;
-    }
-
-    /** Reset to initial value */
-    reset(): void {
-        this._value = this._option.initial;
-    }
-
-    test(value): FieldTestResult {
+    /** Validate field's value
+     * - Return value if valid.
+     * - Throw errors if invalid.
+    */
+    validate(value: any = undefined): any {
         const errors: Array<Error> = [];
         if (value === undefined) {
             /** Check required constrain. */
-            if (this._option.required) {
-                return {'errors': [new RequiredError(`Field is required`)]}; 
+            if (this.option.required) {
+                throw new RequiredError(`Field is required`); 
             } else { /** Return immediatly to skip validations */
-                return {'value': value};
+                return value;
             }
         }
 
         /** Check with grant values to skip validations */
         if (this._option.grant.includes(value)) {
-            return {'value': value};
+            return value;
         }
 
         /** Validate and assign return value if undefined */
         for (const validator of this.validators) {
             try {
                 const value_ = validator(value);
-                if (value_) { value = value_ };
+                if (value_) {
+                    // Set value for next validator.
+                    value = value_;
+                }
             } catch (error) {
                 errors.push(error);
             }
         }
-
-        if (errors.length == 0) {
-            return {'value': value}
-        } else {
-            return {'errors': errors}
-        };
-    }
-
-    /** Validate field's value
-     * - Return value if valid.
-     */
-    validate(value): any {
-        const fieldTestResult: FieldTestResult = this.test(value);
-        if ('errors' in fieldTestResult) {
-            const fieldError = new FieldError();
-            fieldError.message = fieldError.errors_to_message(fieldTestResult['errors']);
-            throw fieldError;
+        if (errors.length > 0) {
+            throw new ValidateError().setErrors(errors);
         }
-        return fieldTestResult['value'];
+        return value;
     }
 }
 
 
 export class DefineField {
 
-    static option: FieldOption = {
+    static defaultOption: FieldOption = {
         required: false,
         initial: undefined,
         grant: []
@@ -173,7 +144,7 @@ export class DefineField {
         this._validators = [...validators];
     }
 
-    protected _option: FieldOption = DefineField.option;
+    protected _option: FieldOption = DefineField.defaultOption;
 
     protected _setOption(option: FieldOption) {
         this._option = {...this._option, ...option};
