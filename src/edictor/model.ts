@@ -1,7 +1,8 @@
 import {
     Field,
     DefineField,
-    ValidateError as FieldValidateError } from './field';
+    ValidateError as FieldValidateError
+} from './field';
 
 class ModelError extends Error {
 
@@ -50,6 +51,13 @@ export class DefineError extends ModelError {
     }
 }
 
+export class PartialError extends ModelError {
+    constructor(message='') {
+        super(message);
+        this.name = 'PartialError';
+    }
+}
+
 export class ValidateError extends ModelError {
     constructor(message='') {
         super(message);
@@ -63,7 +71,6 @@ export class InitError extends ModelError {
         this.name = 'InitError';
     }
 }
-
 
 export class UpdateError extends ModelError {
     constructor(message='') {
@@ -97,7 +104,7 @@ interface ModelOption {
     strict?: boolean
 }
 
-interface ModelValidateResult {
+interface ModelTestResult {
     valid?: object,
     invalid?: object,
     error?: object,
@@ -105,7 +112,7 @@ interface ModelValidateResult {
 }
 
 
-export class Model {
+export class Model extends Object {
     protected static _define = {};
     static _definedClass = 'Model';
     static _option: ModelOption = {strict: true};
@@ -118,12 +125,15 @@ export class Model {
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
 
+        console.log(superClass.name);
         if (superClass.name === '') {
-            throw new DefineError(`Model.define() is prohibited. `
-            + `It must be called from a subclass`);
+            throw new DefineError(
+                `Model.define() is prohibited. `
+                + `It must be called from a subclass`
+            );
         }
 
-        const result: ModelValidateResult = {
+        const result: ModelTestResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -179,13 +189,13 @@ export class Model {
         }
     }
 
-    static _test(data: Object, option: ModelOption = {}): Object {
+    static test(data: Object, option: ModelOption = {}): Object {
         this._check_input_data(data);
 
         /** Isolate received data */
         data = {...data};
         option = {...this._option, ...option};
-        const result: ModelValidateResult = {
+        const result: ModelTestResult = {
             valid: {},
             invalid: {},
             error: {}
@@ -225,23 +235,23 @@ export class Model {
     }
 
     static partial(data: Object, option: ModelOption = {}): Object {
-        let result: Object;
-        try {
-            result = this.validate(data);
-            return result;
-        } catch (error) {
-            // if Object.keys(data) intersect Object.keys(error.error)
-            // Throw errors.
-            console.log(error);
+        const result = this.test(data);
+        const valid_keys = Object.keys(result['valid']);
+        const data_keys = Object.keys(data);
+        if (valid_keys.length !== data_keys.length) {
+            throw new PartialError().setError(result['error'])
         }
-        return result;
+        if (!(data_keys.every((key) => valid_keys.includes(key)))) {
+            throw new PartialError().setError(result['error'])
+        }
+        return result['valid'];
     }
 
     static validate(data: Object, option: ModelOption = {}): Object {
-        const result = this._test(data);
+        const result = this.test(data, option);
 
         if (Object.keys(result['error']).length > 0) {
-            throw new ModelError().setError(result['error']);
+            throw new ValidateError().setError(result['error']);
         }
 
         return result['valid'];
@@ -250,6 +260,7 @@ export class Model {
     protected _option: ModelOption;
 
     constructor(data: Object = {}, option: ModelOption = {}) {
+        super();
         const _class = this.constructor as typeof Model;
         option = {..._class._option, ...option};
         this._option = option;
@@ -257,12 +268,10 @@ export class Model {
         try {
             data = _class.validate(data, option);
         } catch (error) {
-            if (error.name === "InputDataError") {
-                throw error;
+            if (error instanceof ModelError) {
+                throw new InitError().setError(error);
             }
-            const result = JSON.parse(error.message);
-            result["errorMessage"] = `new ${this}() throws errors.`
-            throw new InitError(JSON.stringify(result));
+            throw error;
         }
 
         Object.assign(this, data);
@@ -284,7 +293,14 @@ export class Model {
                     }
                 }
                 /** Validate value => Throw FieldValidateError is invalid */
-                value = field.validate(value);
+                try {
+                    value = field.validate(value);
+                } catch (error) {
+                    if (error instanceof FieldValidateError) {
+                        throw new SetValueError(`\`[${key}] = ${value}\` is invalid`);
+                    }
+                    throw error;
+                }
                 return Reflect.set(target, key, value);
             },
             deleteProperty: (target, key): boolean => {
@@ -318,9 +334,9 @@ export class Model {
         try {
             new class_({ ...this.object(), ...data });
         } catch (error) {
-            const validationResult = JSON.parse(error.message);
-            validationResult["errorMessage"] = `${this.constructor.name}().update(data)\n throw errors`;
-            throw new UpdateError(JSON.stringify(validationResult));
+            if (error instanceof ModelError) {
+                throw new UpdateError().setError(error.error);
+            }
         }
         for (const key in data) {
             this[key] = data[key];
