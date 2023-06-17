@@ -4,6 +4,8 @@ import {
     ValidateError as FieldValidateError
 } from './field';
 
+import { Class } from './util';
+
 class ModelError extends Error {
 
     /** return readable error object */
@@ -112,26 +114,24 @@ interface ModelTestResult {
 }
 
 
-export class Model extends Object {
+export class Model {
     protected static _define = {};
-    static _definedClass = 'Model';
+    static _definedClass: string;
     static _option: ModelOption = {strict: true};
 
     static define(model: Object = {}, option: ModelOption = {}): typeof Model {
-        if (this._definedClass === this.name) {
-            throw new DefineError(`${this} has been defined.`);
-        }
         const superClass = Object.getPrototypeOf(this);
-        this._option = {...superClass._option, ...option};
-        this._define = {...superClass._define};
-
-        console.log(superClass.name);
         if (superClass.name === '') {
             throw new DefineError(
                 `Model.define() is prohibited. `
                 + `It must be called from a subclass`
             );
         }
+        if (this._definedClass === this.name) {
+            throw new DefineError(`${this} has been defined.`);
+        }
+        this._option = {...superClass._option, ...option};
+        this._define = {...superClass._define};
 
         const result: ModelTestResult = {
             valid: {},
@@ -260,7 +260,6 @@ export class Model extends Object {
     protected _option: ModelOption;
 
     constructor(data: Object = {}, option: ModelOption = {}) {
-        super();
         const _class = this.constructor as typeof Model;
         option = {..._class._option, ...option};
         this._option = option;

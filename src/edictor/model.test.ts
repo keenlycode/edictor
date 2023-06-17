@@ -24,41 +24,40 @@ describe('class Model', () => {
         enable: defineField({initial: false}).instance('boolean')
     });
 
-    test.only('Model.define()', () => {
+    test('Model.define()', () => {
         try {
-            continue test this line
             Model.define()
         } catch (error) {
             expect(error).toBeInstanceOf(DefineError);
         }
 
-        // expect(Object.keys(User.field)).toEqual(['name', 'phone', 'enable']);
-        // expect(User.field['name'] instanceof Field);
-        // expect(User.field['name'].name).toEqual('name');
+        expect(Object.keys(User.field)).toEqual(['name', 'phone', 'enable']);
+        expect(User.field['name'] instanceof Field);
+        expect(User.field['name'].name).toEqual('name');
 
-        // expect(() => { User.define({}) }).toThrow(DefineError);
+        expect(() => { User.define({}) }).toThrow(DefineError);
 
-        // class Test extends Model {};
+        class Test extends Model {};
 
-        // try {
-        //     Test.define({'property': 1})
-        // } catch (error) {
-        //     expect(error).toBeInstanceOf(DefineError);
-        //     /** Test that error.message is a valid JSON */
-        //     JSON.parse(error.message);
-        // }
+        try {
+            Test.define({'property': 1})
+        } catch (error) {
+            expect(error).toBeInstanceOf(DefineError);
+            /** Test that error.message is a valid JSON */
+            JSON.parse(error.message);
+        }
 
-        // class ModelDefineError extends Model {};
+        class ModelDefineError extends Model {};
 
-        // try {
-        //     ModelDefineError.define({
-        //         name: defineField({initial: 1}).instance('string')
-        //     })
-        // } catch (error) {
-        //     expect(error).toBeInstanceOf(DefineError);
-        //     /** Test that error.message is a valid JSON */
-        //     JSON.parse(error.message);
-        // }
+        try {
+            ModelDefineError.define({
+                name: defineField({initial: 1}).instance('string')
+            })
+        } catch (error) {
+            expect(error).toBeInstanceOf(DefineError);
+            /** Test that error.message is a valid JSON */
+            JSON.parse(error.message);
+        }
     })
 
     test('Model.partial()', () => {
