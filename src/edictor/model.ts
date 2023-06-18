@@ -235,7 +235,7 @@ export class Model {
     }
 
     static partial(data: Object, option: ModelOption = {}): Object {
-        const result = this.test(data);
+        const result = this.test(data, option);
         const valid_keys = Object.keys(result['valid']);
         const data_keys = Object.keys(data);
 
