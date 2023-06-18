@@ -43,8 +43,6 @@ describe('class Model', () => {
             Test.define({'property': 1})
         } catch (error) {
             expect(error).toBeInstanceOf(DefineError);
-            /** Test that error.message is a valid JSON */
-            JSON.parse(error.message);
         }
 
         class ModelDefineError extends Model {};
@@ -55,8 +53,6 @@ describe('class Model', () => {
             })
         } catch (error) {
             expect(error).toBeInstanceOf(DefineError);
-            /** Test that error.message is a valid JSON */
-            JSON.parse(error.message);
         }
     })
 

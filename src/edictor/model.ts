@@ -4,8 +4,6 @@ import {
     ValidateError as FieldValidateError
 } from './field';
 
-import { Class } from './util';
-
 class ModelError extends Error {
 
     /** return readable error object */
@@ -47,7 +45,7 @@ class ModelError extends Error {
 }
 
 export class DefineError extends ModelError {
-    constructor(message='') {
+    constructor(message='Model definition contains error') {
         super(message);
         this.name = 'DefineError';
     }
@@ -78,6 +76,13 @@ export class UpdateError extends ModelError {
     constructor(message='') {
         super(message);
         this.name = 'UpdateError';
+    }
+}
+
+export class DefineFieldError extends Error {
+    constructor(message='') {
+        super(message);
+        this.name = 'DefineFieldError';
     }
 }
 
@@ -133,11 +138,7 @@ export class Model {
         this._option = {...superClass._option, ...option};
         this._define = {...superClass._define};
 
-        const result: ModelTestResult = {
-            valid: {},
-            invalid: {},
-            error: {}
-        };
+        const error = {};
 
         for (let [key, defineField] of Object.entries(model)) {
 
@@ -148,26 +149,26 @@ export class Model {
                 field = defineField.field();
                 if (field.name === undefined) { field.name = key };
             } else {
-                result["error"][key] = 'Assigned value is not an instance of DefineField'
+                error[key] = new DefineFieldError(
+                    `Assigned value is not an instance of DefineField`
+                )
                 continue;
             }
 
-            if (field.option.initial === undefined) {
-                result["valid"][key] = defineField;
-            } else if (field.option.initial !== undefined) {
+            if (field.option.initial !== undefined) {
                 try {
                     field.validate(field.option.initial);
-                    result["valid"][key] = defineField;
                 } catch (e) {
-                    result["error"][key] = `Field({initial: ${field.option.initial}})`
-                    + ` conflicts with Field's validation => ${e}`
+                    error[key] = new DefineFieldError(
+                        `Field({initial: ${field.option.initial}})`
+                        + ` conflicts with Field's validation`
+                    )
                 }
             }
             model[key] = field;
         }
-        if (Object.keys(result["error"]).length > 0) {
-            result["errorMessage"] = `${this.name}.define() throw errors`;
-            throw new DefineError(JSON.stringify(result));
+        if (Object.keys(error).length > 0) {
+            throw new DefineError().setError(error);
         }
         this._define = {...this._define, ...model};
         this._definedClass = this.name;
