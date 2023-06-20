@@ -119,27 +119,28 @@ export const apply = (func: Function): any => {
 /** Check if value is array of something. */
 export const arrayOf = (
         ...validators: Array<ValidatorType|DefineField|Model>
-    ) : (values) => ArrayOf => {
+    ) => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
             values,
             validators: Array<ValidatorType|DefineField|Model>
-        ): ArrayOf => {
+        ) => {
         if (!(values instanceof Array)) {
             throw new ValidationError(`${values} is not iterable`);
         };
         const array = new ArrayOf(...validators);
         array.push(...values);
-        return array;
+        // return array;
     }
 
-    return function arrayOf (values=[]): ArrayOf { return wrapper(values, validators) };
+    return function arrayOf(values=[]) { return wrapper(values, validators) };
 }
 
 /** Validate that value pass `model_class` validation */
 export const model = (model_class: typeof Model) => {
-    const wrapper = (value, model_class: typeof Model): Model => {
-        return new model_class(value);
+    const wrapper = (value, model_class: typeof Model) => {
+        model_class.validate(value);
+        // return new model_class(value);
     }
-    return (value) => { return wrapper(value, model_class) };
+    return function model(value) { return wrapper(value, model_class) };
 }
