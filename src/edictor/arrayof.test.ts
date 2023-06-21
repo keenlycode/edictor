@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
-import { ArrayOf, SetValueError, PushError, ArrayTestResult, ValidationError } from './arrayof';
+import {
+    ArrayOf,
+    SetValueError,
+    PushError,
+    SetError,
+    ValidationError
+} from './arrayof';
 import { AssertError, assert } from './util';
-import { Model, defineField } from '../edictor';
 
 describe('class ArrayOf', () => {
     let validators: any;
@@ -41,7 +46,6 @@ describe('class ArrayOf', () => {
 
     test('ArrayOf()._validate_value_with_validators()', () => {
         array = new ArrayOf();
-        console.log(array.validators)
         array._validate_value_with_validators(1, []);
         expect(() => {
             array._validate_value_with_validators(true, ['string', 'number'])
@@ -80,6 +84,15 @@ describe('class ArrayOf', () => {
 
     test('ArrayOf().test()', () => {
         array = new ArrayOf(['string', 'number']);
+    })
+
+    test('ArrayOf().set()', () => {
+        array.set(1,2);
+        try {
+            array.set(true);
+        } catch (error) {
+            expect(error).toBeInstanceOf(SetError);
+        }
     })
 
     test('ArrayOf().push()', () => {
