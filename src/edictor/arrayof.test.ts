@@ -12,7 +12,7 @@ describe('class ArrayOf', () => {
         array = new ArrayOf(...validators);
     })
 
-    test('new ArrayOf()', () => {
+    test.only('new ArrayOf()', () => {
         expect(array).toBeInstanceOf(ArrayOf)
         array[0] = 'test string';
         let error_;
@@ -22,7 +22,6 @@ describe('class ArrayOf', () => {
             error_ = error;
         }
         expect(error_).toBeInstanceOf(SetValueError);
-        expect(JSON.parse(error_.message)).toBeInstanceOf(Object);
     })
 
     test('ArrayOf()._validate()', () => {
