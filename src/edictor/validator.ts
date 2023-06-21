@@ -129,7 +129,7 @@ export const arrayOf = (
             throw new ValidationError(`${values} is not iterable`);
         };
         const array = new ArrayOf(...validators);
-        array.push(...values);
+        array.set(...values);
         // return array;
     }
 

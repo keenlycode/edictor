@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, test } from '@jest/globals';
 import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from './validator';
-import { ArrayOf } from './validator';
 import { Model, InitError } from './model';
 import { defineField } from './field';
-import { SetValueError, PushError } from './arrayof';
+import { SetError } from './arrayof';
 
 
 test('instance', () => {
@@ -59,7 +58,7 @@ test.only('arrayOf()', () => {
     const numberDef = defineField({name: 'number'}).instance('number');
     arrayDef = arrayOf(numberDef);
     arrayDef([1,2]);
-    expect(() => {arrayDef([true])}).toThrow(SetValueError);
+    expect(() => {arrayDef([true])}).toThrow(SetError);
 
     /** Move tests below to array.test.ts */
 

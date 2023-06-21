@@ -98,6 +98,9 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string, value, receiver): boolean {
+                if (key === "length") {
+                    return Reflect.set(target, key, receiver);
+                }
                 try {
                     target._validate_value_with_validators(value);
                 } catch (error) {
