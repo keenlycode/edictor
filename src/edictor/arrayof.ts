@@ -128,25 +128,24 @@ export class ArrayOf extends Array {
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator,
                 `${value} => must be instance of ${validator}`);
-            return value;
+            return;
         }
 
         if (validator instanceof Array) {
             assert(value instanceof Array,
                 `value must be instance of Array`)
             const array = new ArrayOf(...validator);
-            array.push(...value);
-            return array;
+            array.set(...value);
+            return;
         }
         // If validator is a Function
         if (is_function(validator)) {
             validator(value);
-            return value;
         }
         // If validator is a Class
         if (is_class(validator)) {
             assert(value instanceof validator);
-            return value;
+            return;
         }
     }
 
@@ -205,8 +204,8 @@ export class ArrayOf extends Array {
         return length;
     }
 
-    test(values, validators=this.validators): ArrayTestResult {
-        validators = [...validators];
+    test(values): ArrayTestResult {
+        const validators = [...this.validators];
         values = [...values];
         let testResult: ArrayTestResult = {
             "valid": {},
@@ -215,11 +214,8 @@ export class ArrayOf extends Array {
         };
         for (const i in values) {
             try {
-                const result = this._validate_value_with_validators(
-                    values[i], validators);
-                if (result !== undefined) {
-                    testResult['valid'][i] = result;
-                }
+                this._validate_value_with_validators(values[i], validators);
+                testResult['valid'][i] = values[i];
             } catch (error) {
                 testResult['invalid'][i] = values[i];
                 testResult['error'][i] = error;

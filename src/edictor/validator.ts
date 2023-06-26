@@ -22,23 +22,23 @@ export class ArrayOf extends _ArrayOf {
         super(...validators);
     }
 
-    _validate(value: any, validator: any): void|ArrayOf {
+    _validate(value: any, validator: any) {
         if (validator instanceof DefineField) {
             validator = validator.field();
             validator.validate(value);
-            return value;
+            return;
         }
         if (validator.prototype instanceof Model) {
-            new validator(value);
-            return value;
+            validator.validate(value);
+            return;
         }
-        if (validator instanceof Array) {
-            util.assert(value instanceof Array,
-                `value must be instance of Array`)
-            const array = new ArrayOf(...validator);
-            array.push(...value);
-            return array;
-        }
+        // if (validator instanceof Array) {
+        //     util.assert(value instanceof Array,
+        //         `value must be instance of Array`)
+        //     const array = new ArrayOf(...validator);
+        //     array.push(...value);
+        //     return array;
+        // }
         return super._validate(value, validator);
     }
 
@@ -130,7 +130,6 @@ export const arrayOf = (
         };
         const array = new ArrayOf(...validators);
         array.set(...values);
-        // return array;
     }
 
     return function arrayOf(values=[]) { return wrapper(values, validators) };
@@ -140,7 +139,6 @@ export const arrayOf = (
 export const model = (model_class: typeof Model) => {
     const wrapper = (value, model_class: typeof Model) => {
         model_class.validate(value);
-        // return new model_class(value);
     }
     return function model(value) { return wrapper(value, model_class) };
 }

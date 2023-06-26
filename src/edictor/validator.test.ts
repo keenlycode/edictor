@@ -1,6 +1,14 @@
-import { beforeEach, describe, expect, test } from '@jest/globals';
-import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from './validator';
-import { Model, InitError } from './model';
+import { expect, test } from '@jest/globals';
+import {
+    instance,
+    assert,
+    apply,
+    regexp,
+    arrayOf,
+    model,
+    ValidationError
+} from './validator';
+import { Model, ValidateError } from './model';
 import { defineField } from './field';
 import { SetError } from './arrayof';
 
@@ -47,7 +55,7 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test.only('arrayOf()', () => {
+test('arrayOf()', () => {
     let arrayDef;
     const values = ['a', 'b', true];
     arrayDef = arrayOf('string', 'boolean');
@@ -96,8 +104,8 @@ test('model()', () => {
     User.define({
         'name': defineField().instance('string')
     })
-    const userModel = model(User);
+    const userValidator = model(User);
     const user_data = {"name": "User Name"};
-    let user = userModel(user_data);
-    expect(() => { user = userModel({"name": 1}) }).toThrow(InitError);
+    let user = userValidator(user_data);
+    expect(() => { user = userValidator({"name": 1}) }).toThrow(ValidateError);
 });

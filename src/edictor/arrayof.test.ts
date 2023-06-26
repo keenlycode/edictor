@@ -31,16 +31,16 @@ describe('class ArrayOf', () => {
     test('ArrayOf()._validate()', () => {
         let validator: any = ['string', 'boolean'];
         array = new ArrayOf();
-        expect(array._validate([true, 'a'], validator)).toEqual([true, 'a']);
-        expect(() => array._validate([1, 'a'], validator)).toThrow(PushError);
+        array._validate([true, 'a'], validator);
+        expect(() => array._validate([1, 'a'], validator)).toThrow(SetError);
 
         validator = (value) => { assert(value <= 100) };
-        expect(array._validate(100, validator)).toEqual(100);
+        array._validate(100, validator);
 
         class Test {};
         const test = new Test();
         validator = Array;
-        expect(array._validate(test, Test)).toEqual(test);
+        array._validate(test, Test);
         expect(() => array._validate('a', Test)).toThrow(AssertError);
     })
 
