@@ -170,21 +170,21 @@ export class ArrayOf extends Array {
         }
         
         throw new ValidationError(
-            `Expect (${this.validators_to_names(validators)})`
+            `Expect (${this.validators_to_string(validators)})`
         )
     }
 
-    validators_to_names(validators=this.validators) {
+    validators_to_string(validators=this.validators): string {
         validators = [...validators];
         const names = validators.map((validator)  => {
-            return this.validator_to_name(validator);
+            return this.validator_to_string(validator);
         })
-        return names;
+        return `[${names}]`;
     }
 
-    validator_to_name(validator: ValidatorType) {
+    validator_to_string(validator: ValidatorType): string {
         if (validator instanceof Array) {
-            return this.validators_to_names(validator);
+            return `${this.validators_to_string(validator)}`;
         }
         if (is_function(validator)) {
             return `${(validator as Function).name}()`;
@@ -192,7 +192,9 @@ export class ArrayOf extends Array {
         if (is_class(validator)) {
             return (validator as Class).name;
         }
-        return validator;
+        if (typeof(validator) === "string") {
+            return `"${validator}"`;
+        }
     }
 
     _push_skip_proxy(...values): number {
