@@ -245,7 +245,8 @@ export class ArrayOf extends Array {
 
     /** Return a new native object with same data */
     object(): Array<any> {
-        return JSON.parse(JSON.stringify(this));
+        const object = [...this];
+        return object;
     }
 
     /** Return JSON */

@@ -104,10 +104,11 @@ describe('class ArrayOf', () => {
         }
     })
     
-    test('ArrayOf().object()', () => {
+    test.only('ArrayOf().object()', () => {
         const values = ['a', 'b', 0, 1];
         array = new ArrayOf('string', 'number');
-        array.push(...values);
+        array.set(...values);
+        console.log(array.object());
 
         expect(array.object()).toEqual(values);
     
