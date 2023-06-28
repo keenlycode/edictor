@@ -6,17 +6,17 @@
 
 <el-title-code>Javascript / ES6+</el-title-code>
 ```js
-/** Schema Test */
-const result = Package.test({
+/** Schema validation */
+Package.validate({
     'name': 'edictor',
     'version': '0.4.0',
     'homepage': 'https://nitipit.github.io/edictor/'
 })
 
 /** Atomic Instance */
-const package = new Package({
+const pk = new Package({
     'name': 'edictor', // Required field
 })
 
-package['version'] = '0.4.0';
+pk['version'] = '0.4.0';
 ```

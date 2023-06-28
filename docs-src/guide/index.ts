@@ -51,3 +51,36 @@ window.Model = Model;
 window.defineField = defineField;
 window.Package = Package;
 window.People = People;
+
+/** Schema validation */
+Package.validate({
+    'name': 'edictor',
+    'version': '0.4.0',
+    'homepage': 'https://nitipit.github.io/edictor/'
+})
+
+/** Atomic Instance */
+const pk = new Package({
+    'name': 'edictor',
+    'version': '0.5.0'
+})
+
+pk['version'] = '0.5.1';
+
+/** Validations */
+
+// Data is valid
+Package.validate({
+    name: 'test-package',
+    version: '0.0.1'
+})
+
+// Data is invalid, throw errors.
+try {
+    Package.validate({
+        version: '0.4.0',
+        homepage: 'https://nitipit.github.io/edictor/'
+    })
+} catch (error) {
+    // console.error(error);
+};
