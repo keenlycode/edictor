@@ -55,7 +55,7 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test.only('arrayOf()', () => {
+test('arrayOf()', () => {
     let arrayDef;
     arrayDef = arrayOf('string', 'boolean');
     arrayDef(['a', 'b', true]);
@@ -74,8 +74,14 @@ test.only('arrayOf()', () => {
     })
     arrayDef = arrayOf(User);
     const user1 = new User({name: 'user-1'});
-    const user2 = new User({name: 'user-2'});
+    const user2 = {'name': 'user-2'};
     arrayDef([user1, user2]);
+    try {
+        arrayDef([user1, user2, 'user']);
+    } catch (error) {
+        // console.error(error.errorInfo);
+        expect(Object.keys(error.errorInfo)).toEqual(['2']);
+    }
 
 });
 
