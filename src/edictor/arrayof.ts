@@ -5,18 +5,65 @@ import {
     Class
 } from './util';
 
+export class ErrorObject extends Error {
+    /** return readable error object */
+    static errorInfo(error): Object {
+        const errorInfo = {};
+        for (const [key, value] of Object.entries(error)) {
+            if (value instanceof ErrorObject) {
+                errorInfo[key] = this.errorInfo(value);
+                continue;
+            }
+            if (value instanceof Error) {
+                errorInfo[key] = `${value.name}(${value.message})`
+                continue;
+            };
+        }
+        return errorInfo;
+    }
+
+    constructor(message='Object contains errors') {
+        super(message);
+        this.name = 'ErrorObject';
+    }
+
+    /** Error object */
+    error: Object;
+
+    /** Readable error information */
+    errorInfo: Object;
+
+    /** Set error object */
+    setError(error: Object): ErrorObject {
+        this.error = error;
+        this.errorInfo = ErrorObject.errorInfo(error);
+        this.message += '\nYou can catch `error` then inspect' +
+            ' `error.error` or `error.errorInfo` for more detail';
+        this.message += "\n" + JSON.stringify(this.errorInfo, null, 4);
+        return this;
+    }
+}
+
+
+export class SetError extends ErrorObject {
+    constructor(message='') {
+        super(message);
+        this.name = 'SetError';
+    }
+}
+
+export class PushError extends ErrorObject {
+    constructor(message='') {
+        super(message);
+        this.name = 'PushError';
+    }
+}
+
 
 export class SetValueError extends Error {
     constructor(message='') {
         super(message);
         this.name = 'SetValueError';
-    }
-}
-
-export class PushError extends Error {
-    constructor(message='') {
-        super(message);
-        this.name = 'PushError';
     }
 }
 
@@ -28,10 +75,9 @@ export class ValidationError extends Error {
 }
 
 export interface ArrayTestResult {
-    valid: object,
-    invalid: object,
-    error: object,
-    errorMessage?: string
+    valid?: object,
+    invalid?: object,
+    error?: object
 }
 
 export type ValidatorType = string|Function|Class|any|Array<any>;
@@ -52,17 +98,15 @@ export class ArrayOf extends Array {
                 return Reflect.get(target, key, receiver);
             },
             set(target, key: string, value, receiver): boolean {
-                const result = target._validate_value_with_validators(value);
-                if ("value" in result) {
-                    value = result["value"];
-                    return Reflect.set(target, key, value, receiver);
-                } else if ("error" in result) {
-                    const errorMessage = {
-                        errorMessage: `${result["error"]}`,
-                        error: {[key]: value}
-                    }
-                    throw new SetValueError(JSON.stringify(errorMessage));
+                if (key === "length") {
+                    return Reflect.set(target, key, receiver);
                 }
+                try {
+                    target._validate_value_with_validators(value);
+                } catch (error) {
+                    throw new SetValueError(`{${key}: ${error}}`)
+                }
+                return Reflect.set(target, key, receiver);
             },
             ownKeys(target) {
                 /**
@@ -84,25 +128,24 @@ export class ArrayOf extends Array {
         if (typeof(validator) === "string") {
             assert(typeof(value) === validator,
                 `${value} => must be instance of ${validator}`);
-            return value;
+            return;
         }
 
         if (validator instanceof Array) {
             assert(value instanceof Array,
                 `value must be instance of Array`)
             const array = new ArrayOf(...validator);
-            array.push(...value);
-            return array;
+            array.set(...value);
+            return;
         }
         // If validator is a Function
         if (is_function(validator)) {
             validator(value);
-            return value;
         }
         // If validator is a Class
         if (is_class(validator)) {
             assert(value instanceof validator);
-            return value;
+            return;
         }
     }
 
@@ -123,24 +166,25 @@ export class ArrayOf extends Array {
             } catch {};
         }
         if (value_pass_once) {
-            return {"value": value_};
+            return value_
         }
-        return {"error": new ValidationError(
-            `Expect (${this.validators_to_names(validators)})`
-        )}
+        
+        throw new ValidationError(
+            `Expect ArrayOf(${this.validators_to_string(validators)})`
+        )
     }
 
-    validators_to_names(validators=this.validators) {
+    validators_to_string(validators=this.validators): string {
         validators = [...validators];
         const names = validators.map((validator)  => {
-            return this.validator_to_name(validator);
+            return this.validator_to_string(validator);
         })
-        return names;
+        return `${names}`;
     }
 
-    validator_to_name(validator: ValidatorType) {
+    validator_to_string(validator: ValidatorType): string {
         if (validator instanceof Array) {
-            return this.validators_to_names(validator);
+            return `[${this.validators_to_string(validator)}]`;
         }
         if (is_function(validator)) {
             return `${(validator as Function).name}()`;
@@ -148,7 +192,9 @@ export class ArrayOf extends Array {
         if (is_class(validator)) {
             return (validator as Class).name;
         }
-        return validator;
+        if (typeof(validator) === "string") {
+            return `"${validator}"`;
+        }
     }
 
     _push_skip_proxy(...values): number {
@@ -160,8 +206,8 @@ export class ArrayOf extends Array {
         return length;
     }
 
-    test(values, validators=this.validators): ArrayTestResult {
-        validators = [...validators];
+    test(values): ArrayTestResult {
+        const validators = [...this.validators];
         values = [...values];
         let testResult: ArrayTestResult = {
             "valid": {},
@@ -169,38 +215,40 @@ export class ArrayOf extends Array {
             "error": {}
         };
         for (const i in values) {
-            let result = this._validate_value_with_validators(
-                values[i], validators);
-            if ("value" in result) {
-                testResult['valid'][i] = result["value"];
-            } else if ("error" in result) {
+            try {
+                this._validate_value_with_validators(values[i], validators);
+                testResult['valid'][i] = values[i];
+            } catch (error) {
                 testResult['invalid'][i] = values[i];
-                testResult['error'][i] = result["error"];
+                testResult['error'][i] = error;
             }
         }
-        if (Object.keys(testResult['error']).length > 0) {
-            testResult['errorMessage'] = `ArrayOf Test Error: Expect (${this.validators_to_names().toString()})`;
-        }
         return testResult;
+    }
+
+    set(...values) {
+        values = [...values];
+        const result = this.test(values);
+        if (Object.keys(result["error"]).length > 0) {
+            throw new SetError().setError(result['error']);
+        }
+        this.length = 0;
+        this._push_skip_proxy(...Object.values(result["valid"])); 
     }
 
     push(...values): number {
         values = [...values];
         const result = this.test(values);
-        if (Object.keys(result["invalid"]).length > 0) {
-            const errorMessage = {
-                "errorMessage": result["test"],
-                "valid": result["valid"],
-                "invalid": result["invalid"]
-            }
-            throw new PushError(JSON.stringify(errorMessage));
+        if (Object.keys(result["error"]).length > 0) {
+            throw new PushError().setError(result['error']);
         }
         return this._push_skip_proxy(...Object.values(result["valid"]));
     }
 
     /** Return a new native object with same data */
     object(): Array<any> {
-        return JSON.parse(JSON.stringify(this));
+        const object = [...this];
+        return object;
     }
 
     /** Return JSON */

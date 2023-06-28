@@ -1,7 +1,7 @@
 // tsconfig.json for tsc compile.
 {
     "compilerOptions": {
-        "lib": ["es2017"],
+        "lib": ["es2021"],
         "esModuleInterop": true,
         "target": "es6",
         "module": "es6",

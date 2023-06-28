@@ -1,9 +1,16 @@
-import { beforeEach, describe, expect, test } from '@jest/globals';
-import { instance, assert, apply, regexp, arrayOf, model, ValidationError } from './validator';
-import { ArrayOf } from './validator';
-import { Model, InitError } from './model';
+import { expect, test } from '@jest/globals';
+import {
+    instance,
+    assert,
+    apply,
+    regexp,
+    arrayOf,
+    model,
+    ValidationError
+} from './validator';
+import { Model, ValidateError } from './model';
 import { defineField } from './field';
-import { SetValueError, PushError } from './arrayof';
+import { SetError } from './arrayof';
 
 
 test('instance', () => {
@@ -49,53 +56,33 @@ test('regexp', () => {
 })
 
 test('arrayOf()', () => {
-    let array;
-    const values = ['a', 'b', true];
-    array = arrayOf('string', 'boolean');
-    expect(() => array(1)).toThrow(ValidationError);
-    array = array(values);
-    expect(array).toBeInstanceOf(ArrayOf);
-    expect(array).toEqual(values);
-    expect(() => array.push(1)).toThrow(PushError);
+    let arrayDef;
+    arrayDef = arrayOf('string', 'boolean');
+    arrayDef(['a', 'b', true]);
+    expect(() => arrayDef(1)).toThrow(ValidationError);
 
     /** Test with defineField() */
     const numberDef = defineField({name: 'number'}).instance('number');
-    array = arrayOf(numberDef);
-    array = array();
-    array[0] = 1;
-    array.push(2);
-    expect(array).toEqual([1,2]);
-    expect(() => {array[0] = true}).toThrow(SetValueError);
-    expect(() => array.push(true)).toThrow(PushError);
-    expect(array).toEqual([1,2]);
+    arrayDef = arrayOf(numberDef);
+    arrayDef([1,2]);
+    expect(() => {arrayDef([true])}).toThrow(SetError);
 
-    /** Test recursive array */
-    array = arrayOf([numberDef]);
-    array = array();
-    array[0] = [1];
-    array[0].push(2);
-    expect(array).toEqual([[1,2]]);
-    expect(() => array[0].push([true])).toThrow(PushError);
- 
-    /** Test with Model() */
+    /** Test with Model */
     class User extends Model {};
     User.define({
         'name': defineField().instance('string')
     })
-    const user_data = {"name": "User Name"};
-    array = arrayOf(User);
-    let user = new User(user_data);
-    array = array([user]);
-    expect(array[0].object()).toEqual(user.object());
+    arrayDef = arrayOf(User);
+    const user1 = new User({name: 'user-1'});
+    const user2 = {'name': 'user-2'};
+    arrayDef([user1, user2]);
+    try {
+        arrayDef([user1, user2, 'user']);
+    } catch (error) {
+        // console.error(error.errorInfo);
+        expect(Object.keys(error.errorInfo)).toEqual(['2']);
+    }
 
-    /** Test with Model() by native object */
-    array[0] = user_data;
-    expect(array[0]).toEqual(user_data);
-
-    /** Test recursive array with Model() and defineField() */
-    array = arrayOf([User, numberDef], "string");
-    array = array();
-    array.push([user_data, 1], 'a');
 });
 
 test('model()', () => {
@@ -103,8 +90,8 @@ test('model()', () => {
     User.define({
         'name': defineField().instance('string')
     })
-    const userModel = model(User);
+    const userValidator = model(User);
     const user_data = {"name": "User Name"};
-    let user = userModel(user_data);
-    expect(() => { user = userModel({"name": 1}) }).toThrow(InitError);
+    let user = userValidator(user_data);
+    expect(() => { user = userValidator({"name": 1}) }).toThrow(ValidateError);
 });

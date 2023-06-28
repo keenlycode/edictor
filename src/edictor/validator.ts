@@ -22,31 +22,25 @@ export class ArrayOf extends _ArrayOf {
         super(...validators);
     }
 
-    _validate(value: any, validator: any): void|ArrayOf {
+    _validate(value: any, validator: any) {
         if (validator instanceof DefineField) {
             validator = validator.field();
             validator.validate(value);
-            return value;
+            return;
         }
         if (validator.prototype instanceof Model) {
-            new validator(value);
-            return value;
+            validator.validate(value);
+            return;
         }
-        if (validator instanceof Array) {
-            util.assert(value instanceof Array,
-                `value must be instance of Array`)
-            const array = new ArrayOf(...validator);
-            array.push(...value);
-            return array;
-        }
+
         return super._validate(value, validator);
     }
 
-    validator_to_name(validator: ValidatorType) {
+    validator_to_string(validator: ValidatorType) {
         if (validator instanceof DefineField) {
             return `defineField({name: ${validator.field().name}})`;
         }
-        return super.validator_to_name(validator);
+        return super.validator_to_string(validator);
     }
 }
 
@@ -78,7 +72,7 @@ export const instance = (...types: Array<string|util.Class>) => {
 
 /** Validate with Regular Expression */
 export const regexp = (regexp_: RegExp) => {
-    const wrapper = (value: 'string', regexp_: RegExp): void => {
+    const wrapper = (value: string, regexp_: RegExp): void => {
         if (!(regexp_.test(value))) {
             throw new ValidationError(
                 `"${value}" doesn't pass Regular Expression => ${regexp_}`
@@ -116,30 +110,29 @@ export const apply = (func: Function): any => {
 }
 
 
-/** Check if value is array of something. */
+/** Check if value is an array of something. */
 export const arrayOf = (
         ...validators: Array<ValidatorType|DefineField|Model>
-    ) : (values) => ArrayOf => {
+    ) => {
     /**  Return ArrayOf instance which can validate it's array. */
     const wrapper = (
-            values,
+            values: Array<any>,
             validators: Array<ValidatorType|DefineField|Model>
-        ): ArrayOf => {
+        ) => {
         if (!(values instanceof Array)) {
             throw new ValidationError(`${values} is not iterable`);
         };
         const array = new ArrayOf(...validators);
-        array.push(...values);
-        return array;
+        array.set(...values);
     }
 
-    return function arrayOf (values=[]): ArrayOf { return wrapper(values, validators) };
+    return function arrayOf(values=[]) { return wrapper(values, validators) };
 }
 
 /** Validate that value pass `model_class` validation */
 export const model = (model_class: typeof Model) => {
-    const wrapper = (value, model_class: typeof Model): Model => {
-        return new model_class(value);
+    const wrapper = (value: Object, model_class: typeof Model) => {
+        model_class.validate(value);
     }
-    return (value) => { return wrapper(value, model_class) };
+    return function model(value) { return wrapper(value, model_class) };
 }

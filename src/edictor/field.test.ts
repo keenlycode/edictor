@@ -156,7 +156,6 @@ describe('DefineField Unit Test', () => {
         expect(defineField1.validators[0].name).toEqual('arrayOf');
         const field = defineField1.field();
         let result = field.validate(['a', 'b']);
-        expect(result).toBeInstanceOf(ArrayOf);
         expect(result).toEqual(['a', 'b']);
         expect(() => {field.validate([1, 2])}).toThrow(ValidateError);
     })
