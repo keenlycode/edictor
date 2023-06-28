@@ -319,9 +319,9 @@ export class Model {
         return proxy;
     }
 
-    /** Return a new native object with same data */
+    /** Return object data */
     object(): Object {
-        return JSON.parse(JSON.stringify(this));
+        return {...this};
     }
 
     /** Return JSON */
