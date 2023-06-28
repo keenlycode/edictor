@@ -13,34 +13,21 @@ describe('Usage', () => {
     test('Normal Usage', () => {
         let array = new ArrayOf('string', 'number');
         array.set('0', 1);
+        try {
+            array.set(true, 1, true);
+        } catch (error) { // Error at index: 0,2
+            expect(Object.keys(error.errorInfo)).toEqual(['0', '2']);
+        }
 
-        // /** Test recursive array */
-        // array = arrayOf([numberDef]);
-        // array = array();
-        // array[0] = [1];
-        // array[0].push(2);
-        // expect(array).toEqual([[1,2]]);
-        // expect(() => array[0].push([true])).toThrow(PushError);
-    
-        // /** Test with Model() */
-        // class User extends Model {};
-        // User.define({
-        //     'name': defineField().instance('string')
-        // })
-        // const user_data = {"name": "User Name"};
-        // array = arrayOf(User);
-        // let user = new User(user_data);
-        // array = array([user]);
-        // expect(array[0].object()).toEqual(user.object());
+        // High order array
+        array = new ArrayOf(['string', 'number'], 'boolean');
+        array.set([0, 1, '2'], false, true);
 
-        // /** Test with Model() by native object */
-        // array[0] = user_data;
-        // expect(array[0]).toEqual(user_data);
-
-        // /** Test recursive array with Model() and defineField() */
-        // array = arrayOf([User, numberDef], "string");
-        // array = array();
-        // array.push([user_data, 1], 'a');
+        try {
+            array.set(true, [0, 1, false]);
+        } catch (error) {
+            expect(Object.keys(error.errorInfo)).toEqual(['1']);
+        }
     });
 
     test('High order constrains', () => {
