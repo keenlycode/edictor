@@ -27,7 +27,7 @@ describe('Usage', () => {
         try {
             array.set(true, [0, 1, false]);
         } catch (error) {
-            console.error(error.errorInfo);
+            // console.error(error.errorInfo);
             expect(Object.keys(error.errorInfo)).toEqual(['1']);
         }
     });
@@ -92,8 +92,8 @@ describe('class ArrayOf', () => {
     })
 
     test('ArrayOf().validators_to_string()', () => {
-        let validators_ = array.validators_to_string();
-        validators_ = JSON.parse(validators_);
+        let validators_: any = array.validators_to_string();
+        validators_ = validators_.replaceAll('"', '').split(',');
         expect(validators_).toEqual(validators);
     })
 
