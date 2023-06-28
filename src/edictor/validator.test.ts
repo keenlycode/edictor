@@ -55,12 +55,11 @@ test('regexp', () => {
     expect(() => {email('user@example')}).toThrow(ValidationError);
 })
 
-test('arrayOf()', () => {
+test.only('arrayOf()', () => {
     let arrayDef;
-    const values = ['a', 'b', true];
     arrayDef = arrayOf('string', 'boolean');
+    arrayDef(['a', 'b', true]);
     expect(() => arrayDef(1)).toThrow(ValidationError);
-    arrayDef(values);
 
     /** Test with defineField() */
     const numberDef = defineField({name: 'number'}).instance('number');
@@ -68,35 +67,16 @@ test('arrayOf()', () => {
     arrayDef([1,2]);
     expect(() => {arrayDef([true])}).toThrow(SetError);
 
-    /** Move tests below to array.test.ts */
+    /** Test with Model */
+    class User extends Model {};
+    User.define({
+        'name': defineField().instance('string')
+    })
+    arrayDef = arrayOf(User);
+    const user1 = new User({name: 'user-1'});
+    const user2 = new User({name: 'user-2'});
+    arrayDef([user1, user2]);
 
-    // /** Test recursive array */
-    // array = arrayOf([numberDef]);
-    // array = array();
-    // array[0] = [1];
-    // array[0].push(2);
-    // expect(array).toEqual([[1,2]]);
-    // expect(() => array[0].push([true])).toThrow(PushError);
- 
-    // /** Test with Model() */
-    // class User extends Model {};
-    // User.define({
-    //     'name': defineField().instance('string')
-    // })
-    // const user_data = {"name": "User Name"};
-    // array = arrayOf(User);
-    // let user = new User(user_data);
-    // array = array([user]);
-    // expect(array[0].object()).toEqual(user.object());
-
-    // /** Test with Model() by native object */
-    // array[0] = user_data;
-    // expect(array[0]).toEqual(user_data);
-
-    // /** Test recursive array with Model() and defineField() */
-    // array = arrayOf([User, numberDef], "string");
-    // array = array();
-    // array.push([user_data, 1], 'a');
 });
 
 test('model()', () => {

@@ -170,7 +170,7 @@ export class ArrayOf extends Array {
         }
         
         throw new ValidationError(
-            `Expect (${this.validators_to_string(validators)})`
+            `Expect ArrayOf(${this.validators_to_string(validators)})`
         )
     }
 
@@ -179,12 +179,12 @@ export class ArrayOf extends Array {
         const names = validators.map((validator)  => {
             return this.validator_to_string(validator);
         })
-        return `[${names}]`;
+        return `${names}`;
     }
 
     validator_to_string(validator: ValidatorType): string {
         if (validator instanceof Array) {
-            return `${this.validators_to_string(validator)}`;
+            return `[${this.validators_to_string(validator)}]`;
         }
         if (is_function(validator)) {
             return `${(validator as Function).name}()`;

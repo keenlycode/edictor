@@ -16,6 +16,7 @@ describe('Usage', () => {
         try {
             array.set(true, 1, true);
         } catch (error) { // Error at index: 0,2
+            // console.error(error.errorInfo);
             expect(Object.keys(error.errorInfo)).toEqual(['0', '2']);
         }
 
@@ -26,6 +27,7 @@ describe('Usage', () => {
         try {
             array.set(true, [0, 1, false]);
         } catch (error) {
+            console.error(error.errorInfo);
             expect(Object.keys(error.errorInfo)).toEqual(['1']);
         }
     });
