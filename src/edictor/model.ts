@@ -329,6 +329,7 @@ export class Model {
         return JSON.stringify(this);
     }
 
+    /** Update data */
     update(data: Object): void {
         const class_ = this.constructor as typeof Model;
         try {
