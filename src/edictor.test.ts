@@ -79,5 +79,4 @@ test('Usage Test', () => {
 
     edictor['author'] = author;
     edictor['contributors'].push(contributor);
-    new Package(edictor.object());
 })

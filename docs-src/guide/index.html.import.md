@@ -22,7 +22,12 @@ import { Model, defineField } from 'url/to/edictor';
 
 <div id="import.node" class="link-padding-top" style="margin-top: -4rem;"></div>
 
-<h3 style="margin-top: 2rem;">Node (ES6+ & CommonJS)</h3>
+<h3 style="margin-top: 2rem;">Node (ES6+ & CommonJS) / Build Tools</h3>
+
+<el-title-blockquote>Note</el-title-blockquote>
+> `Edictor` is built with [**Parcel**](https://parceljs.org/). However, it
+> should be compatible with any Javascript bulid tools.
+<br>
 
 **ES Module (Preferred)**
 
@@ -30,6 +35,7 @@ import { Model, defineField } from 'url/to/edictor';
 ```js
 import { Model, defineField } from 'edictor';
 ```
+<br>
 
 **CommonJS Module**
 

@@ -2,11 +2,16 @@
 
 ## Nesting Data
 
-**Package** schema contains nesting data in the field named **author**
+From the schema definition, **Package** contains nesting data in the field
+named **author**.
 
 <el-title-code>Javascript / ES6+</el-title-code>
 ```js
-Package.define({
-    author: defineField().model(People)
+const authur = new People({
+    name: 'author',
+    email: 'author@example.com'
 })
+package['author'] = author; // valid
+package['author'] = {...author}; // valid
+package['author']['url'] = 'url'; // invalid, throws errors.
 ```

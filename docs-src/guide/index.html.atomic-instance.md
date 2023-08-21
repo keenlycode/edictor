@@ -31,22 +31,12 @@ package['author'] = 'someone';
     style="margin-top: -3rem;">
 <div>
 
-### Retrieve Data Object
+### Retrieve Data
 
 <el-title-code>Javascript / ES6+</el-titile-code>
 ```js
-const packageData = package.object();
-```
-
-<div id="atomic-instance.retrieve-json" class="link-padding-top"
-    style="margin-top: -3rem;">
-<div>
-
-### Retrieve JSON
-
-<el-title-code>Javascript / ES6+</el-titile-code>
-```js
-const packageJSON = package.json();
+const packageData = {...package}; // data object
+const packageJSON = JSON.stringify(package); // data in JSON
 ```
 
 <div id="atomic-instance.atomic-update" class="link-padding-top"
@@ -54,25 +44,18 @@ const packageJSON = package.json();
 <div>
 
 ### Atomic Update
-<el-title-code>Typescript declaration</el-titile-code>
-```ts
-class Model {
-    update(data: Object): void;
-}
-```
 
-`Model().update(data)` updates the `data` into instance
+`model.update` updates the `data` into instance
 only if the whole `data` is valid, in the other hand,
 it will throws errors and reject new data if it's invalid.
 
 <el-title-code>Javascript / ES6+</el-title-code>
 ```js
+import { update } from 'edictor';
 try {
-    edictor.update({
-        name: "{ Edictor }",
+    update(package, {
+        name: "example",
         version: "a.b.c" // Validation error
     })
 } catch (e) {};
-
-edictor.object(); // Return same data without any update.
 ```
