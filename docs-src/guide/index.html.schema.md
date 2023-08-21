@@ -1,21 +1,10 @@
-<div id="Schema" class="link-padding-top"></div>
+<div id="validations" class="link-padding-top"></div>
 
 ## Schema
 
-<div id="verifications.1-schema-validation" class="link-padding-top"
+<div id="validations.1-schema-validation" class="link-padding-top"
     style="margin-top: -4rem;">
 <div>
-
-### 1. Create data from schemas.
-
-<el-title-code>Javascript / ES6+</el-title-code>
-```js
-const pk = Package.data({
-    'name': 'edictor',
-    'version': '0.4.0',
-    'homepage': 'https://nitipit.github.io/edictor/'
-})
-```
 
 ### 1. Schema Validation
 <el-title-code>Typescript declaration</el-titile-code>
@@ -32,14 +21,14 @@ data with the schema, expected to throw errors if data is invalid.
 ```js
 // Data is valid
 Package.validate({
-    name: 'test-package',
+    name: 'example',
     version: '0.0.1'
 })
 
 // Data is invalid, throw errors.
 Package.validate({
-    version: '0.4.0',
-    homepage: 'https://nitipit.github.io/edictor/'
+    version: '0.0.1',
+    homepage: 'http://example.com'
 })
 ```
 
@@ -48,7 +37,7 @@ Package.validate({
 Uncaugth ValidateError ...
 ```
 
-<div id="verifications.2-partial-validation" class="link-padding-top"
+<div id="validations.2-partial-validation" class="link-padding-top"
     style="margin-top: -3rem;">
 <div>
 
@@ -68,7 +57,7 @@ some of schema fields to validate data.
 <el-title-code>Javascript / ES6+</el-titile-code>
 ```js
 Package.partial({
-    'version': '0.4.0'
+    'version': '0.0.1'
 })
 ```
 

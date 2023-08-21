@@ -318,29 +318,17 @@ export class Model {
 
         return proxy;
     }
+}
 
-    /** Return object data */
-    object(): Object {
-        return {...this};
-    }
-
-    /** Return JSON */
-    json(): string {
-        return JSON.stringify(this);
-    }
-
-    /** Update data */
-    update(data: Object): void {
-        const class_ = this.constructor as typeof Model;
-        try {
-            new class_({ ...this.object(), ...data });
-        } catch (error) {
-            if (error instanceof ModelError) {
-                throw new UpdateError().setError(error.error);
-            }
-        }
-        for (const key in data) {
-            this[key] = data[key];
+/** Atomic update data to object */
+export function update(obj: Model, data: Object): void {
+    const class_ = obj.constructor as typeof Model;
+    try {
+        new class_({...obj, ...data});
+    } catch (error) {
+        if (error instanceof ModelError) {
+            throw new UpdateError().setError(error.error);
         }
     }
+    Object.assign(obj, data);
 }

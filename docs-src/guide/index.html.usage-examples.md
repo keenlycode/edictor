@@ -8,15 +8,16 @@
 ```js
 /** Schema validation */
 Package.validate({
-    'name': 'edictor',
-    'version': '0.4.0',
-    'homepage': 'https://nitipit.github.io/edictor/'
+    'name': 'example',
+    'version': '0.0.1',
+    'homepage': 'http://example.com'
 })
 
 /** Atomic Instance */
 const pk = new Package({
-    'name': 'edictor', // Required field
+    'name': 'example', // Required field
+    'version': '0.0.1' // Required field
 })
 
-pk['version'] = '0.4.0';
+pk['version'] = '0.0.2';
 ```

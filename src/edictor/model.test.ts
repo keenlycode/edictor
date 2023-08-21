@@ -4,7 +4,8 @@ import {
     InitError,
     UpdateError,
     InputDataError,
-    Model
+    Model,
+    update
 } from './model';
 import {
     defineField,
@@ -137,30 +138,16 @@ describe('class Model', () => {
         expect({...user}).toEqual(user);
     });
 
-    test('Model().object()', () => {
-        let user = new User({
-            "name": "Firstname Lastname"
-        });
-        expect(user.object()).toEqual({...user});
-    })
-
-    test('Model().json()', () => {
-        let user = new User({
-            "name": "Firstname Lastname"
-        });
-        expect(JSON.parse(user.json())).toEqual(user);
-    })
-
-    test('Model().update()', () => {
+    test('Atomic update', () => {
         let user = new User({
             "name": "First Last"
         });
-        expect(() => { user.update({name: "test", phone: 1}) })
+        expect(() => { update(user, {name: "test", phone: 1}) })
             .toThrow(UpdateError);
 
         expect(user).toEqual({name: "First Last", enable: false});
 
-        user.update({name: "test", phone: "+66 111 1111"});
+        update(user, {name: "test", phone: "+66 111 1111"});
         expect(user).toEqual({name: "test", phone: "+66 111 1111", enable: false});
     })
 })
