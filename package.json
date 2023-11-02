@@ -33,7 +33,7 @@
         "babel-jest": "^29.5.0",
         "color": "^4.2.3",
         "edictor": "file:./",
-        "gadjet": "file:../gadjet",
+        "gadjet": "^1.0.4",
         "highlight.js": "^11.8.0",
         "jest": "^29.5.0",
         "parcel": "^2.8.3",

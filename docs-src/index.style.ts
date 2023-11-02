@@ -65,13 +65,15 @@ a {
     }
 
     button[el="guide"] {
-        ${bgColorInt(theme.purple2)}
+        ${bgColorInt({color: theme.purple2})}
     }
 
     button {
         display: flex;
         margin: 0.5rem;
         margin-top: 2rem;
+        padding-top: 0.3em;
+        padding-bottom: 0.5em;
         el-icon {
             margin-right: 0.2rem;
         }

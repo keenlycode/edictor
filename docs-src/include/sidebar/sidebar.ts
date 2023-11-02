@@ -1,5 +1,5 @@
 import Color from 'color';
-import { Sidebar, aspectRatio, bgColor, lift } from 'gadjet/src/gadjet';
+import { Sidebar, aspectRatio, bgColor, bgColorInt, lift } from 'gadjet/src/gadjet';
 import { Menu as SidebarMenu, ButtonPin as SidebarButton } from 'gadjet/src/gadjet';
 import { theme } from '../../_color';
 
@@ -25,6 +25,10 @@ SidebarMenu.tagStyle(`
     padding-bottom: 5rem;
     font-size: 0.85rem;
     a {
+        ${bgColorInt({
+            color: new Color(theme.purple3).lighten(0.5).toString(),
+            lighten: -0.2
+        })}
         text-decoration: none;
     }
 `)
@@ -36,14 +40,6 @@ Sidebar.tagStyle({
 });
 
 Sidebar.tagStyle(`
-    div[el="content"] {
-        width: 90%;
-        max-width: 300px;
-        height: auto;
-        max-height: 100vh;
-        border-bottom-right-radius: 1em;
-        ${lift({level: 3})}
-    }
     div[el="header"] {
         display: flex;
         flex-wrap: wrap;
@@ -63,6 +59,14 @@ Sidebar.tagStyle(`
         el-icon {
             font-size: 3em;
         }
+    }
+    div[el="content"] {
+        width: 90%;
+        max-width: 300px;
+        height: auto;
+        max-height: 100vh;
+        border-bottom-right-radius: 1em;
+        ${lift({level: 3})}
     }
 `)
 
