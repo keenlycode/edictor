@@ -10,14 +10,12 @@
 
 {% include 'include/sidebar/sidebar.html' %}
 
-<div id="guide" class="container">
+<div class="container">
     {{markdown('index.html.guide.md')}}
-    {{markdown('index.html.install.md')}}
-    {{markdown('index.html.import.md')}}
+    {{markdown('index.html.setup.md')}}
     {{markdown('index.html.define.md')}}
     {{markdown('index.html.usage-examples.md')}}
     {{markdown('index.html.schema.md')}}
     {{markdown('index.html.atomic-instance.md')}}
-    {{markdown('index.html.nesting-data.md')}}
 </div>
 {% endblock %}

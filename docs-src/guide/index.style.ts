@@ -3,14 +3,14 @@ import {
     bgColor
 } from "gadjet/src/style";
 import Color from 'color';
-import { theme } from '../_color';
+import { palette, theme } from '../_color';
 
 css`
 body {
     ${bgColor(new Color(theme.yellow).lighten(0.2).toString())}
 }
 
-#guide {
+.container {
     max-width: 850px;
     @media screen and (min-width: 1230px) {
         margin-left: calc(330px + 2vw);
@@ -19,6 +19,7 @@ body {
     @media screen and (max-width: 600px) {
         padding-top: 3rem;
     }
+
     h1 {
         margin: auto;
         text-align: center;
@@ -35,5 +36,11 @@ body {
     .link-padding-top {
         padding-top: 4rem;
     }
+}
+#guide {
+    padding-bottom: 3rem;
+    ${bgColor(palette.light)}
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
 }
 `
